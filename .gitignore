@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Screenshots de teste local
+*.png
+!docs/*.png
+
+# Node (caso adicione tooling)
+node_modules/
+package-lock.json
+
+# Python (caso use Playwright local)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Backups
+*.bak
+*~
