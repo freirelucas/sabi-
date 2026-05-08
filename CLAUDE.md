@@ -27,39 +27,46 @@ O app é uma carta afetiva pra Gabriela ("Nena"): na ficção, **Nena é a profe
 
 - **To** — protagonista, filhote sabiá-laranjeira
 - **Ben** — vizinho e amigo de To (mora no galho do lado), vão juntos pra escola. Sabiá com **topete distintivo**
-- **Caca** — colega da escola, **canarinho amarelo** (espécie diferente — variedade visual; a escola dos sabiás aceita amigos de outras espécies)
-- **Jo, Tete, Tata** — três colegas que se apresentam e contam histórias (Tete tem flor de ipê na cabeça; Tata tem fita)
-- **Didi, Toto, Todi** — personagens da história contada pelas três colegas (conjunto restritíssimo de letras D/I/T/O — pedagogicamente intencional)
-- **Nena** — **professora dos sabiás**, sabiá mais velha com óculos. Aniversariante (revelado como surpresa pela turma na cena 8). Tipo de personagem no código: `'nena'`.
-- **Bento** — filho do Lucas (mundo real, não personagem do app). Revelação na cena 7: BENTO = To + Ben.
+- **Time de ping-pong** (rápidos):
+  - **Caca** — canarinho amarelo (espécie diferente)
+  - **Jo** — sabiá sem acessório, peito mais escuro
+  - **Tete** — sabiá com flor de ipê na cabeça
+- **Time de xadrez** (calmos):
+  - **Tata** — sabiá com fita na cabeça
+  - **Tito** — sabiá com **penagem cinza-oliveira** (introduzido na v5)
+  - **Lila** — sabiá com **penagem rosa-violeta** + flor (introduzido na v5)
+- **Nena** — **professora dos sabiás**, sabiá mais velha com óculos. Aniversariante (surpresa silenciosa no E6). Tipo no código: `'nena'`.
+- **Bento** — filho do Lucas (mundo real, não personagem do app). Easter-egg no antigo `roda-apresentacao` (legado).
 
-### Roteiro — 6 cenas (v4)
-
-Conceito: primeiro dia de To e Ben na escola. Aula sobre SOS e nomes da turma.
+### Roteiro — 6 episódios (v5)
 
 ```
-0. Amanhecer no ninho       To acorda, primeiro dia, canto sabiá
-1. Encontro com Ben         Vão juntos pra escola
-2. Chegada na escola        Nena recebe Ben e To, anuncia o tema
-                            da aula: "SOS e os nomes de todo mundo"
-3. Aula SOS                 Nena ensina ... --- ... (3 curtos / 3 longos
-                            / 3 curtos). Botão "ouvir SOS" + brincar
-                            com · / – livre.
-4. Roda de apresentação     7 personagens em círculo (Nena + Caca + Jo
-                            + Tete + Tata + To + Ben). Sequência guiada
-                            por seta. Cada toque na criança ativa toca
-                            "EU SOU [nome]" + SOS. Easter-egg quando
-                            Ben (último) fala: overlay "Ben + To = BENTO".
-5. Final: PARABÉNS NENA     Toda turma canta. Botão volta pra landing.
+E1. primeiro-dia    Lógica geral dos toques. Nena recebe Ben e To,
+                    explica que tudo no Morse é · ou –.
+E2. time-pingpong   Caca, Jo, Tete (rápidos). Cada um se apresenta;
+                    "rebatida" de palma antes do nome em Morse.
+E3. time-xadrez     Tata, Tito, Lila (calmos). Mesmo molde, mas
+                    BPM reduzido pra 70% durante o episódio.
+E4. futebol-recap   Os 6 amigos numa grade 3×2. Botão "ouvir a
+                    turma" toca cada nome em ordem.
+E5. sos-licao       SOS é pedido de ajuda — confiança, seriedade.
+                    Reusa o renderer aula-sos com fala diferente.
+E6. segredo         Turma sussurra sem Nena (8 personagens em
+                    círculo). Botão "ensaiar baixinho" toca
+                    PARABENS NENA. Botão "Nena chegou!" mostra
+                    overlay celebrando + confete.
 ```
 
-Tipos de ação na ROTEIRO:
-- `ouvir-canto`: cena 0
-- `aprender-letras`: cena 1 (T,O,B,E,N)
-- `aula-sos`: cena 3 (SOS visual + botões)
-- `roda-apresentacao`: cena 4 (círculo + sequência guiada)
-- `parabens-nena`: cena 5
-- `null`: cena 2 (só narrativa)
+Tipos de ação ativos:
+- `aprender-toques` (E1): compasso + 4 velocidades + botões · / –
+- `time-apresentacao` (E2/E3): 3 personagens em fileira, sequência guiada
+- `recap-nomes` (E4): grade + botão "ouvir todos"
+- `aula-sos` (E5): 3 grupos visuais + ouvir SOS + brincar
+- `segredo-parabens` (E6): círculo de turma + ensaiar + Nena chegou
+
+Tipos legados (renderers preservados como dead code): `ouvir-canto`,
+`aprender-letras`, `apresentar-nomes`, `curto-longo`, `revelar-bento`,
+`surpresa-letras`, `roda-apresentacao`, `parabens-nena`, `final`.
 
 ### Palavras por letra (modo letra-por-letra)
 
@@ -91,15 +98,31 @@ Nota: o personagem **Jo** (uma das três colegas na história) continua sendo Jo
 
 2. **Síntese sabiá** (fallback): duas funções específicas — `playSabiaPontoSintetico` (chirp ascendente em G5) e `playSabiaTracoSintetico` (pio descendente G5→A4 com vibrato 7Hz). Auditivamente distintas. Usadas se o decode do sample falhar.
 
-3. **WebAudioFont via CDN** (legacy, opcional): violão acústico steel (~118 KB) + Bird Tweet (~9 KB). Carregamento em background, fallback pra síntese se CDN falhar. O sabiá-laranjeira agora vem do sample real, mas o WebAudioFont continua sendo a fonte do violão.
+3. **WebAudioFont via CDN**: preset **0260_Stratocaster_sf2_file** (sample real de Stratocaster) pra **guitarra**, + Bird Tweet pro sabiá fallback. Antes usava 0240 (acoustic steel). Lucas testou 0270 (Electric Clean) e reportou "horroroso", então a v5 trocou pra Stratocaster real. Carregamento em background, fallback pra síntese se CDN falhar.
+
+4. **Karplus-Strong para guitarra** (síntese fallback v5): quando WebAudioFont não carrega ou não está disponível, `playViolaoSintetico` gera o som via algoritmo Karplus-Strong — buffer PCM offline com loop de delay + lowpass + decay. Soa muito mais como corda real do que oscillator+filter (que era a abordagem da v4 e Lucas reportou ruim). Buffer cacheado por nota MIDI pra evitar recomputar.
 
 Loader inicial mostra "o sabiá está afinando o bico…". Timeout de 6s por arquivo. Botão "continuar com som simples" aparece após 4s.
 
 **Conceito de pulso (v4)**: BPM agora é semínima por minuto. Ponto = semicolcheia (1/4 de beat). Espaçamentos seguem o padrão Morse 1:3:7. Default 120 BPM (range 60-180). Cabeça de compasso visual (`.compasso`) aparece nas cenas de Morse pulsando no tempo do BPM, dando referência rítmica visual.
 
+### Sistema de velocidade (v5)
+
+4 níveis nomeados (`VELOCIDADES` no código):
+- 🐢 **tartaruga** — 50 BPM
+- 🚶 **menino**    — 75 BPM (default)
+- 🐰 **coelho**    — 110 BPM
+- 🐆 **guepardo**  — 160 BPM
+
+Substituiu o slider contínuo da v4 (Lucas reportou que 120 BPM ficava
+rápido demais e queria níveis claros pra criança).
+
+`criarSeletorVelocidade(onChange)` é a função reusável — aparece no
+teclado, na cena E1 (aprender-toques) e na E5 (aula-sos). Estado
+persiste em `localStorage`.
+
 ### Sistema de loops
 
-- **Slider BPM**: 21 valores fixos de 40 a 100, step 3 (`VALORES_BPM` no código)
 - **Repetições**: chips 1× / 2× / 4× / 8× (mutuamente exclusivos)
 - **Loop infinito**: toggle separado; quando ativo, repetições ficam desabilitadas
 
@@ -174,4 +197,6 @@ Se Lucas pedir uma nova mudança:
 - **v2 narrativa** (segunda sessão) — pivot pra história em 9 cenas. Personagens To, Ben, Caca, Jo, Tete, Tata, Professor. Áudio: WebAudioFont via CDN. Final inicial: "BENTO = Ben + To".
 - **v2 final-aniversário** (sessão anterior) — três mudanças do Lucas: (1) J→Judo no vocabulário (não Jo); (2) cena 3 da aula explica que é boas-vindas pro Ben+To e aniversário da Nena; (3) cena final vira PARABÉNS NENA, com o nome dela ecoando 4 vezes na sequência Morse final.
 - **v3 Nena-professora** — pivot do arco: Nena deixa de ser "mãe do Bento aniversariante invisível" e vira a **professora dos sabiás**. O aniversário é revelado como surpresa da turma com cena dedicada de letras (PA+RA+BE+NS+NE+NA).
-- **v4 SOS + roda + 3 áreas separadas** (atual) — reformulação narrativa grande: a história agora é sobre o **primeiro dia** de To e Ben, com a aula focada em **SOS** e nos **nomes da turma**. ROTEIRO compactado pra 6 cenas (era 10). Cena de apresentações vira **roda interativa em círculo** — 7 personagens (Nena + 6 crianças) dispostos em ângulos via cálculo polar; sequência guiada por seta. BENTO=Ben+To vira easter-egg overlay quando o último (Ben) fala. Landing redesenhada: 3 portas claras (História / Jogo das letras / Teclado livre), final da história volta pra landing (sem auto-nav pro teclado). PALAVRAS_RAPIDAS ganha SOS e os nomes individuais (JO, TETE, TATA).
+- **v4 SOS + roda + 3 áreas separadas** — reformulação narrativa grande: a história agora é sobre o **primeiro dia** de To e Ben, com a aula focada em **SOS** e nos **nomes da turma**. ROTEIRO compactado pra 6 cenas (era 10). Cena de apresentações vira **roda interativa em círculo** — 7 personagens (Nena + 6 crianças) dispostos em ângulos via cálculo polar; sequência guiada por seta. BENTO=Ben+To vira easter-egg overlay quando o último (Ben) fala. Landing redesenhada: 3 portas claras (História / Jogo das letras / Teclado livre), final da história volta pra landing (sem auto-nav pro teclado). PALAVRAS_RAPIDAS ganha SOS e os nomes individuais (JO, TETE, TATA).
+- **v5 técnico** — bumbo + baqueta SVG no lugar da bolinha que andava de lado a lado. Toggle 🥁 (default mudo) liga tique audível. Violão → guitarra: preset 0240 → 0270 → **0260 Stratocaster** (Lucas reportou 0270 horroroso). UX dos botões padronizada (emojis em todos os "próximo", `.botao.grande` no tocar do teclado). Teclado mobile mais espaçado.
+- **v5 narrativo + Karplus-Strong + 4 velocidades** (atual) — reformulação completa em 6 episódios: E1 primeiro-dia (lógica geral), E2 time de ping-pong (Caca + Jo + Tete), E3 time de xadrez (Tata + **Tito** + **Lila** — 2 personagens novos), E4 futebol-recap (todos juntos), E5 SOS-lição (tom mais sério, sobre confiança), E6 segredo (turma sussurra preparando surpresa pra Nena). 4 ações novas: `aprender-toques`, `time-apresentacao`, `recap-nomes`, `segredo-parabens`. Síntese da guitarra reescrita em **Karplus-Strong** (pluck de string realista). Slider BPM substituído por **4 velocidades nomeadas** (tartaruga / menino / coelho / guepardo) — default = menino (75 BPM, era 120). Seletor de velocidade aparece no teclado e nas cenas com pulso.

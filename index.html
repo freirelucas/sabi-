@@ -258,6 +258,9 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .cena-fundo.celebracao {
   background: linear-gradient(180deg, #FFE4B8 0%, #F4D35E 40%, #E8A45C 100%);
 }
+.cena-fundo.campinho {
+  background: linear-gradient(180deg, #DCE8EE 0%, #B5D9B5 40%, #7AB87A 100%);
+}
 
 /* Sol/Lua decorativo no fundo da cena */
 .cena-sol {
@@ -273,6 +276,12 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-size: 24px;
   opacity: 0.6;
   z-index: 1;
+}
+.cena-deco-emoji {
+  position: absolute; top: 18px; right: 22px;
+  font-size: 32px;
+  z-index: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.18));
 }
 
 .cena-palco {
@@ -395,6 +404,96 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 @keyframes rodaAtivoPulsa {
   0%, 100% { box-shadow: 0 0 0 4px rgba(232,164,92,0.35), var(--sombra-media); }
   50%      { box-shadow: 0 0 0 10px rgba(232,164,92,0.18), var(--sombra-media); }
+}
+
+/* ===== TIME-APRESENTACAO (E2 ping-pong / E3 xadrez) — 3 em fileira ===== */
+.time-fileira {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  margin: 10px auto 6px;
+}
+.time-slot {
+  width: 92px; height: 110px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  background: white;
+  border: 2px solid var(--marrom-claro);
+  border-radius: 16px;
+  padding: 6px 4px 8px;
+  box-shadow: var(--sombra-suave);
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s, opacity 0.2s;
+}
+.time-slot:disabled { opacity: 0.55; cursor: default; }
+.time-slot.ativo {
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 4px rgba(232,164,92,0.35), var(--sombra-media);
+  animation: rodaAtivoPulsa 1.2s ease-in-out infinite;
+}
+.time-slot.falou {
+  background: var(--papel-fundo);
+  border-color: var(--folha);
+  opacity: 0.7;
+}
+.time-slot:active { transform: scale(0.94); }
+.time-slot-nome {
+  font-family: var(--display); font-weight: 800;
+  font-size: 13px; color: var(--marrom);
+  margin-top: 4px;
+}
+.time-slot.falou .time-slot-nome::before { content: '✓ '; color: var(--folha); }
+.time-fileira.pingpong .time-slot.ativo { border-color: var(--laranja); }
+.time-fileira.xadrez   .time-slot.ativo {
+  border-color: var(--re-violao);
+  box-shadow: 0 0 0 4px rgba(184,134,159,0.35), var(--sombra-media);
+}
+@media (max-width: 380px) {
+  .time-slot { width: 80px; height: 100px; }
+}
+
+/* ===== RECAP-NOMES (E4 futebol) — grade 3×2 ===== */
+.recap-grade {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 360px;
+  margin: 10px auto;
+}
+.recap-item {
+  display: flex; flex-direction: column; align-items: center;
+  background: white;
+  border: 2px solid var(--marrom-claro);
+  border-radius: 14px;
+  padding: 8px 4px;
+  min-height: 92px;
+  box-shadow: var(--sombra-suave);
+  transition: transform 0.15s, border-color 0.18s, box-shadow 0.18s;
+}
+.recap-item:active { transform: scale(0.94); }
+.recap-item.ativo {
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 4px rgba(232,164,92,0.35), var(--sombra-media);
+  animation: rodaAtivoPulsa 1s ease-in-out infinite;
+}
+.recap-nome {
+  font-family: var(--display); font-weight: 800;
+  font-size: 14px; color: var(--marrom);
+  margin-top: 4px;
+}
+
+/* ===== SEGREDO (E6) — turma em círculo, modo sussurro ===== */
+.roda-circulo.segredo {
+  background: radial-gradient(closest-side, rgba(216,200,255,0.35), transparent 75%);
+}
+.roda-circulo.segredo.sussurrando {
+  animation: sussurroPulsa 0.9s ease-in-out infinite;
+}
+@keyframes sussurroPulsa {
+  0%, 100% { background: radial-gradient(closest-side, rgba(216,200,255,0.35), transparent 75%); }
+  50%      { background: radial-gradient(closest-side, rgba(216,200,255,0.6),  transparent 70%); }
+}
+.turma-segredo {
+  cursor: default;
+  opacity: 0.95;
+  background: white;
+  border: 2px solid var(--marrom-claro);
 }
 .roda-status {
   text-align: center;
@@ -649,6 +748,41 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   background: var(--laranja);
   color: white;
   border-color: var(--laranja);
+}
+
+/* ===== SELETOR DE VELOCIDADE — 4 chips nomeados ===== */
+.velocidade-seletor {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  justify-content: center;
+  margin: 6px auto;
+  flex: 1; max-width: 100%;
+}
+.chip-velocidade {
+  display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 64px; min-height: 56px;
+  padding: 6px 10px;
+  background: white;
+  border: 2px solid var(--marrom-claro);
+  border-radius: 14px;
+  font-family: var(--display); font-weight: 700;
+  color: var(--marrom);
+  box-shadow: var(--sombra-suave);
+  cursor: pointer;
+  transition: transform 0.1s, background 0.15s, border-color 0.15s;
+  line-height: 1.1;
+}
+.chip-velocidade:active { transform: scale(0.93); }
+.chip-velocidade.ativo {
+  background: var(--laranja);
+  border-color: var(--laranja-vivo);
+  color: white;
+  box-shadow: 0 0 0 3px rgba(232,164,92,0.25), var(--sombra-media);
+}
+.chip-vel-emoji { font-size: 22px; line-height: 1; }
+.chip-vel-nome  { font-size: 11px; margin-top: 2px; letter-spacing: 0.02em; }
+@media (max-width: 380px) {
+  .chip-velocidade { min-width: 58px; min-height: 50px; padding: 4px 6px; }
+  .chip-vel-emoji { font-size: 19px; }
 }
 
 /* Indicador rítmico (forma da letra) */
@@ -1204,8 +1338,10 @@ const Audio = (() => {
     // 0270 = Electric Guitar Clean (GeneralUser GS soundfont). Brilhante, sustain
     // longo, sem distorção — boa pra solo nas cordas Ré4/Sol4. Antes era 0240
     // (acústico steel), que ficava abafado em volume baixo no celular.
-    const VIOLAO_URL = 'https://surikov.github.io/webaudiofontdata/sound/0270_GeneralUserGS_sf2_file.js';
-    const VIOLAO_NAME = '_tone_0270_GeneralUserGS_sf2_file';
+    // 0260_Stratocaster: sample real de Stratocaster (não General MIDI). Soa mais
+    // natural que 0270 (Electric Clean GUS), que Lucas reportou "artificial".
+    const VIOLAO_URL = 'https://surikov.github.io/webaudiofontdata/sound/0260_Stratocaster_sf2_file.js';
+    const VIOLAO_NAME = '_tone_0260_Stratocaster_sf2_file';
     const PASSARO_URL = 'https://surikov.github.io/webaudiofontdata/sound/01230_Aspirin_sf2_file.js';
     const PASSARO_NAME = '_tone_01230_Aspirin_sf2_file';
 
@@ -1638,59 +1774,66 @@ const Audio = (() => {
     }
   }
 
-  // ===== GUITARRA SOLO (corda solta Sol4 / Ré4) =====
-  // Síntese fallback usada quando WebAudioFont (preset 0270 Electric Clean)
-  // não carrega. Saw + harmônico 3º + leve waveshaper pra brilho de guitarra
-  // limpa, sustain longo (2.2s) pra notas cantadas em vez de violão pulsado.
-  function playViolaoSintetico(when, midiNote, dur = 2.0, vol = 0.4) {
-    when = when || now();
+  // ===== GUITARRA — KARPLUS-STRONG (corda solta Sol4 / Ré4) =====
+  // Síntese de string pluck via Karplus-Strong: PCM gerado offline com loop
+  // de delay + filtro lowpass que decai a cada iteração. Soa muito mais como
+  // corda real do que oscillator+filter (que Lucas reportou "horroroso"):
+  // ataque transiente correto, harmônicos naturais, decay logarítmico.
+  // Buffer pre-gerado é cacheado por nota MIDI pra evitar recomputar.
+  const _ksCache = {};
+  function _gerarKS(midiNote, dur, sr) {
     const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
+    const len = Math.round(sr * dur);
+    const buf = new Float32Array(len);
 
-    // Fundamental: sawtooth com leve detune pra encorpar
-    const osc = ctx.createOscillator();
-    osc.type = 'sawtooth';
-    osc.frequency.value = freq;
-    osc.detune.setValueAtTime(-4, when);
-    osc.detune.linearRampToValueAtTime(0, when + 0.06);
+    // Tamanho do delay = sr/freq (período fundamental em amostras)
+    const delayLen = Math.round(sr / freq);
+    const delay = new Float32Array(delayLen);
 
-    // Filtro com Q alto: faz o pluck "abrir" e voltar (lembra captador)
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(freq * 8, when);
-    filter.frequency.exponentialRampToValueAtTime(freq * 2.5, when + dur);
-    filter.Q.value = 3.5;
-
-    // Waveshaper sutil pra adicionar brilho harmônico (sem distorcer demais)
-    const shaper = ctx.createWaveShaper();
-    const curve = new Float32Array(2048);
-    for (let i = 0; i < 2048; i++) {
-      const x = (i / 2048) * 2 - 1;
-      // tanh suave: drive baixo, mantém timbre limpo mas adiciona harmônicos
-      curve[i] = Math.tanh(x * 1.6);
+    // Excitação: ruído branco com pequeno fade-in pra evitar click forte
+    for (let i = 0; i < delayLen; i++) {
+      const fade = Math.min(1, i / 40);
+      delay[i] = (Math.random() * 2 - 1) * fade;
     }
-    shaper.curve = curve;
 
+    // Loop principal: a cada amostra, output do buffer atual,
+    // filtra média 2-tap (lowpass natural), aplica decay, escreve de volta
+    const decay = 0.998; // controla sustain (mais alto = mais longo)
+    let idx = 0;
+    for (let n = 0; n < len; n++) {
+      const cur = delay[idx];
+      const next = delay[(idx + 1) % delayLen];
+      buf[n] = cur;
+      delay[idx] = (cur + next) * 0.5 * decay;
+      idx = (idx + 1) % delayLen;
+    }
+    return buf;
+  }
+  function playViolaoSintetico(when, midiNote, dur = 2.2, vol = 0.5) {
+    when = when || now();
+    const sr = ctx.sampleRate;
+    const cacheKey = midiNote + '_' + Math.round(dur * 10);
+    let pcm = _ksCache[cacheKey];
+    if (!pcm) {
+      pcm = _gerarKS(midiNote, dur, sr);
+      _ksCache[cacheKey] = pcm;
+    }
+    const audioBuf = ctx.createBuffer(1, pcm.length, sr);
+    audioBuf.getChannelData(0).set(pcm);
+
+    const src = ctx.createBufferSource();
+    src.buffer = audioBuf;
+
+    // Envelope: ataque rápido (5ms), sustain proporcional, fade-out exp
     const env = ctx.createGain();
     env.gain.setValueAtTime(0, when);
-    env.gain.linearRampToValueAtTime(vol, when + 0.004);
-    // Sustain longo: -3dB em metade da duração, fade-out exponencial até o fim
-    env.gain.exponentialRampToValueAtTime(vol * 0.5, when + dur * 0.6);
+    env.gain.linearRampToValueAtTime(vol, when + 0.005);
     env.gain.exponentialRampToValueAtTime(0.001, when + dur);
 
-    // 3º harmônico discreto pra brilho de guitarra
-    const harm = ctx.createOscillator();
-    harm.type = 'sine';
-    harm.frequency.value = freq * 3;
-    const eHarm = ctx.createGain();
-    eHarm.gain.setValueAtTime(0, when);
-    eHarm.gain.linearRampToValueAtTime(vol * 0.12, when + 0.005);
-    eHarm.gain.exponentialRampToValueAtTime(0.001, when + dur * 0.7);
-
-    osc.connect(filter).connect(shaper).connect(env).connect(masterGain);
-    harm.connect(eHarm).connect(masterGain);
-    osc.start(when); harm.start(when);
-    osc.stop(when + dur + 0.05); harm.stop(when + dur * 0.7 + 0.05);
-    _track(osc, env); _track(harm, eHarm);
+    src.connect(env).connect(masterGain);
+    src.start(when);
+    src.stop(when + dur + 0.1);
+    _track(src, env);
   }
   function playViolaoReal(when, midiNote, dur = 1.4, vol = 0.5) {
     if (!sfPlayer || !sfInstruments.violao) return playViolaoSintetico(when, midiNote, dur, vol);
@@ -1814,7 +1957,7 @@ const State = {
   letraSelecionada: null,
   vozTeclado: 'sabia', // 'sabia' | 'palma' | 'telegrafo' | 'violao'
   notacaoBinaria: false,
-  bpm: 120,
+  bpm: 75, // default = menino (4-velocidades). Antes era 120 (rápido demais)
   loopInfinito: false,
   loopId: null,        // id do timeout do loop
   texto: '',           // input do teclado
@@ -1896,7 +2039,7 @@ function el(tag, props = {}, children = []) {
    PERSONAGENS — fábrica de SVGs estilizados
    ============================================================ */
 function passaroSVG(personagem) {
-  // personagem: 'to' | 'ben' | 'caca' | 'jo' | 'tete' | 'tata' | 'nena' | 'sabia'
+  // personagem: 'to' | 'ben' | 'caca' | 'jo' | 'tete' | 'tata' | 'tito' | 'lila' | 'nena' | 'sabia'
   // Retorna um SVG configurado.
   const wrap = el('div', { class: 'passaro-' + personagem });
   let svgInner = '';
@@ -1914,6 +2057,10 @@ function passaroSVG(personagem) {
     jo:    { cores: { ...COR_PADRAO, peito: '#D88841', dorso: '#5F4329' }, acessorio: null, scale: 1.1 },
     tete:  { cores: { ...COR_PADRAO, peito: '#F4B860' }, acessorio: 'flor', scale: 0.9 },
     tata:  { cores: { ...COR_PADRAO, peito: '#E8A45C', dorso: '#9B7553' }, acessorio: 'fita', scale: 0.95 },
+    // Tito: time de xadrez. Penagem cinza-oliveira pra distinguir.
+    tito:  { cores: { ...COR_PADRAO, peito: '#C9B57C', dorso: '#6B6242', dorsoClaro: '#8E8460', cabeca: '#6B6242', cabecaClara: '#8E8460' }, acessorio: 'topete', scale: 1 },
+    // Lila: time de xadrez. Penagem rosa-violeta.
+    lila:  { cores: { ...COR_PADRAO, peito: '#E8B8C2', dorso: '#8E6A8B', dorsoClaro: '#B093AE', cabeca: '#8E6A8B', cabecaClara: '#B093AE' }, acessorio: 'flor', scale: 0.95 },
     nena:  { cores: { ...COR_PADRAO, dorso: '#5F4329', peito: '#C99A6A' }, acessorio: 'oculos', scale: 1.2 },
     sabia: { cores: COR_PADRAO, acessorio: null, scale: 1 },
   };
@@ -2175,105 +2322,119 @@ function renderMorse(seq) {
 }
 
 /* ============================================================
-   ROTEIRO — 6 CENAS DA HISTÓRIA
-   Primeiro dia de To e Ben na escola dos sabiás. A professora Nena
-   ensina SOS e os nomes da turma. Termina com Parabéns coletivo.
+   ROTEIRO — 6 EPISÓDIOS
+   E1 primeiro-dia    Lógica geral dos toques, Ben e To recebidos
+   E2 time-pingpong   Caca, Jo, Tete (primeiro bloco de amigos)
+   E3 time-xadrez     Tata, Tito, Lila (segundo bloco de amigos)
+   E4 futebol-recap   Todos juntos, recapitulando os nomes
+   E5 sos-licao       SOS é pedido de ajuda — confiança, seriedade
+   E6 segredo         Turma prepara um parabéns secreto pra Nena
    ============================================================ */
 const ROTEIRO = [
-  // Cena 0: amanhecer no ninho — primeiro dia de escola
+  // E1: PRIMEIRO DIA — lógica geral dos toques. Condensa amanhecer +
+  // encontro com Ben + chegada na escola num só episódio. Nena recebe
+  // os dois e ensina que tudo no Morse é um som curto (·) ou longo (–).
   {
-    id: 'amanhecer',
+    id: 'primeiro-dia',
     fundo: 'amanhecer',
     decoracao: 'sol',
-    personagens: [{ tipo: 'to', classe: 'protagonista' }],
-    fala: 'Hoje é o <b>primeiro dia</b> de escola!',
-    falaSub: 'O sol acordou. To esticou as asas. Vai ouvir o canto do sabiá.',
-    acao: { tipo: 'ouvir-canto' },
-    proximo: '🚀 vamos!',
-  },
-  // Cena 1: encontro com Ben no caminho
-  {
-    id: 'encontro-ben',
-    fundo: 'dia-claro',
-    decoracao: 'nuvem',
     personagens: [
+      { tipo: 'nena', classe: 'nena' },
       { tipo: 'to', classe: 'protagonista' },
       { tipo: 'ben' },
     ],
-    fala: '— Bom dia, <b>Ben</b>! / — Bom dia, <b>To</b>!',
-    falaSub: 'Ben mora no galho do lado. São amigos. Vão juntos pra escola.',
-    acao: { tipo: 'aprender-letras', letras: ['T', 'O', 'B', 'E', 'N'] },
-    proximo: '🐦 voar pra escola',
+    fala: 'Primeiro dia! A <b>Nena</b> recebe Ben e To na escola.',
+    falaSub: '<em>"Tudo no Morse é só isso: um som <b>curto</b> · ou um som <b>longo</b> –. Vamos brincar?"</em>',
+    acao: { tipo: 'aprender-toques' },
+    proximo: '🏓 conhecer o time de ping-pong',
   },
-  // Cena 2: chegada na escola — Nena recebe e anuncia o tema
+  // E2: TIME DE PING-PONG — Caca, Jo, Tete. Rápidos, ágeis, falam
+  // primeiro. Cada um se apresenta com nome em Morse + uma "rebatida"
+  // (palmadinha curta) entre os toques.
   {
-    id: 'chegada-escola',
-    fundo: 'escola',
-    personagens: [
-      { tipo: 'nena', classe: 'nena' },
-      { tipo: 'to', classe: 'menor' },
-      { tipo: 'ben', classe: 'menor' },
-      { tipo: 'caca', classe: 'menor' },
-      { tipo: 'jo', classe: 'menor' },
-      { tipo: 'tete', classe: 'menor' },
-      { tipo: 'tata', classe: 'menor' },
-    ],
-    fala: '— <em>Bem-vindos</em>, Ben e To! Eu sou a <b>Nena</b>, professora dos sabiás.',
-    falaSub: 'A Nena olha pra turma: <em>"hoje a gente aprende o <b>SOS</b> e os <b>nomes</b> de todo mundo."</em>',
-    acao: null,
-    proximo: '📚 começar a aula',
-  },
-  // Cena 3: aula SOS — três pontos, três traços, três pontos
-  {
-    id: 'aula-sos',
-    fundo: 'escola',
-    personagens: [
-      { tipo: 'nena', classe: 'nena' },
-    ],
-    fala: 'O <b>SOS</b> é o pedido de ajuda mais famoso. <em>Três curtos, três longos, três curtos.</em>',
-    falaSub: 'Nena ensina: ouve em canto sabiá, depois brinca com · e –.',
-    acao: { tipo: 'aula-sos' },
-    proximo: '🎯 agora a roda',
-  },
-  // Cena 4: roda de apresentação — sequência guiada
-  {
-    id: 'roda-nomes',
-    fundo: 'celebracao',
-    personagens: [], // a roda renderiza próprios personagens em círculo
-    fala: '— Vamos fazer a <b>roda</b>! Cada um diz o nome e manda um <em>SOS</em>.',
-    falaSub: 'Toca em quem está com a setinha. Quando todo mundo falar, fecha a roda.',
+    id: 'time-pingpong',
+    fundo: 'dia-claro',
+    decoracao: 'bola-pingpong',
+    personagens: [],
+    fala: '— Oi! Esse é o <b>time de ping-pong</b>: <em>rápidos como uma bolinha</em>.',
+    falaSub: 'Toca em quem está com a setinha — ele rebate o nome em Morse.',
     acao: {
-      tipo: 'roda-apresentacao',
-      // Ordem: Nena começa, passa pra Caca → Jo → Tete → Tata → To → Ben (fecha).
-      // BENTO easter-egg: quando Ben fala (último), aparece "Ben + To = BENTO".
+      tipo: 'time-apresentacao',
+      time: 'pingpong',
       sequencia: [
-        { quem: 'nena', nome: 'Nena' },
+        { quem: 'caca', nome: 'Caca' },
+        { quem: 'jo',   nome: 'Jo'   },
+        { quem: 'tete', nome: 'Tete' },
+      ],
+    },
+    proximo: '♟ conhecer o time de xadrez',
+  },
+  // E3: TIME DE XADREZ — Tata, Tito, Lila. Calmos, pensativos. Nomes
+  // tocam mais devagar (BPM reduzido durante o episódio).
+  {
+    id: 'time-xadrez',
+    fundo: 'tarde',
+    decoracao: 'xadrez',
+    personagens: [],
+    fala: '— Esse é o <b>time de xadrez</b>: <em>devagar e com calma</em>.',
+    falaSub: 'Cada nome chega num tempo só dele. Toca pra ouvir.',
+    acao: {
+      tipo: 'time-apresentacao',
+      time: 'xadrez',
+      sequencia: [
+        { quem: 'tata', nome: 'Tata' },
+        { quem: 'tito', nome: 'Tito' },
+        { quem: 'lila', nome: 'Lila' },
+      ],
+    },
+    proximo: '⚽ ir pro futebol',
+  },
+  // E4: FUTEBOL (recap) — os 6 amigos jogam juntos. Recapitulação dos
+  // nomes em ordem (botão "ouvir todos" toca cada um em Morse com
+  // pausa entre eles). Bola passa de um pro outro visualmente.
+  {
+    id: 'futebol-recap',
+    fundo: 'campinho',
+    decoracao: 'bola',
+    personagens: [],
+    fala: '⚽ Todo mundo no <b>campinho</b>: ping-pong + xadrez = <em>turma</em>!',
+    falaSub: 'Aperta "ouvir a turma" pra recapitular cada nome em ordem.',
+    acao: {
+      tipo: 'recap-nomes',
+      nomes: [
         { quem: 'caca', nome: 'Caca' },
         { quem: 'jo',   nome: 'Jo'   },
         { quem: 'tete', nome: 'Tete' },
         { quem: 'tata', nome: 'Tata' },
-        { quem: 'to',   nome: 'To'   },
-        { quem: 'ben',  nome: 'Ben'  },
+        { quem: 'tito', nome: 'Tito' },
+        { quem: 'lila', nome: 'Lila' },
       ],
     },
-    proximo: '🎉 parabéns!',
+    proximo: '🆘 aprender o SOS',
   },
-  // Cena 5: final — toda turma canta PARABÉNS NENA
+  // E5: SOS é PEDIDO DE AJUDA — tom mais sério. Nena explica que
+  // SOS não é brincadeira: é o que se manda quando alguém precisa
+  // de ajuda de verdade. Botão pra ouvir + brincar com · e –.
   {
-    id: 'final',
-    fundo: 'celebracao',
+    id: 'sos-licao',
+    fundo: 'escola',
     personagens: [
-      { tipo: 'to', classe: 'protagonista' },
-      { tipo: 'ben' },
-      { tipo: 'caca' },
-      { tipo: 'jo' },
-      { tipo: 'tete' },
-      { tipo: 'tata' },
       { tipo: 'nena', classe: 'nena' },
     ],
-    fala: '🎉 <b>PARABÉNS, turma!</b> 🎂',
-    falaSub: 'Primeiro dia foi <em>maravilhoso</em>. A turma canta junto pra Nena.',
-    acao: { tipo: 'parabens-nena' },
+    fala: 'O <b>SOS</b> é um <em>pedido de ajuda</em>. <b>Três curtos, três longos, três curtos.</b>',
+    falaSub: '<em>"A gente só pede SOS quando precisa de ajuda <b>de verdade</b> — pra alguém em quem confia."</em>',
+    acao: { tipo: 'aula-sos' },
+    proximo: '🤫 a turma tem um segredo',
+  },
+  // E6: SEGREDO — a turma sussurra (Nena não está ali). Combinam
+  // ensaiar o parabéns. Quando "Nena chegou", overlay celebra.
+  {
+    id: 'segredo',
+    fundo: 'celebracao',
+    personagens: [],
+    fala: '🤫 — <em>Pssssiu!</em> A turma combina uma <b>surpresa</b> pra Nena…',
+    falaSub: 'Aperta "ensaiar" pra cantar parabéns junto. Depois "Nena chegou!" pra ver a surpresa.',
+    acao: { tipo: 'segredo-parabens' },
     proximo: '🏠 voltar pra escola',
   },
 ];
@@ -2408,6 +2569,9 @@ function renderCena(tela, cena) {
     const fundo = el('div', { class: 'cena-fundo ' + cena.fundo });
     if (cena.decoracao === 'sol') fundo.appendChild(el('div', { class: 'cena-sol' }));
     if (cena.decoracao === 'nuvem') fundo.appendChild(el('div', { class: 'cena-nuvem' }, '☁️'));
+    if (cena.decoracao === 'bola-pingpong') fundo.appendChild(el('div', { class: 'cena-deco-emoji' }, '🏓'));
+    if (cena.decoracao === 'xadrez') fundo.appendChild(el('div', { class: 'cena-deco-emoji' }, '♟'));
+    if (cena.decoracao === 'bola') fundo.appendChild(el('div', { class: 'cena-deco-emoji' }, '⚽'));
     fundo.appendChild(el('div', { class: 'cena-galho' }));
 
     const palco = el('div', { class: 'cena-palco' });
@@ -2561,8 +2725,13 @@ function renderAcaoCena(container, cena) {
     // Pulso visual contínuo + botão pra ouvir o SOS inteiro + botões · / – pra brincar.
     const compasso = criarCompasso('pulso');
     container.appendChild(compasso);
-    const T = calcularTiming(State.bpm);
+    let T = calcularTiming(State.bpm);
     State.cleanupAtual = ativarCompasso(compasso, T.beat);
+
+    container.appendChild(criarSeletorVelocidade((novoBpm) => {
+      T = calcularTiming(novoBpm);
+      State.cleanupAtual = ativarCompasso(compasso, T.beat);
+    }));
 
     // SOS escrito em três grupos visualmente distintos
     const sosWrap = el('div', {
@@ -2622,6 +2791,254 @@ function renderAcaoCena(container, cena) {
       onClick: () => { Audio.unlock(); Audio.playElemento('-', 'sabia', undefined, T.traco); }
     }, State.notacaoBinaria ? '1 longo' : '– longo'));
     container.appendChild(acoesEl);
+  } else if (a.tipo === 'aprender-toques') {
+    // E1: lógica geral dos toques. Compasso + display que acumula + botões
+    // grandes · e –. Mesmo molde do antigo curto-longo, mas com falas da Nena
+    // pra criança entender que tudo no Morse é só esses dois sons.
+    const compasso = criarCompasso('pulso');
+    container.appendChild(compasso);
+    let T = calcularTiming(State.bpm);
+    State.cleanupAtual = ativarCompasso(compasso, T.beat);
+
+    // Seletor de velocidade: re-ativa o compasso no novo BPM
+    container.appendChild(criarSeletorVelocidade((novoBpm) => {
+      T = calcularTiming(novoBpm);
+      State.cleanupAtual = ativarCompasso(compasso, T.beat);
+    }));
+
+    container.appendChild(el('div', {
+      style: 'text-align:center; font-family:var(--display); font-style:italic; color:var(--marrom-claro); font-size:14px; margin:4px 0;'
+    }, 'aperta os botões pra brincar com curto e longo'));
+
+    const dispEl = el('div', { class: 'morse-display', style: 'font-size:48px; min-height:60px;' });
+    container.appendChild(dispEl);
+
+    const fileira = el('div', { style: 'display:flex; gap:18px; justify-content:center; margin: 8px 0;' });
+    fileira.appendChild(el('button', {
+      class: 'botao-grande-icone amarelo',
+      'aria-label': 'tocar um ponto curto',
+      onClick: () => {
+        Audio.unlock();
+        Audio.playElemento('.', 'sabia', undefined, T.ponto);
+        const s = el('span', { class: 'ponto', html: State.notacaoBinaria ? '0' : '·' });
+        s.style.fontSize = '40px'; s.style.color = 'var(--sol-violao)';
+        dispEl.appendChild(s);
+        if (dispEl.children.length > 12) dispEl.firstChild.remove();
+      }
+    }, State.notacaoBinaria ? '0' : '·'));
+    fileira.appendChild(el('button', {
+      class: 'botao-grande-icone',
+      style: 'background: var(--re-violao); width:120px; border-radius:40px;',
+      'aria-label': 'tocar um traço longo',
+      onClick: () => {
+        Audio.unlock();
+        Audio.playElemento('-', 'sabia', undefined, T.traco);
+        const s = el('span', { class: 'traco', html: State.notacaoBinaria ? '1' : '–' });
+        s.style.fontSize = '48px'; s.style.color = 'var(--re-violao)';
+        dispEl.appendChild(s);
+        if (dispEl.children.length > 12) dispEl.firstChild.remove();
+      }
+    }, State.notacaoBinaria ? '1' : '–'));
+    container.appendChild(fileira);
+  } else if (a.tipo === 'time-apresentacao') {
+    // E2/E3: 3 personagens lado a lado, sequência guiada por setinha.
+    // Cada toque rebate o nome em Morse. Time ping-pong toca em BPM normal +
+    // som curto de "rebatida" entre os toques. Time xadrez toca BPM reduzido.
+    const seq = a.sequencia;
+    const eXadrez = a.time === 'xadrez';
+    const bpmEpisodio = eXadrez ? Math.max(60, Math.round(State.bpm * 0.7)) : State.bpm;
+    let idx = 0;
+    const falados = new Set();
+
+    const linha = el('div', { class: 'time-fileira' + (eXadrez ? ' xadrez' : ' pingpong') });
+    container.appendChild(linha);
+
+    const status = el('div', { class: 'roda-status', 'aria-live': 'polite' });
+    container.appendChild(status);
+
+    function render() {
+      linha.innerHTML = '';
+      seq.forEach((item) => {
+        const ehAtivo = idx < seq.length && seq[idx].quem === item.quem;
+        const ehFalado = falados.has(item.quem);
+        const slot = el('button', {
+          class: 'time-slot' + (ehFalado ? ' falou' : '') + (ehAtivo ? ' ativo' : ''),
+          'aria-label': ehFalado ? `${item.nome} já falou` : (ehAtivo ? `tocar para ${item.nome}` : `aguarde ${item.nome}`),
+          ...(!ehAtivo && !ehFalado ? { disabled: 'true' } : {}),
+          onClick: () => apresentar(item),
+        });
+        const svg = passaroSVG(item.quem);
+        if (svg) { svg.style.width = '64px'; svg.style.height = '64px'; svg.style.transform = 'scale(1)'; slot.appendChild(svg); }
+        slot.appendChild(el('div', { class: 'time-slot-nome' }, item.nome));
+        linha.appendChild(slot);
+      });
+    }
+    function atualizaStatus() {
+      if (idx >= seq.length) {
+        status.innerHTML = eXadrez
+          ? '♟ <b>turma do xadrez completa!</b>'
+          : '🏓 <b>turma do ping-pong completa!</b>';
+        return;
+      }
+      const proximo = seq[idx];
+      status.innerHTML = (eXadrez ? '♟' : '🏓') + ` toca em <b>${proximo.nome}</b>`;
+    }
+    function apresentar(item) {
+      if (idx >= seq.length || seq[idx].quem !== item.quem) return;
+      if (falados.has(item.quem)) return;
+      falados.add(item.quem);
+      idx++;
+      Audio.unlock();
+
+      // Pingpong: leve "rebatida" (palmadinha) antes do nome. Xadrez: silêncio.
+      if (!eXadrez) {
+        try { Audio.playElemento('.', 'palma', undefined, 80); } catch(e) {}
+      }
+      const morseNome = palavraParaMorse(item.nome.toUpperCase());
+      const bpmAntes = State.bpm;
+      State.bpm = bpmEpisodio;
+      tocarSequencia(morseNome, {
+        voz: 'sabia',
+        onFim: () => {
+          State.bpm = bpmAntes;
+          atualizaStatus();
+          render();
+        },
+      });
+      atualizaStatus();
+      render();
+    }
+
+    render();
+    atualizaStatus();
+  } else if (a.tipo === 'recap-nomes') {
+    // E4: futebol. Grade dos 6 nomes. Botão "ouvir a turma" toca um por um
+    // em Morse com pausa entre eles. Cada nome destacado no momento.
+    const lista = a.nomes;
+
+    const grade = el('div', { class: 'recap-grade' });
+    container.appendChild(grade);
+    lista.forEach((item) => {
+      const cell = el('button', {
+        class: 'recap-item',
+        'aria-label': `ouvir ${item.nome}`,
+        onClick: () => {
+          Audio.unlock();
+          cell.classList.add('ativo');
+          tocarSequencia(palavraParaMorse(item.nome.toUpperCase()), {
+            voz: 'sabia',
+            onFim: () => cell.classList.remove('ativo'),
+          });
+        }
+      });
+      const svg = passaroSVG(item.quem);
+      if (svg) { svg.style.width = '52px'; svg.style.height = '52px'; svg.style.transform = 'scale(1)'; cell.appendChild(svg); }
+      cell.appendChild(el('div', { class: 'recap-nome' }, item.nome));
+      grade.appendChild(cell);
+    });
+
+    const acoes = el('div', { class: 'cena-acoes' });
+    let tocandoTodos = false;
+    const btnTodos = el('button', {
+      class: 'botao laranja grande',
+      onClick: () => {
+        if (tocandoTodos) { pararLoop(); tocandoTodos = false; btnTodos.textContent = '⚽ ouvir a turma'; return; }
+        Audio.unlock();
+        tocandoTodos = true;
+        btnTodos.textContent = '⏸ parar';
+        let i = 0;
+        const cells = grade.querySelectorAll('.recap-item');
+        const proximo = () => {
+          cells.forEach(c => c.classList.remove('ativo'));
+          if (i >= lista.length) {
+            tocandoTodos = false;
+            btnTodos.textContent = '⚽ ouvir a turma';
+            return;
+          }
+          const nome = lista[i].nome.toUpperCase();
+          if (cells[i]) cells[i].classList.add('ativo');
+          tocarSequencia(palavraParaMorse(nome), {
+            voz: 'sabia',
+            onFim: () => {
+              i++;
+              State.elementoTimeouts.push(setTimeout(proximo, 600));
+            },
+          });
+        };
+        proximo();
+      }
+    }, '⚽ ouvir a turma');
+    acoes.appendChild(btnTodos);
+    container.appendChild(acoes);
+  } else if (a.tipo === 'segredo-parabens') {
+    // E6: turma sussurra (sem Nena). Botão "ensaiar" toca PARABENS NENA em
+    // canto sabiá baixo. Botão "Nena chegou!" mostra overlay celebrando.
+    const turma = [
+      { quem: 'caca', nome: 'Caca' },
+      { quem: 'jo',   nome: 'Jo'   },
+      { quem: 'tete', nome: 'Tete' },
+      { quem: 'tata', nome: 'Tata' },
+      { quem: 'tito', nome: 'Tito' },
+      { quem: 'lila', nome: 'Lila' },
+      { quem: 'to',   nome: 'To'   },
+      { quem: 'ben',  nome: 'Ben'  },
+    ];
+
+    const circulo = el('div', { class: 'roda-circulo segredo' });
+    container.appendChild(circulo);
+
+    function posicionar() {
+      circulo.innerHTML = '';
+      const total = turma.length;
+      turma.forEach((item, i) => {
+        const angulo = (i / total) * 2 * Math.PI - Math.PI / 2;
+        const raio = 38;
+        const x = 50 + raio * Math.cos(angulo);
+        const y = 50 + raio * Math.sin(angulo);
+        const slot = el('div', {
+          class: 'roda-slot turma-segredo',
+          style: `left:${x}%; top:${y}%;`,
+        });
+        const svg = passaroSVG(item.quem);
+        if (svg) { svg.style.width = '52px'; svg.style.height = '52px'; svg.style.transform = 'scale(1)'; slot.appendChild(svg); }
+        slot.appendChild(el('div', { class: 'roda-slot-nome' }, item.nome));
+        circulo.appendChild(slot);
+      });
+    }
+    posicionar();
+
+    const surpresa = el('div', { class: 'bento-overlay escondido' }, [
+      el('div', { class: 'bento-overlay-frase', html: '🎉 <b>PARABÉNS, NENA!</b> 🎂' }),
+      el('div', { class: 'bento-overlay-sub' }, 'a turma cantou pra ela'),
+    ]);
+    container.appendChild(surpresa);
+
+    const acoes = el('div', { class: 'cena-acoes', style: 'flex-wrap:wrap; gap:10px;' });
+    const btnEnsaiar = el('button', {
+      class: 'botao amarelo',
+      onClick: () => {
+        Audio.unlock();
+        circulo.classList.add('sussurrando');
+        const seq = palavraParaMorse('PARABENS NENA');
+        tocarSequencia(seq, {
+          voz: 'sabia',
+          onFim: () => circulo.classList.remove('sussurrando'),
+        });
+      }
+    }, '🎵 ensaiar baixinho');
+    acoes.appendChild(btnEnsaiar);
+    acoes.appendChild(el('button', {
+      class: 'botao laranja',
+      onClick: () => {
+        Audio.unlock();
+        surpresa.classList.remove('escondido');
+        celebrar(40);
+        const seq = palavraParaMorse('PARABENS NENA');
+        tocarSequencia(seq, { voz: 'sabia' });
+        setTimeout(() => surpresa && surpresa.classList.add('escondido'), 4500);
+      }
+    }, '🎂 Nena chegou!'));
+    container.appendChild(acoes);
   } else if (a.tipo === 'roda-apresentacao') {
     // Roda interativa: 7 personagens em círculo. Sequência guiada por seta.
     // Cada toque na criança ativa toca "EU SOU [nome]" + SOS. Easter-egg BENTO
@@ -2932,9 +3349,49 @@ function renderAcaoCena(container, cena) {
 /* ============================================================
    TECLADO LIVRE
    ============================================================ */
-const PALAVRAS_RAPIDAS = ['SOS', 'BENTO', 'NENA', 'PARABENS NENA', 'TO', 'BEN', 'CACA', 'JO', 'TETE', 'TATA', 'OI', 'MAMA', 'PAPA'];
+const PALAVRAS_RAPIDAS = ['SOS', 'BENTO', 'NENA', 'PARABENS NENA', 'TO', 'BEN', 'CACA', 'JO', 'TETE', 'TATA', 'TITO', 'LILA', 'OI', 'MAMA'];
 const ALFABETO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const VALORES_BPM = [60, 66, 72, 78, 84, 90, 96, 102, 108, 114, 120, 126, 132, 138, 144, 150, 156, 162, 168, 174, 180];
+// 4 velocidades nomeadas (Lucas pediu: "tartaruga, menino, coelho, guepardo").
+// O conceito de BPM contínuo via slider foi descartado — a criança escolhe entre
+// 4 níveis claros. Os BPMs aqui são o "BPM real" que vai pra calcularTiming.
+// Default: menino (75 BPM). Antes era 120, que Lucas reportou rápido demais.
+const VELOCIDADES = [
+  { id: 'tartaruga', emoji: '🐢', nome: 'tartaruga', bpm: 50  },
+  { id: 'menino',    emoji: '🚶', nome: 'menino',    bpm: 75  },
+  { id: 'coelho',    emoji: '🐰', nome: 'coelho',    bpm: 110 },
+  { id: 'guepardo',  emoji: '🐆', nome: 'guepardo',  bpm: 160 },
+];
+const VALORES_BPM = VELOCIDADES.map(v => v.bpm);
+
+// Cria seletor de velocidade reusável (4 chips). Usado no teclado e nas
+// cenas com pulso. Quando troca, atualiza State.bpm e chama onChange.
+function criarSeletorVelocidade(onChange) {
+  const wrap = el('div', { class: 'velocidade-seletor', 'aria-label': 'velocidade' });
+  VELOCIDADES.forEach(v => {
+    const ativo = State.bpm === v.bpm;
+    const chip = el('button', {
+      class: 'chip-velocidade' + (ativo ? ' ativo' : ''),
+      'aria-label': `velocidade ${v.nome}`,
+      'aria-pressed': ativo ? 'true' : 'false',
+      onClick: function() {
+        State.bpm = v.bpm;
+        salvarEstado();
+        wrap.querySelectorAll('.chip-velocidade').forEach(c => {
+          c.classList.remove('ativo');
+          c.setAttribute('aria-pressed', 'false');
+        });
+        this.classList.add('ativo');
+        this.setAttribute('aria-pressed', 'true');
+        if (typeof onChange === 'function') onChange(v.bpm);
+      }
+    }, [
+      el('span', { class: 'chip-vel-emoji' }, v.emoji),
+      el('span', { class: 'chip-vel-nome' }, v.nome),
+    ]);
+    wrap.appendChild(chip);
+  });
+  return wrap;
+}
 
 function renderTeclado(tela) {
   const wrap = el('div', { class: 'teclado-wrap' });
@@ -2976,26 +3433,10 @@ function renderTeclado(tela) {
   }, '0  1'));
   config.appendChild(linhaNot);
 
-  // Linha 3: BPM
+  // Linha 3: velocidade — 4 chips nomeados (tartaruga, menino, coelho, guepardo)
   const linhaBpm = el('div', { class: 'config-linha' });
   linhaBpm.appendChild(el('span', { class: 'config-rotulo' }, 'Ritmo'));
-  const bpmWrap = el('div', { class: 'bpm-slider-wrap' });
-  const bpmValor = el('div', { class: 'bpm-valor' }, State.bpm + ' BPM');
-  const bpmSlider = el('input', {
-    type: 'range',
-    class: 'bpm-slider',
-    min: 0, max: VALORES_BPM.length - 1,
-    value: VALORES_BPM.indexOf(State.bpm) >= 0 ? VALORES_BPM.indexOf(State.bpm) : 9,
-  });
-  bpmSlider.addEventListener('input', (e) => {
-    const idx = parseInt(e.target.value);
-    State.bpm = VALORES_BPM[idx];
-    bpmValor.textContent = State.bpm + ' BPM';
-    salvarEstado();
-  });
-  bpmWrap.appendChild(bpmSlider);
-  bpmWrap.appendChild(bpmValor);
-  linhaBpm.appendChild(bpmWrap);
+  linhaBpm.appendChild(criarSeletorVelocidade());
   config.appendChild(linhaBpm);
 
   // Linha 4: repetições + loop
