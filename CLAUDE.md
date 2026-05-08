@@ -69,19 +69,21 @@ Nota: o personagem **Jo** (uma das três colegas na história) continua sendo Jo
 
 ## Decisões técnicas
 
-### Áudio — WebAudioFont via CDN
+### Áudio — três camadas
 
-Carrega 3 arquivos do GitHub Pages do projeto:
+1. **Amostra real do sabiá-laranjeira** (XC421912, Xeno-Canto, CC BY-NC-SA 4.0) embutida como base64 inline no `index.html` (~37 KB mp3, ~50 KB em base64). Decodificada em `AudioBuffer` no primeiro `unlock()`. Usa offsets fixos do sample pra papéis distintos:
+   - **Ponto** → frase 4 (offset 1.95s × 0.18s): ataque curto e nítido
+   - **Traço** → frase 3 (offset 1.13s × 0.55s): longa, cantada, com trinado natural
+   - **Floreio/intro** → frase inteira (0 → 3.0s)
+   - `playbackRate` é levemente ajustado pra encaixar no BPM (clamped em [0.85, 1.4] pra não distorcer timbre).
 
-```
-https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js   (122 KB)
-https://surikov.github.io/webaudiofontdata/sound/0240_GeneralUserGS_sf2_file.js   (118 KB) — violão acústico steel
-https://surikov.github.io/webaudiofontdata/sound/01230_Aspirin_sf2_file.js   (9 KB) — Bird Tweet
-```
+2. **Síntese sabiá** (fallback): duas funções específicas — `playSabiaPontoSintetico` (chirp ascendente em G5) e `playSabiaTracoSintetico` (pio descendente G5→A4 com vibrato 7Hz). Auditivamente distintas. Usadas se o decode do sample falhar.
 
-Total ~290 KB, primeira carga. Cacheia depois. Loader inicial mostra "o sabiá está afinando o bico…" com barra de progresso. Timeout de 6s por arquivo. Botão "continuar com som simples" aparece após 4s. Se CDN falhar, usa síntese FM aprimorada (3 harmônicos + vibrato + envelope multiestágio).
+3. **WebAudioFont via CDN** (legacy, opcional): violão acústico steel (~118 KB) + Bird Tweet (~9 KB). Carregamento em background, fallback pra síntese se CDN falhar. O sabiá-laranjeira agora vem do sample real, mas o WebAudioFont continua sendo a fonte do violão.
 
-**Lucas reportou explicitamente que o áudio do teclado "não exporta legal"** na v1 (síntese pura) — esta é a razão principal pra mudança pra WebAudioFont. Se ele continuar com queixas de áudio, investiga o agendador (`tocarSequencia` em `index.html`) — pode ser timing de cleanup entre repetições, não a qualidade do som em si.
+Loader inicial mostra "o sabiá está afinando o bico…". Timeout de 6s por arquivo. Botão "continuar com som simples" aparece após 4s.
+
+**Conceito de pulso (v4)**: BPM agora é semínima por minuto. Ponto = semicolcheia (1/4 de beat). Espaçamentos seguem o padrão Morse 1:3:7. Default 120 BPM (range 60-180). Cabeça de compasso visual (`.compasso`) aparece nas cenas de Morse pulsando no tempo do BPM, dando referência rítmica visual.
 
 ### Sistema de loops
 
