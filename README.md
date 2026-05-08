@@ -8,9 +8,11 @@ App standalone (1 HTML) que ensina Morse pro Bento (5 anos) via uma história na
 
 ## Modos
 
-- **História do To** — 10 cenas. To, Ben, Caca e os três colegas aprendem com a professora Nena. Final: surpresa de aniversário pra ela.
-- **Teclado** — escreve uma palavra, ouve em sabiá / palma / telégrafo / violão, com BPM e loop.
-- **Letra por letra** — 26 letras × 26 palavras-âncora (A→Asa, B→Bento…).
+Três áreas distintas, sem mistura entre si:
+
+- **História** — primeiro dia de **To** e **Ben** na escola dos sabiás. A professora **Nena** ensina o **SOS** e os nomes da turma. Roda de apresentações fecha com PARABÉNS coletivo. 6 cenas.
+- **Jogo das letras** — 26 letras × 26 palavras-âncora (A→Asa, B→Bento, C→Casa…). Ouve cada letra e palavra em canto sabiá.
+- **Teclado livre** — escreve qualquer palavra, ouve em sabiá / palma / telégrafo / violão, com BPM e loop.
 
 ## Rodar local
 

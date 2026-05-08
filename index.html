@@ -319,6 +319,139 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   70% { transform: translateY(0); }
 }
 
+/* ===== AULA SOS — três grupos visuais (· · · / – – – / · · ·) ===== */
+.sos-display {
+  display: flex; gap: 18px; justify-content: center; align-items: center;
+  flex-wrap: wrap;
+  margin: 8px auto 4px;
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(38px, 11vw, 60px);
+  line-height: 1;
+}
+.sos-grupo {
+  display: inline-flex; gap: 4px;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.55);
+  border-radius: 14px;
+  border: 1px solid var(--marrom-claro);
+}
+.sos-grupo .ponto, .sos-grupo .traco {
+  display: inline-block;
+  transition: transform 0.2s, color 0.2s;
+}
+.sos-grupo .ativo {
+  transform: scale(1.35);
+  color: var(--laranja-vivo) !important;
+}
+
+/* ===== RODA DE APRESENTAÇÃO — círculo de personagens ===== */
+.roda-circulo {
+  position: relative;
+  width: min(100%, 360px);
+  height: min(100vw - 40px, 360px);
+  margin: 8px auto;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255,235,200,0.4), transparent 75%);
+}
+.roda-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 78px; height: 92px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  background: white;
+  border: 2px solid var(--marrom-claro);
+  border-radius: 16px;
+  padding: 4px 4px 6px;
+  box-shadow: var(--sombra-suave);
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s, opacity 0.2s;
+  cursor: pointer;
+}
+.roda-slot:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+.roda-slot.ativo {
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 4px rgba(232,164,92,0.35), var(--sombra-media);
+  animation: rodaAtivoPulsa 1.2s ease-in-out infinite;
+  z-index: 2;
+}
+.roda-slot.falou {
+  background: var(--papel-fundo);
+  border-color: var(--folha);
+  opacity: 0.7;
+}
+.roda-slot:active { transform: translate(-50%, -50%) scale(0.94); }
+.roda-slot-nome {
+  font-family: var(--display); font-weight: 800;
+  font-size: 12px; color: var(--marrom);
+  margin-top: 2px;
+}
+.roda-slot.falou .roda-slot-nome::before {
+  content: '✓ ';
+  color: var(--folha);
+}
+@keyframes rodaAtivoPulsa {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(232,164,92,0.35), var(--sombra-media); }
+  50%      { box-shadow: 0 0 0 10px rgba(232,164,92,0.18), var(--sombra-media); }
+}
+.roda-status {
+  text-align: center;
+  font-family: var(--display);
+  font-size: clamp(15px, 4vw, 18px);
+  color: var(--marrom);
+  margin: 4px 0 8px;
+  min-height: 22px;
+}
+
+@media (max-width: 480px) {
+  .roda-slot { width: 68px; height: 82px; }
+  .roda-slot .passaro-svg { width: 44px; height: 44px; }
+}
+@media (max-width: 380px) {
+  .roda-slot { width: 60px; height: 74px; }
+  .roda-slot .passaro-svg { width: 38px; height: 38px; }
+}
+
+/* Easter egg BENTO: aparece quando Ben se apresenta (último da roda) */
+.bento-overlay {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px;
+  background: rgba(250, 246, 235, 0.94);
+  z-index: 50;
+  animation: bentoIn 0.4s ease;
+  pointer-events: none;
+}
+.bento-overlay.escondido { display: none; }
+.bento-overlay-frase {
+  font-family: var(--display); font-weight: 900;
+  font-size: clamp(22px, 6vw, 32px);
+  color: var(--marrom);
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.bento-overlay-frase em {
+  font-style: italic;
+  color: var(--laranja-vivo);
+}
+.bento-overlay-frase b {
+  color: var(--folha-escura);
+  font-size: 1.4em;
+}
+.bento-overlay-sub {
+  font-family: var(--display);
+  font-style: italic;
+  color: var(--marrom-claro);
+  font-size: 14px;
+}
+@keyframes bentoIn {
+  0%   { opacity: 0; transform: scale(0.85); }
+  50%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 .cena-galho {
   position: absolute; bottom: 8px; left: 0; right: 0;
   height: 14px;
@@ -1915,144 +2048,90 @@ function renderMorse(seq) {
 }
 
 /* ============================================================
-   ROTEIRO — 9 CENAS DA HISTÓRIA
+   ROTEIRO — 6 CENAS DA HISTÓRIA
+   Primeiro dia de To e Ben na escola dos sabiás. A professora Nena
+   ensina SOS e os nomes da turma. Termina com Parabéns coletivo.
    ============================================================ */
 const ROTEIRO = [
-  // Cena 0: amanhecer no ninho
+  // Cena 0: amanhecer no ninho — primeiro dia de escola
   {
     id: 'amanhecer',
     fundo: 'amanhecer',
     decoracao: 'sol',
     personagens: [{ tipo: 'to', classe: 'protagonista' }],
-    fala: 'Hoje é dia de escola!',
-    falaSub: 'O sol acordou. To esticou as asas.',
+    fala: 'Hoje é o <b>primeiro dia</b> de escola!',
+    falaSub: 'O sol acordou. To esticou as asas. Vai ouvir o canto do sabiá.',
     acao: { tipo: 'ouvir-canto' },
-    proximo: 'vamos!',
+    proximo: 'vamos! →',
   },
-  // Cena 1: encontro com Ben
+  // Cena 1: encontro com Ben no caminho
   {
-    id: 'ben',
+    id: 'encontro-ben',
     fundo: 'dia-claro',
     decoracao: 'nuvem',
     personagens: [
       { tipo: 'to', classe: 'protagonista' },
       { tipo: 'ben' },
     ],
-    fala: '— Bom dia, Ben! / — Bom dia, To!',
-    falaSub: 'Ben mora no galho do lado. São amigos.',
+    fala: '— Bom dia, <b>Ben</b>! / — Bom dia, <b>To</b>!',
+    falaSub: 'Ben mora no galho do lado. São amigos. Vão juntos pra escola.',
     acao: { tipo: 'aprender-letras', letras: ['T', 'O', 'B', 'E', 'N'] },
     proximo: 'voar pra escola →',
   },
-  // Cena 2: chegada na escola, Caca já está
+  // Cena 2: chegada na escola — Nena recebe e anuncia o tema
   {
-    id: 'escola-caca',
-    fundo: 'escola',
-    personagens: [
-      { tipo: 'to', classe: 'protagonista' },
-      { tipo: 'ben' },
-      { tipo: 'caca' },
-    ],
-    fala: '— Oi, Caca!',
-    falaSub: 'Caca é canarinho, mas estuda na escola dos sabiás. Todos são amigos.',
-    acao: { tipo: 'aprender-letras', letras: ['C', 'A'] },
-    proximo: 'tocar a campainha →',
-  },
-  // Cena 3: aula curto/longo — Nena (professora) recebe Ben e To
-  {
-    id: 'aula-curto-longo',
+    id: 'chegada-escola',
     fundo: 'escola',
     personagens: [
       { tipo: 'nena', classe: 'nena' },
       { tipo: 'to', classe: 'menor' },
       { tipo: 'ben', classe: 'menor' },
       { tipo: 'caca', classe: 'menor' },
+      { tipo: 'jo', classe: 'menor' },
+      { tipo: 'tete', classe: 'menor' },
+      { tipo: 'tata', classe: 'menor' },
     ],
     fala: '— <em>Bem-vindos</em>, Ben e To! Eu sou a <b>Nena</b>, professora dos sabiás.',
-    falaSub: 'A Nena explica: pássaros escrevem com música. Todo som é <b>curto</b> ou <b>longo</b>.',
-    acao: { tipo: 'curto-longo' },
-    proximo: 'entendi! →',
+    falaSub: 'A Nena olha pra turma: <em>"hoje a gente aprende o <b>SOS</b> e os <b>nomes</b> de todo mundo."</em>',
+    acao: null,
+    proximo: 'começar a aula →',
   },
-  // Cena 4: as três colegas
+  // Cena 3: aula SOS — três pontos, três traços, três pontos
   {
-    id: 'colegas',
+    id: 'aula-sos',
     fundo: 'escola',
-    personagens: [
-      { tipo: 'jo' },
-      { tipo: 'tete' },
-      { tipo: 'tata' },
-    ],
-    fala: '— Eu sou <b>Jo</b>! Eu sou <b>Tete</b>! Eu sou <b>Tata</b>!',
-    falaSub: 'Mais três colegas se apresentam. Cada nome é um cantinho diferente.',
-    acao: { tipo: 'apresentar-nomes', nomes: ['JO', 'TETE', 'TATA'] },
-    proximo: 'que história é essa? →',
-  },
-  // Cena 5: história das três irmãs
-  {
-    id: 'historia-irmas',
-    fundo: 'tarde',
-    personagens: [
-      { tipo: 'jo' },
-      { tipo: 'tete' },
-      { tipo: 'tata' },
-    ],
-    fala: '— A gente conhece <b>Didi</b>, <b>Toto</b> e <b>Todi</b>. São três passarinhos amigos.',
-    falaSub: 'Olha que coisa: com poucos sons, dá pra fazer muitos nomes.',
-    acao: { tipo: 'apresentar-nomes', nomes: ['DIDI', 'TOTO', 'TODI'] },
-    proximo: 'mais palavras →',
-  },
-  // Cena 6: Nena apresenta palavras solenes
-  {
-    id: 'palavras-solenes',
-    fundo: 'tarde',
     personagens: [
       { tipo: 'nena', classe: 'nena' },
     ],
-    fala: 'Agora as palavras grandes. <em>Mama. Papa. Mim.</em> E uma palavra muito especial…',
-    falaSub: 'A Nena abre as asas e olha pra todo mundo.',
-    acao: { tipo: 'apresentar-nomes', nomes: ['MAMA', 'PAPA', 'MIM'] },
-    proximo: 'qual é a especial? →',
+    fala: 'O <b>SOS</b> é o pedido de ajuda mais famoso. <em>Três curtos, três longos, três curtos.</em>',
+    falaSub: 'Nena ensina: ouve em canto sabiá, depois brinca com · e –.',
+    acao: { tipo: 'aula-sos' },
+    proximo: 'agora a roda →',
   },
-  // Cena 7: revelação
+  // Cena 4: roda de apresentação — sequência guiada
   {
-    id: 'revelacao',
+    id: 'roda-nomes',
     fundo: 'celebracao',
-    personagens: [
-      { tipo: 'to', classe: 'protagonista' },
-      { tipo: 'ben' },
-    ],
-    fala: '<b>BENTO</b> = <em>Ben</em> + <em>To</em>!',
-    falaSub: 'A Nena escreve no galho. Todo mundo olha. Bento é nome de quem ama.',
-    acao: { tipo: 'revelar-bento' },
-    proximo: 'preparar surpresa! 🤫',
-  },
-  // Cena 8: surpresa — cada criança traz duas letras pra Nena
-  {
-    id: 'surpresa-letras',
-    fundo: 'tarde',
-    personagens: [
-      { tipo: 'to', classe: 'protagonista' },
-      { tipo: 'ben' },
-      { tipo: 'caca' },
-      { tipo: 'jo' },
-      { tipo: 'tete' },
-      { tipo: 'tata' },
-    ],
-    fala: '— <em>Pssssiu!</em> A turma tem uma surpresa pra Nena: hoje é o <b>aniversário</b> dela.',
-    falaSub: 'Cada criança traz <b>duas letras</b>. Junta tudo: parabéns Nena!',
+    personagens: [], // a roda renderiza próprios personagens em círculo
+    fala: '— Vamos fazer a <b>roda</b>! Cada um diz o nome e manda um <em>SOS</em>.',
+    falaSub: 'Toca em quem está com a setinha. Quando todo mundo falar, fecha a roda.',
     acao: {
-      tipo: 'surpresa-letras',
-      distribuicao: [
-        { quem: 'to',   nome: 'To',   letras: ['P', 'A'] },
-        { quem: 'ben',  nome: 'Ben',  letras: ['R', 'A'] },
-        { quem: 'caca', nome: 'Caca', letras: ['B', 'E'] },
-        { quem: 'jo',   nome: 'Jo',   letras: ['N', 'S'] },
-        { quem: 'tete', nome: 'Tete', letras: ['N', 'E'] },
-        { quem: 'tata', nome: 'Tata', letras: ['N', 'A'] },
+      tipo: 'roda-apresentacao',
+      // Ordem: Nena começa, passa pra Caca → Jo → Tete → Tata → To → Ben (fecha).
+      // BENTO easter-egg: quando Ben fala (último), aparece "Ben + To = BENTO".
+      sequencia: [
+        { quem: 'nena', nome: 'Nena' },
+        { quem: 'caca', nome: 'Caca' },
+        { quem: 'jo',   nome: 'Jo'   },
+        { quem: 'tete', nome: 'Tete' },
+        { quem: 'tata', nome: 'Tata' },
+        { quem: 'to',   nome: 'To'   },
+        { quem: 'ben',  nome: 'Ben'  },
       ],
     },
-    proximo: 'agora cantar pra Nena! →',
+    proximo: 'parabéns! →',
   },
-  // Cena 9: final — Parabéns pra Nena!
+  // Cena 5: final — toda turma canta PARABÉNS NENA
   {
     id: 'final',
     fundo: 'celebracao',
@@ -2065,10 +2144,10 @@ const ROTEIRO = [
       { tipo: 'tata' },
       { tipo: 'nena', classe: 'nena' },
     ],
-    fala: '🎂 <b>PARABÉNS, NENA!</b> 🎉',
-    falaSub: 'Toda a escola canta para a Nena. <em>Nena, Nena, Nena…</em>',
+    fala: '🎉 <b>PARABÉNS, turma!</b> 🎂',
+    falaSub: 'Primeiro dia foi <em>maravilhoso</em>. A turma canta junto pra Nena.',
     acao: { tipo: 'parabens-nena' },
-    proximo: 'brincar mais →',
+    proximo: 'voltar pra escola →',
   },
 ];
 
@@ -2122,7 +2201,7 @@ function renderApp() {
     renderTeclado(tela);
   } else if (State.modo === 'letras') {
     btnVoltar.classList.remove('escondido');
-    titulo.textContent = 'Letra por letra';
+    titulo.textContent = 'Jogo das letras';
     renderLetras(tela);
   } else if (State.modo === 'letra-detalhe') {
     btnVoltar.classList.remove('escondido');
@@ -2156,20 +2235,8 @@ function renderLanding(tela) {
   }, [
     el('div', { class: 'porta-icone' }, '📖'),
     el('div', { class: 'porta-texto' }, [
-      el('div', { class: 'porta-titulo' }, 'História do To'),
-      el('div', { class: 'porta-desc' }, 'Acompanha o filhote To na escola. Vai aprender no caminho.'),
-    ]),
-    el('div', { class: 'porta-seta' }, '→'),
-  ]));
-
-  portas.appendChild(el('button', {
-    class: 'porta',
-    onClick: () => { Audio.unlock(); navegar('teclado'); }
-  }, [
-    el('div', { class: 'porta-icone' }, '🎹'),
-    el('div', { class: 'porta-texto' }, [
-      el('div', { class: 'porta-titulo' }, 'Teclado do Sabiá'),
-      el('div', { class: 'porta-desc' }, 'Escreve qualquer palavra e ouve em canto, palma ou violão.'),
+      el('div', { class: 'porta-titulo' }, 'História'),
+      el('div', { class: 'porta-desc' }, 'Primeiro dia de To e Ben na escola. SOS e os nomes da turma.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
@@ -2180,8 +2247,20 @@ function renderLanding(tela) {
   }, [
     el('div', { class: 'porta-icone' }, '🔤'),
     el('div', { class: 'porta-texto' }, [
-      el('div', { class: 'porta-titulo' }, 'Letra por letra'),
-      el('div', { class: 'porta-desc' }, 'A é de Asa, B é de Bento… 26 letras, 26 palavras.'),
+      el('div', { class: 'porta-titulo' }, 'Jogo das letras'),
+      el('div', { class: 'porta-desc' }, 'A é de Asa, B é de Bento… ouve cada letra em canto sabiá.'),
+    ]),
+    el('div', { class: 'porta-seta' }, '→'),
+  ]));
+
+  portas.appendChild(el('button', {
+    class: 'porta',
+    onClick: () => { Audio.unlock(); navegar('teclado'); }
+  }, [
+    el('div', { class: 'porta-icone' }, '🎹'),
+    el('div', { class: 'porta-texto' }, [
+      el('div', { class: 'porta-titulo' }, 'Teclado livre'),
+      el('div', { class: 'porta-desc' }, 'Escreve qualquer palavra. Sabiá, palma, telégrafo ou violão.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
@@ -2196,20 +2275,23 @@ function renderLanding(tela) {
 function renderCena(tela, cena) {
   const wrap = el('div', { class: 'cena' });
 
-  // Fundo + personagens
-  const fundo = el('div', { class: 'cena-fundo ' + cena.fundo });
-  if (cena.decoracao === 'sol') fundo.appendChild(el('div', { class: 'cena-sol' }));
-  if (cena.decoracao === 'nuvem') fundo.appendChild(el('div', { class: 'cena-nuvem' }, '☁️'));
-  fundo.appendChild(el('div', { class: 'cena-galho' }));
+  // Fundo + personagens — só renderiza se houver personagens. Cenas com palco vazio
+  // (ex.: roda de apresentação que monta o próprio círculo) não desperdiçam espaço.
+  if (cena.personagens && cena.personagens.length > 0) {
+    const fundo = el('div', { class: 'cena-fundo ' + cena.fundo });
+    if (cena.decoracao === 'sol') fundo.appendChild(el('div', { class: 'cena-sol' }));
+    if (cena.decoracao === 'nuvem') fundo.appendChild(el('div', { class: 'cena-nuvem' }, '☁️'));
+    fundo.appendChild(el('div', { class: 'cena-galho' }));
 
-  const palco = el('div', { class: 'cena-palco' });
-  cena.personagens.forEach(p => {
-    const svg = passaroSVG(p.tipo);
-    if (p.classe) svg.classList.add(p.classe);
-    palco.appendChild(svg);
-  });
-  fundo.appendChild(palco);
-  wrap.appendChild(fundo);
+    const palco = el('div', { class: 'cena-palco' });
+    cena.personagens.forEach(p => {
+      const svg = passaroSVG(p.tipo);
+      if (p.classe) svg.classList.add(p.classe);
+      palco.appendChild(svg);
+    });
+    fundo.appendChild(palco);
+    wrap.appendChild(fundo);
+  }
 
   // Fala principal
   const fala = el('div', {
@@ -2247,8 +2329,9 @@ function renderCena(tela, cena) {
       if (State.cenaIdx < ROTEIRO.length - 1) {
         navegar('historia', { cenaIdx: State.cenaIdx + 1 });
       } else {
+        // Final: volta pra landing (a história termina em si mesma).
         celebrar(40);
-        setTimeout(() => navegar('teclado'), 1800);
+        setTimeout(() => navegar('landing'), 1800);
       }
     }
   }, cena.proximo));
@@ -2346,6 +2429,169 @@ function renderAcaoCena(container, cena) {
       }
     }, State.notacaoBinaria ? '1' : '–'));
     container.appendChild(fileira);
+  } else if (a.tipo === 'aula-sos') {
+    // Aula sobre SOS: três pontos / três traços / três pontos.
+    // Pulso visual contínuo + botão pra ouvir o SOS inteiro + botões · / – pra brincar.
+    const compasso = criarCompasso('pulso');
+    container.appendChild(compasso);
+    const T = calcularTiming(State.bpm);
+    State.cleanupAtual = ativarCompasso(compasso, T.beat);
+
+    // SOS escrito em três grupos visualmente distintos
+    const sosWrap = el('div', {
+      class: 'sos-display',
+      'aria-label': 'sequência SOS em código Morse',
+    });
+    const grupos = [
+      { simb: '·', cor: 'var(--sol-violao)', n: 3, cls: 'ponto' },
+      { simb: '–', cor: 'var(--re-violao)',  n: 3, cls: 'traco' },
+      { simb: '·', cor: 'var(--sol-violao)', n: 3, cls: 'ponto' },
+    ];
+    grupos.forEach((g, i) => {
+      const grupo = el('div', { class: 'sos-grupo' });
+      for (let k = 0; k < g.n; k++) {
+        grupo.appendChild(el('span', {
+          class: g.cls,
+          style: `color: ${g.cor};`,
+        }, State.notacaoBinaria ? (g.cls === 'ponto' ? '0' : '1') : g.simb));
+      }
+      sosWrap.appendChild(grupo);
+    });
+    container.appendChild(sosWrap);
+
+    // Letra "SOS" em texto pequeno pra associação
+    container.appendChild(el('div', {
+      style: 'text-align:center; font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: 0.18em; color: var(--marrom); margin: 4px 0 8px;'
+    }, 'S O S'));
+
+    const acoesEl = el('div', { class: 'cena-acoes', style: 'flex-wrap: wrap; gap: 8px;' });
+    acoesEl.appendChild(el('button', {
+      class: 'botao laranja',
+      onClick: () => {
+        Audio.unlock();
+        const seq = MORSE['S'] + ' ' + MORSE['O'] + ' ' + MORSE['S'];
+        const elementos = sosWrap.querySelectorAll('.ponto, .traco');
+        tocarSequencia(seq, {
+          voz: 'sabia',
+          compasso,
+          onElemento: (ch, i) => {
+            elementos.forEach(x => x.classList.remove('ativo'));
+            if (elementos[i]) {
+              elementos[i].classList.add('ativo');
+              setTimeout(() => elementos[i] && elementos[i].classList.remove('ativo'), 200);
+            }
+          },
+        });
+      }
+    }, '🆘 ouvir SOS'));
+    acoesEl.appendChild(el('button', {
+      class: 'botao secundario pequeno',
+      'aria-label': 'tocar um ponto curto',
+      onClick: () => { Audio.unlock(); Audio.playElemento('.', 'sabia', undefined, T.ponto); }
+    }, State.notacaoBinaria ? '0 curto' : '· curto'));
+    acoesEl.appendChild(el('button', {
+      class: 'botao secundario pequeno',
+      'aria-label': 'tocar um traço longo',
+      onClick: () => { Audio.unlock(); Audio.playElemento('-', 'sabia', undefined, T.traco); }
+    }, State.notacaoBinaria ? '1 longo' : '– longo'));
+    container.appendChild(acoesEl);
+  } else if (a.tipo === 'roda-apresentacao') {
+    // Roda interativa: 7 personagens em círculo. Sequência guiada por seta.
+    // Cada toque na criança ativa toca "EU SOU [nome]" + SOS. Easter-egg BENTO
+    // quando Ben (último) fala — antes de habilitar continuar.
+    const seq = a.sequencia;
+    let idx = 0;          // próximo da sequência
+    const falados = new Set();
+    let bentoMostrado = false;
+
+    const circulo = el('div', { class: 'roda-circulo', 'aria-label': 'roda de apresentação' });
+    container.appendChild(circulo);
+
+    const status = el('div', {
+      class: 'roda-status',
+      'aria-live': 'polite',
+    });
+    container.appendChild(status);
+
+    // Easter-egg overlay: aparece quando Ben (último) fala
+    const bentoOverlay = el('div', { class: 'bento-overlay escondido' }, [
+      el('div', { class: 'bento-overlay-frase', html: '<em>Ben</em> + <em>To</em> = <b>BENTO</b>' }),
+      el('div', { class: 'bento-overlay-sub' }, 'descoberta da turma!'),
+    ]);
+    container.appendChild(bentoOverlay);
+
+    function posicionarPersonagens() {
+      circulo.innerHTML = '';
+      const total = seq.length;
+      seq.forEach((item, i) => {
+        const angulo = (i / total) * 2 * Math.PI - Math.PI / 2; // começa do topo
+        const raio = 38; // % do container do círculo
+        const x = 50 + raio * Math.cos(angulo);
+        const y = 50 + raio * Math.sin(angulo);
+        const ehAtivo = idx < seq.length && seq[idx].quem === item.quem;
+        const ehFalado = falados.has(item.quem);
+        const slot = el('button', {
+          class: 'roda-slot' + (ehFalado ? ' falou' : '') + (ehAtivo ? ' ativo' : ''),
+          style: `left: ${x}%; top: ${y}%;`,
+          'aria-label': ehFalado ? `${item.nome} já se apresentou` : (ehAtivo ? `tocar para ${item.nome} se apresentar` : `aguarde ${item.nome}`),
+          ...(!ehAtivo && !ehFalado ? { disabled: 'true' } : {}),
+          onClick: () => apresentar(item),
+        });
+        const svg = passaroSVG(item.quem);
+        if (svg) {
+          svg.style.width = '52px';
+          svg.style.height = '52px';
+          svg.style.transform = 'scale(1)';
+          slot.appendChild(svg);
+        }
+        slot.appendChild(el('div', { class: 'roda-slot-nome' }, item.nome));
+        circulo.appendChild(slot);
+      });
+    }
+
+    function atualizaStatus() {
+      if (idx >= seq.length) {
+        status.innerHTML = '🎉 <b>roda fechada!</b> todo mundo se apresentou.';
+        return;
+      }
+      const proximo = seq[idx];
+      status.innerHTML = `🎯 toca em <b>${proximo.nome}</b>`;
+    }
+
+    function apresentar(item) {
+      if (idx >= seq.length || seq[idx].quem !== item.quem) return;
+      if (falados.has(item.quem)) return;
+
+      falados.add(item.quem);
+      idx++;
+
+      Audio.unlock();
+      const ehUltimo = idx >= seq.length;
+
+      // Sequência: NOME espaço-de-palavra SOS
+      const morseNome = palavraParaMorse(item.nome.toUpperCase());
+      const seqCompleta = morseNome + ' / ' + MORSE['S'] + ' ' + MORSE['O'] + ' ' + MORSE['S'];
+
+      tocarSequencia(seqCompleta, {
+        voz: 'sabia',
+        onFim: () => {
+          if (ehUltimo && !bentoMostrado) {
+            bentoMostrado = true;
+            bentoOverlay.classList.remove('escondido');
+            celebrar(20);
+            setTimeout(() => bentoOverlay && bentoOverlay.classList.add('escondido'), 3500);
+          }
+          atualizaStatus();
+          posicionarPersonagens();
+        },
+      });
+
+      atualizaStatus();
+      posicionarPersonagens();
+    }
+
+    posicionarPersonagens();
+    atualizaStatus();
   } else if (a.tipo === 'revelar-bento') {
     container.appendChild(el('div', { class: 'palavra-display' }, 'BENTO'));
     container.appendChild(el('div', {
@@ -2559,7 +2805,7 @@ function renderAcaoCena(container, cena) {
 /* ============================================================
    TECLADO LIVRE
    ============================================================ */
-const PALAVRAS_RAPIDAS = ['BENTO', 'NENA', 'PARABENS NENA', 'TO', 'BEN', 'CACA', 'OI', 'MAMA', 'PAPA', 'MIM', 'JUDO'];
+const PALAVRAS_RAPIDAS = ['SOS', 'BENTO', 'NENA', 'PARABENS NENA', 'TO', 'BEN', 'CACA', 'JO', 'TETE', 'TATA', 'OI', 'MAMA', 'PAPA'];
 const ALFABETO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const VALORES_BPM = [60, 66, 72, 78, 84, 90, 96, 102, 108, 114, 120, 126, 132, 138, 144, 150, 156, 162, 168, 174, 180];
 
