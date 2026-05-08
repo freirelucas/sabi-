@@ -695,43 +695,44 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-family: var(--display); font-size: 12px;
   color: var(--tinta-suave);
 }
-/* Bumbo + baqueta — substituem a cabeça de compasso. A baqueta gira no tempo
-   do BPM via CSS (var --beat-dur). Sincronia com áudio é controlada pelo JS
-   em ativarCompasso, que adiciona .batendo no momento exato do beat. */
-.compasso-bumbo {
+/* Metrônomo: caixa trapezoidal + haste oscilando como pêndulo. Substituiu
+   o bumbo+baqueta da v5 (Lucas: "reveja de maneira crítica" — visual saturado).
+   A haste gira de -25deg a +25deg em cada beat via CSS (var --beat-dur). */
+.compasso-metronomo {
   position: relative;
-  width: 110px; height: 78px;
+  width: 56px; height: 80px;
 }
-.compasso-bumbo svg { width: 100%; height: 100%; overflow: visible; }
-.bumbo-corpo {
-  fill: var(--marrom);
-  stroke: var(--marrom-fundo);
-  stroke-width: 2;
+.compasso-metronomo svg { width: 100%; height: 100%; overflow: visible; }
+.metronomo-caixa { fill: var(--marrom); stroke: var(--marrom-fundo); stroke-width: 1.5; }
+.metronomo-painel { fill: #f6efe2; stroke: var(--marrom-claro); stroke-width: 1; }
+.metronomo-base   { fill: var(--marrom-fundo); }
+.metronomo-pivot  { fill: var(--laranja-vivo); }
+.metronomo-haste {
+  transform-origin: 28px 70px;
+  animation: pendulo var(--beat-dur, 0.8s) ease-in-out infinite alternate;
 }
-.bumbo-pele { fill: #f6efe2; stroke: var(--marrom-claro); stroke-width: 1.5; }
-.bumbo-aro  { fill: var(--laranja); }
-.bumbo-pele.batendo {
-  animation: bumboTremor 0.12s ease-out;
-}
-@keyframes bumboTremor {
-  0%   { transform: scale(1, 1); }
-  40%  { transform: scale(1.06, 0.94); }
-  100% { transform: scale(1, 1); }
-}
-.baqueta {
-  transform-origin: 70% 8%;
-  animation: baquetaBate var(--beat-dur, 0.5s) ease-in-out infinite alternate;
-}
-.compasso:not(.tocando) .baqueta {
+.compasso:not(.tocando) .metronomo-haste {
   animation: none;
-  transform: rotate(-30deg);
+  transform: rotate(0deg);
 }
-@keyframes baquetaBate {
-  from { transform: rotate(-55deg); }
-  to   { transform: rotate(-2deg);  }
+@keyframes pendulo {
+  from { transform: rotate(-22deg); }
+  to   { transform: rotate( 22deg); }
 }
-.baqueta-haste { fill: #c9a06b; stroke: #8e6a3f; stroke-width: 0.8; }
-.baqueta-ponta { fill: #4a3422; }
+.metronomo-haste-corpo { fill: #c9a06b; stroke: #8e6a3f; stroke-width: 0.6; }
+.metronomo-peso        { fill: var(--marrom-fundo); }
+.metronomo-pulso {
+  fill: var(--laranja);
+  opacity: 0;
+}
+.metronomo-pulso.ativo {
+  animation: metronomoBate 0.18s ease-out;
+}
+@keyframes metronomoBate {
+  0%   { opacity: 0;   transform: scale(0.6); }
+  40%  { opacity: 0.9; transform: scale(1);   }
+  100% { opacity: 0;   transform: scale(0.6); }
+}
 .compasso-rotulo { font-weight: 700; opacity: 0.7; }
 .compasso-toggle {
   display: inline-flex; align-items: center; justify-content: center;
@@ -748,6 +749,82 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   background: var(--laranja);
   color: white;
   border-color: var(--laranja);
+}
+
+/* ===== DECOMPOSIÇÃO DE NOMES — letras visíveis + loop + highlight ===== */
+.decomp-painel {
+  background: var(--papel-fundo);
+  border: 2px dashed var(--marrom-claro);
+  border-radius: 16px;
+  padding: 12px 10px;
+  margin: 12px auto 6px;
+  max-width: 100%;
+  animation: decompIn 0.3s ease;
+}
+.decomp-painel.escondido { display: none; }
+@keyframes decompIn {
+  0%   { opacity: 0; transform: scale(0.96); }
+  100% { opacity: 1; transform: scale(1);    }
+}
+.decomp-titulo {
+  text-align: center;
+  font-family: var(--display);
+  font-size: clamp(15px, 4vw, 17px);
+  color: var(--marrom);
+  margin-bottom: 8px;
+}
+.decomp-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  margin: 8px auto;
+}
+.decomp-letras {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+  max-width: 100%;
+}
+.decomp-letra {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-width: 56px; min-height: 70px;
+  padding: 6px 8px;
+  background: white;
+  border: 2px solid var(--marrom-claro);
+  border-radius: 12px;
+  box-shadow: var(--sombra-suave);
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.18s, box-shadow 0.18s, background 0.15s;
+}
+.decomp-letra:active { transform: scale(0.93); }
+.decomp-letra.ativo {
+  background: var(--laranja);
+  border-color: var(--laranja-vivo);
+  color: white;
+  box-shadow: 0 0 0 4px rgba(232,164,92,0.35), var(--sombra-media);
+  animation: rodaAtivoPulsa 0.7s ease-in-out infinite;
+}
+.decomp-letra-nome {
+  font-family: var(--display); font-weight: 900;
+  font-size: 22px; color: inherit;
+  line-height: 1;
+}
+.decomp-letra.ativo .decomp-letra-nome { color: white; }
+.decomp-letra-morse {
+  font-family: var(--display); font-weight: 800;
+  font-size: 13px; letter-spacing: 0.08em;
+  margin-top: 4px;
+  color: var(--marrom);
+}
+.decomp-letra.ativo .decomp-letra-morse { color: white; }
+.decomp-letra-morse .ponto { color: var(--sol-violao); }
+.decomp-letra-morse .traco { color: var(--re-violao); }
+.decomp-letra.ativo .decomp-letra-morse .ponto,
+.decomp-letra.ativo .decomp-letra-morse .traco { color: white; }
+.decomp-controles {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  margin-top: 4px;
+}
+@media (max-width: 380px) {
+  .decomp-letra { min-width: 48px; min-height: 62px; padding: 4px 6px; }
+  .decomp-letra-nome { font-size: 18px; }
+  .decomp-letra-morse { font-size: 11px; }
 }
 
 /* ===== SELETOR DE VELOCIDADE — 4 chips nomeados ===== */
@@ -1798,7 +1875,10 @@ const Audio = (() => {
 
     // Loop principal: a cada amostra, output do buffer atual,
     // filtra média 2-tap (lowpass natural), aplica decay, escreve de volta
-    const decay = 0.998; // controla sustain (mais alto = mais longo)
+    // v6: decay 0.998 → 0.985, dur default 2.2s → 1.0s. Lucas reportou que a
+    // notas sustentavam demais e viravam "firula", mascarando as notas-alvo
+    // (Sol4 ponto / Ré4 traço). Notas mais curtas, mais claras.
+    const decay = 0.985;
     let idx = 0;
     for (let n = 0; n < len; n++) {
       const cur = delay[idx];
@@ -1809,7 +1889,7 @@ const Audio = (() => {
     }
     return buf;
   }
-  function playViolaoSintetico(when, midiNote, dur = 2.2, vol = 0.5) {
+  function playViolaoSintetico(when, midiNote, dur = 1.0, vol = 0.55) {
     when = when || now();
     const sr = ctx.sampleRate;
     const cacheKey = midiNote + '_' + Math.round(dur * 10);
@@ -1835,7 +1915,7 @@ const Audio = (() => {
     src.stop(when + dur + 0.1);
     _track(src, env);
   }
-  function playViolaoReal(when, midiNote, dur = 1.4, vol = 0.5) {
+  function playViolaoReal(when, midiNote, dur = 1.0, vol = 0.55) {
     if (!sfPlayer || !sfInstruments.violao) return playViolaoSintetico(when, midiNote, dur, vol);
     when = when || now();
     try {
@@ -1844,7 +1924,7 @@ const Audio = (() => {
       playViolaoSintetico(when, midiNote, dur, vol);
     }
   }
-  function playViolao(when, midiNote, dur = 1.4, vol = 0.5) {
+  function playViolao(when, midiNote, dur = 1.0, vol = 0.55) {
     if (useSoundfont) playViolaoReal(when, midiNote, dur, vol);
     else playViolaoSintetico(when, midiNote, dur, vol);
   }
@@ -1873,8 +1953,10 @@ const Audio = (() => {
       playTelegrafo(when, longo);
     } else if (voz === 'violao') {
       const midi = longo ? MIDI_RE4 : MIDI_SOL4;
-      // pluck soa melhor com decay maior que duração lógica
-      playViolao(when, midi, Math.max(durSec * 4, 0.6), 0.55);
+      // v6: dur compacto pra notas claras (Lucas: "perde a sensação das notas
+      // alvo"). Pluck respeita o tempo do Morse: ponto curto, traço longo,
+      // sem virar firula sustenida.
+      playViolao(when, midi, Math.max(durSec * 1.6, 0.35), 0.55);
     }
   }
 
@@ -2141,34 +2223,39 @@ function pararLoop() {
 /* ============================================================
    CABEÇA DE COMPASSO — pulso visual sincronizado com BPM
    ============================================================ */
-// Bumbo + baqueta SVG: visual da batida do tempo. Mais figurativo do que a
-// bolinha que era usada antes — Lucas reportou desalinhamento e queria algo
-// mais óbvio pra criança. A pele "treme" no momento exato do beat (.batendo);
-// a baqueta gira em loop de cima pra baixo no tempo do BPM via CSS.
+// Metrônomo SVG: caixa trapezoidal com haste oscilando como pêndulo.
+// Visual muito mais nítido que bumbo+baqueta+treme da pele (Lucas: "reveja
+// de maneira crítica"). A haste vai de -22deg a +22deg em cada beat via CSS,
+// sincronizada com --beat-dur. O ponto laranja pisca no exato momento do tick.
 function criarCompasso(rotulo) {
   const wrap = el('div', { class: 'compasso' });
   if (rotulo) wrap.appendChild(el('span', { class: 'compasso-rotulo' }, rotulo));
 
-  const bumbo = el('div', { class: 'compasso-bumbo' });
-  bumbo.innerHTML = `
-    <svg viewBox="0 0 92 64" xmlns="http://www.w3.org/2000/svg">
-      <ellipse class="bumbo-corpo" cx="46" cy="40" rx="34" ry="20"/>
-      <ellipse class="bumbo-pele"  cx="46" cy="40" rx="28" ry="15" style="transform-origin: 46px 40px;"/>
-      <ellipse class="bumbo-aro"   cx="46" cy="40" rx="28" ry="15" fill="none" stroke-width="2.5"
-               style="stroke: var(--marrom); fill: none;"/>
-      <g class="baqueta">
-        <rect class="baqueta-haste" x="62" y="2" width="3.2" height="38" rx="1.5"/>
-        <circle class="baqueta-ponta" cx="63.6" cy="40" r="3.5"/>
+  const metro = el('div', { class: 'compasso-metronomo' });
+  metro.innerHTML = `
+    <svg viewBox="0 0 56 80" xmlns="http://www.w3.org/2000/svg">
+      <!-- caixa trapezoidal -->
+      <polygon class="metronomo-caixa" points="14,12 42,12 50,76 6,76"/>
+      <!-- painel claro central -->
+      <polygon class="metronomo-painel" points="18,18 38,18 44,72 12,72"/>
+      <!-- pivot da haste -->
+      <circle class="metronomo-pivot" cx="28" cy="70" r="3"/>
+      <!-- haste do pêndulo (vai do pivot pra cima) -->
+      <g class="metronomo-haste">
+        <rect class="metronomo-haste-corpo" x="26.6" y="22" width="2.8" height="48" rx="0.8"/>
+        <rect class="metronomo-peso" x="24" y="34" width="8" height="6" rx="1"/>
       </g>
+      <!-- pulso piscante (laranja) no topo -->
+      <circle class="metronomo-pulso" cx="28" cy="8" r="4" style="transform-origin: 28px 8px;"/>
     </svg>
   `;
-  wrap.appendChild(bumbo);
+  wrap.appendChild(metro);
 
-  // Toggle de áudio do bumbo: começa mudo, criança decide se quer ouvir.
+  // Toggle de áudio do tique: começa mudo. Lucas: criança decide se quer ouvir.
   const btn = el('button', {
     class: 'compasso-toggle',
-    'aria-label': 'ouvir o bumbo',
-    title: 'ouvir o bumbo',
+    'aria-label': 'ouvir o tique do metrônomo',
+    title: 'ouvir o tique',
     onClick: () => {
       State.bumboAudivel = !State.bumboAudivel;
       btn.classList.toggle('ativo', State.bumboAudivel);
@@ -2182,12 +2269,11 @@ function criarCompasso(rotulo) {
   return wrap;
 }
 
-// Liga o pulso do bumbo ao tempo. beatMs = duração de um beat em ms.
-// Retorna função de cleanup. Se já houver um interval ativo no mesmo elemento,
-// limpa antes de criar novo (evita vazamento em re-ativação).
+// Liga o pulso do metrônomo ao tempo. beatMs = duração de um beat em ms.
+// O setInterval pisca o ponto laranja no exato momento do tick (sincroniza
+// com a posição da haste no extremo da oscilação).
 function ativarCompasso(elementoCompasso, beatMs) {
   if (!elementoCompasso) return () => {};
-  // Limpa interval anterior se existir
   const previa = elementoCompasso.dataset.intervalId;
   if (previa) {
     clearInterval(parseInt(previa, 10));
@@ -2195,13 +2281,12 @@ function ativarCompasso(elementoCompasso, beatMs) {
   }
   elementoCompasso.style.setProperty('--beat-dur', (beatMs / 1000) + 's');
   elementoCompasso.classList.add('tocando');
-  const pele = elementoCompasso.querySelector('.bumbo-pele');
+  const pulso = elementoCompasso.querySelector('.metronomo-pulso');
   const pulsar = () => {
-    if (pele) {
-      pele.classList.remove('batendo');
-      // force reflow pra reiniciar a animação a cada beat
-      void pele.offsetWidth;
-      pele.classList.add('batendo');
+    if (pulso) {
+      pulso.classList.remove('ativo');
+      void pulso.offsetWidth;
+      pulso.classList.add('ativo');
     }
     if (State.bumboAudivel && Audio.playBumbo) {
       Audio.playBumbo();
@@ -2307,6 +2392,112 @@ function palavraParaMorse(palavra) {
   }).filter(Boolean).join(' ');
 }
 
+// Componente: decompõe um nome em cards de letras (cada uma com seu padrão
+// Morse). Lucas pediu na v6: "letras visíveis com padrão, loop ativo por
+// default, letras clicáveis individualmente, highlight da letra ativa".
+// Retorna { wrap, tocarTudo(opts), tocarLetra(idx) }. opts.loop = boolean.
+function criarDecomposicaoNome(nome, voz = 'sabia') {
+  const letras = nome.toUpperCase().replace(/[^A-Z]/g, '').split('');
+  const wrap = el('div', { class: 'decomp-wrap' });
+
+  // Linha de cards (uma letra por card, com padrão Morse abaixo)
+  const linha = el('div', { class: 'decomp-letras' });
+  const cards = letras.map((letra, idx) => {
+    const cod = MORSE[letra] || '';
+    const card = el('button', {
+      class: 'decomp-letra',
+      'aria-label': `letra ${letra}, ouvir`,
+      'data-idx': idx,
+      onClick: () => tocarLetra(idx),
+    }, [
+      el('div', { class: 'decomp-letra-nome' }, letra),
+      el('div', {
+        class: 'decomp-letra-morse',
+        html: cod.split('').map(c =>
+          c === '.' ? '<span class="ponto">·</span>' : '<span class="traco">–</span>'
+        ).join(' ')
+      }),
+    ]);
+    linha.appendChild(card);
+    return card;
+  });
+  wrap.appendChild(linha);
+
+  // Controles: play/pause loop + reset
+  const controles = el('div', { class: 'decomp-controles' });
+  const btnPlay = el('button', {
+    class: 'botao laranja',
+    'aria-label': 'tocar o nome em loop',
+  }, '▶ tocar em loop');
+  controles.appendChild(btnPlay);
+  wrap.appendChild(controles);
+
+  let tocando = false;
+  let proximoTimeout = null;
+
+  function pararTudoLocal() {
+    tocando = false;
+    if (proximoTimeout) { clearTimeout(proximoTimeout); proximoTimeout = null; }
+    pararLoop();
+    cards.forEach(c => c.classList.remove('ativo'));
+    btnPlay.innerHTML = '▶ tocar em loop';
+  }
+
+  function tocarLetra(idx) {
+    Audio.unlock();
+    if (tocando) pararTudoLocal();
+    const letra = letras[idx];
+    const cod = MORSE[letra];
+    if (!cod) return;
+    cards.forEach(c => c.classList.remove('ativo'));
+    cards[idx].classList.add('ativo');
+    tocarSequencia(cod, {
+      voz,
+      onFim: () => {
+        if (cards[idx]) cards[idx].classList.remove('ativo');
+      }
+    });
+  }
+
+  function tocarTudo() {
+    if (tocando) { pararTudoLocal(); return; }
+    Audio.unlock();
+    tocando = true;
+    btnPlay.innerHTML = '⏸ parar';
+
+    let i = 0;
+    const proxima = () => {
+      if (!tocando) return;
+      cards.forEach(c => c.classList.remove('ativo'));
+      if (i >= letras.length) {
+        // fim do nome — pequena pausa e recomeça (loop ativo por default)
+        i = 0;
+        proximoTimeout = setTimeout(proxima, 700);
+        State.elementoTimeouts.push(proximoTimeout);
+        return;
+      }
+      const letra = letras[i];
+      const cod = MORSE[letra];
+      if (cards[i]) cards[i].classList.add('ativo');
+      tocarSequencia(cod, {
+        voz,
+        onFim: () => {
+          i++;
+          if (tocando) {
+            proximoTimeout = setTimeout(proxima, 220);
+            State.elementoTimeouts.push(proximoTimeout);
+          }
+        }
+      });
+    };
+    proxima();
+  }
+
+  btnPlay.addEventListener('click', tocarTudo);
+
+  return { wrap, tocarTudo, tocarLetra, parar: pararTudoLocal };
+}
+
 // Renderiza Morse em HTML respeitando notação atual
 function renderMorse(seq) {
   const sym = State.notacaoBinaria
@@ -2336,6 +2527,7 @@ const ROTEIRO = [
   // os dois e ensina que tudo no Morse é um som curto (·) ou longo (–).
   {
     id: 'primeiro-dia',
+    titulo: 'Primeiro dia',
     fundo: 'amanhecer',
     decoracao: 'sol',
     personagens: [
@@ -2353,6 +2545,7 @@ const ROTEIRO = [
   // (palmadinha curta) entre os toques.
   {
     id: 'time-pingpong',
+    titulo: 'Time de ping-pong',
     fundo: 'dia-claro',
     decoracao: 'bola-pingpong',
     personagens: [],
@@ -2373,6 +2566,7 @@ const ROTEIRO = [
   // tocam mais devagar (BPM reduzido durante o episódio).
   {
     id: 'time-xadrez',
+    titulo: 'Time de xadrez',
     fundo: 'tarde',
     decoracao: 'xadrez',
     personagens: [],
@@ -2394,6 +2588,7 @@ const ROTEIRO = [
   // pausa entre eles). Bola passa de um pro outro visualmente.
   {
     id: 'futebol-recap',
+    titulo: 'Futebol da turma',
     fundo: 'campinho',
     decoracao: 'bola',
     personagens: [],
@@ -2417,6 +2612,7 @@ const ROTEIRO = [
   // de ajuda de verdade. Botão pra ouvir + brincar com · e –.
   {
     id: 'sos-licao',
+    titulo: 'SOS é pedido de ajuda',
     fundo: 'escola',
     personagens: [
       { tipo: 'nena', classe: 'nena' },
@@ -2430,6 +2626,7 @@ const ROTEIRO = [
   // ensaiar o parabéns. Quando "Nena chegou", overlay celebra.
   {
     id: 'segredo',
+    titulo: 'O segredo da turma',
     fundo: 'celebracao',
     personagens: [],
     fala: '🤫 — <em>Pssssiu!</em> A turma combina uma <b>surpresa</b> pra Nena…',
@@ -2481,7 +2678,9 @@ function renderApp() {
   } else if (State.modo === 'historia') {
     btnVoltar.classList.remove('escondido');
     const idx = State.cenaIdx;
-    titulo.textContent = `História — ${idx + 1} de ${ROTEIRO.length}`;
+    const ep = ROTEIRO[idx];
+    const tituloEp = ep.titulo || ep.id;
+    titulo.textContent = `Ep ${idx + 1}/${ROTEIRO.length} · ${tituloEp}`;
     renderCena(tela, ROTEIRO[idx]);
   } else if (State.modo === 'teclado') {
     btnVoltar.classList.remove('escondido');
@@ -2841,20 +3040,25 @@ function renderAcaoCena(container, cena) {
     }, State.notacaoBinaria ? '1' : '–'));
     container.appendChild(fileira);
   } else if (a.tipo === 'time-apresentacao') {
-    // E2/E3: 3 personagens lado a lado, sequência guiada por setinha.
-    // Cada toque rebate o nome em Morse. Time ping-pong toca em BPM normal +
-    // som curto de "rebatida" entre os toques. Time xadrez toca BPM reduzido.
+    // E2/E3 v6: Lucas pediu decomposição completa. Quando clica em quem está
+    // com a setinha, mostra o nome decomposto em letras (com Morse abaixo) +
+    // botão de loop + cliques individuais + highlight. Mantém o conceito de
+    // sequência guiada (não pula direto pra próximo até criança brincar).
     const seq = a.sequencia;
     const eXadrez = a.time === 'xadrez';
-    const bpmEpisodio = eXadrez ? Math.max(60, Math.round(State.bpm * 0.7)) : State.bpm;
     let idx = 0;
     const falados = new Set();
+    let decompAtual = null;
 
     const linha = el('div', { class: 'time-fileira' + (eXadrez ? ' xadrez' : ' pingpong') });
     container.appendChild(linha);
 
     const status = el('div', { class: 'roda-status', 'aria-live': 'polite' });
     container.appendChild(status);
+
+    // Painel da decomposição — preenchido quando a criança escolhe alguém
+    const painel = el('div', { class: 'decomp-painel escondido' });
+    container.appendChild(painel);
 
     function render() {
       linha.innerHTML = '';
@@ -2863,9 +3067,9 @@ function renderAcaoCena(container, cena) {
         const ehFalado = falados.has(item.quem);
         const slot = el('button', {
           class: 'time-slot' + (ehFalado ? ' falou' : '') + (ehAtivo ? ' ativo' : ''),
-          'aria-label': ehFalado ? `${item.nome} já falou` : (ehAtivo ? `tocar para ${item.nome}` : `aguarde ${item.nome}`),
+          'aria-label': ehFalado ? `${item.nome} já falou` : (ehAtivo ? `escolher ${item.nome}` : `aguarde ${item.nome}`),
           ...(!ehAtivo && !ehFalado ? { disabled: 'true' } : {}),
-          onClick: () => apresentar(item),
+          onClick: () => escolher(item),
         });
         const svg = passaroSVG(item.quem);
         if (svg) { svg.style.width = '64px'; svg.style.height = '64px'; svg.style.transform = 'scale(1)'; slot.appendChild(svg); }
@@ -2881,30 +3085,30 @@ function renderAcaoCena(container, cena) {
         return;
       }
       const proximo = seq[idx];
-      status.innerHTML = (eXadrez ? '♟' : '🏓') + ` toca em <b>${proximo.nome}</b>`;
+      status.innerHTML = (eXadrez ? '♟' : '🏓') + ` escolhe <b>${proximo.nome}</b>`;
     }
-    function apresentar(item) {
+    function escolher(item) {
       if (idx >= seq.length || seq[idx].quem !== item.quem) return;
       if (falados.has(item.quem)) return;
       falados.add(item.quem);
       idx++;
-      Audio.unlock();
 
-      // Pingpong: leve "rebatida" (palmadinha) antes do nome. Xadrez: silêncio.
-      if (!eXadrez) {
-        try { Audio.playElemento('.', 'palma', undefined, 80); } catch(e) {}
-      }
-      const morseNome = palavraParaMorse(item.nome.toUpperCase());
-      const bpmAntes = State.bpm;
-      State.bpm = bpmEpisodio;
-      tocarSequencia(morseNome, {
-        voz: 'sabia',
-        onFim: () => {
-          State.bpm = bpmAntes;
-          atualizaStatus();
-          render();
-        },
-      });
+      // Limpa decomposição anterior (se houver) e mostra a nova
+      if (decompAtual) decompAtual.parar();
+      painel.innerHTML = '';
+      painel.classList.remove('escondido');
+
+      const titulo = el('div', { class: 'decomp-titulo' }, [
+        el('span', {}, eXadrez ? '♟ ' : '🏓 '),
+        el('b', {}, item.nome),
+        el('span', { style: 'opacity:0.7' }, ' em código'),
+      ]);
+      painel.appendChild(titulo);
+
+      decompAtual = criarDecomposicaoNome(item.nome, 'sabia');
+      painel.appendChild(decompAtual.wrap);
+      decompAtual.tocarTudo(); // já começa em loop (Lucas: "loop ativo por default")
+
       atualizaStatus();
       render();
     }
@@ -2912,64 +3116,48 @@ function renderAcaoCena(container, cena) {
     render();
     atualizaStatus();
   } else if (a.tipo === 'recap-nomes') {
-    // E4: futebol. Grade dos 6 nomes. Botão "ouvir a turma" toca um por um
-    // em Morse com pausa entre eles. Cada nome destacado no momento.
+    // E4 v6: clica em quem da turma → mostra decomposição completa do nome
+    // (letras visíveis + Morse + loop default + cliques individuais).
     const lista = a.nomes;
+    let decompAtual = null;
 
     const grade = el('div', { class: 'recap-grade' });
     container.appendChild(grade);
+
+    const painel = el('div', { class: 'decomp-painel escondido' });
+    container.appendChild(painel);
+
+    function escolher(item, cell) {
+      if (decompAtual) decompAtual.parar();
+      painel.innerHTML = '';
+      painel.classList.remove('escondido');
+
+      // Marca quem está sendo ouvido na grade
+      grade.querySelectorAll('.recap-item').forEach(c => c.classList.remove('ativo'));
+      cell.classList.add('ativo');
+
+      painel.appendChild(el('div', { class: 'decomp-titulo' }, [
+        el('span', {}, '⚽ '),
+        el('b', {}, item.nome),
+        el('span', { style: 'opacity:0.7' }, ' em código'),
+      ]));
+
+      decompAtual = criarDecomposicaoNome(item.nome, 'sabia');
+      painel.appendChild(decompAtual.wrap);
+      decompAtual.tocarTudo(); // loop ativo
+    }
+
     lista.forEach((item) => {
       const cell = el('button', {
         class: 'recap-item',
-        'aria-label': `ouvir ${item.nome}`,
-        onClick: () => {
-          Audio.unlock();
-          cell.classList.add('ativo');
-          tocarSequencia(palavraParaMorse(item.nome.toUpperCase()), {
-            voz: 'sabia',
-            onFim: () => cell.classList.remove('ativo'),
-          });
-        }
+        'aria-label': `decompor ${item.nome}`,
       });
+      cell.addEventListener('click', () => escolher(item, cell));
       const svg = passaroSVG(item.quem);
       if (svg) { svg.style.width = '52px'; svg.style.height = '52px'; svg.style.transform = 'scale(1)'; cell.appendChild(svg); }
       cell.appendChild(el('div', { class: 'recap-nome' }, item.nome));
       grade.appendChild(cell);
     });
-
-    const acoes = el('div', { class: 'cena-acoes' });
-    let tocandoTodos = false;
-    const btnTodos = el('button', {
-      class: 'botao laranja grande',
-      onClick: () => {
-        if (tocandoTodos) { pararLoop(); tocandoTodos = false; btnTodos.textContent = '⚽ ouvir a turma'; return; }
-        Audio.unlock();
-        tocandoTodos = true;
-        btnTodos.textContent = '⏸ parar';
-        let i = 0;
-        const cells = grade.querySelectorAll('.recap-item');
-        const proximo = () => {
-          cells.forEach(c => c.classList.remove('ativo'));
-          if (i >= lista.length) {
-            tocandoTodos = false;
-            btnTodos.textContent = '⚽ ouvir a turma';
-            return;
-          }
-          const nome = lista[i].nome.toUpperCase();
-          if (cells[i]) cells[i].classList.add('ativo');
-          tocarSequencia(palavraParaMorse(nome), {
-            voz: 'sabia',
-            onFim: () => {
-              i++;
-              State.elementoTimeouts.push(setTimeout(proximo, 600));
-            },
-          });
-        };
-        proximo();
-      }
-    }, '⚽ ouvir a turma');
-    acoes.appendChild(btnTodos);
-    container.appendChild(acoes);
   } else if (a.tipo === 'segredo-parabens') {
     // E6: turma sussurra (sem Nena). Botão "ensaiar" toca PARABENS NENA em
     // canto sabiá baixo. Botão "Nena chegou!" mostra overlay celebrando.
