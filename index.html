@@ -517,7 +517,20 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .botao.secundario:active { background: var(--papel-fundo); }
 .botao.amarelo { background: var(--amarelo); color: var(--marrom); }
 .botao.amarelo:active { background: var(--amarelo-bico); }
-.botao.pequeno { padding: 10px 16px; font-size: 14px; min-height: 40px; border-radius: 20px; }
+.botao.pequeno { padding: 12px 18px; font-size: 15px; min-height: 48px; border-radius: 24px; }
+.botao.grande {
+  padding: 18px 28px;
+  font-size: clamp(17px, 4.6vw, 19px);
+  min-height: 60px;
+  border-radius: 30px;
+  box-shadow: var(--sombra-grande, 0 6px 16px rgba(0,0,0,0.2));
+}
+.botao em { font-style: italic; opacity: 0.95; }
+@media (max-width: 380px) {
+  .botao { padding: 12px 18px; font-size: 15px; min-height: 50px; }
+  .botao-grande-icone { width: 70px; height: 70px; font-size: 28px; }
+  .botao-grande-icone.maior { width: 90px; height: 90px; font-size: 36px; }
+}
 
 .botao-grande-icone {
   display: grid; place-items: center;
@@ -583,36 +596,60 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-family: var(--display); font-size: 12px;
   color: var(--tinta-suave);
 }
-.compasso-trilho {
+/* Bumbo + baqueta — substituem a cabeça de compasso. A baqueta gira no tempo
+   do BPM via CSS (var --beat-dur). Sincronia com áudio é controlada pelo JS
+   em ativarCompasso, que adiciona .batendo no momento exato do beat. */
+.compasso-bumbo {
   position: relative;
-  width: 110px; height: 16px;
-  border-radius: 8px;
-  background: linear-gradient(to right,
-    transparent 0%, var(--papel-fundo) 12%,
-    var(--papel-fundo) 88%, transparent 100%);
-  border: 1px solid var(--marrom-claro);
-  border-color: rgba(125, 90, 60, 0.25);
+  width: 110px; height: 78px;
 }
-.compasso-cabeca {
-  position: absolute; top: -3px; left: 12%;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  background: var(--laranja);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.18);
-  transform: translateX(-50%) scale(0.9);
-  transition: transform 0.08s ease;
+.compasso-bumbo svg { width: 100%; height: 100%; overflow: visible; }
+.bumbo-corpo {
+  fill: var(--marrom);
+  stroke: var(--marrom-fundo);
+  stroke-width: 2;
 }
-.compasso.tocando .compasso-cabeca {
-  animation: balanco var(--beat-dur, 0.5s) ease-in-out infinite alternate;
+.bumbo-pele { fill: #f6efe2; stroke: var(--marrom-claro); stroke-width: 1.5; }
+.bumbo-aro  { fill: var(--laranja); }
+.bumbo-pele.batendo {
+  animation: bumboTremor 0.12s ease-out;
 }
-.compasso.tocando .compasso-cabeca.batendo {
-  transform: translateX(-50%) scale(1.18);
+@keyframes bumboTremor {
+  0%   { transform: scale(1, 1); }
+  40%  { transform: scale(1.06, 0.94); }
+  100% { transform: scale(1, 1); }
 }
-@keyframes balanco {
-  from { left: 12%; }
-  to   { left: 88%; }
+.baqueta {
+  transform-origin: 70% 8%;
+  animation: baquetaBate var(--beat-dur, 0.5s) ease-in-out infinite alternate;
 }
+.compasso:not(.tocando) .baqueta {
+  animation: none;
+  transform: rotate(-30deg);
+}
+@keyframes baquetaBate {
+  from { transform: rotate(-55deg); }
+  to   { transform: rotate(-2deg);  }
+}
+.baqueta-haste { fill: #c9a06b; stroke: #8e6a3f; stroke-width: 0.8; }
+.baqueta-ponta { fill: #4a3422; }
 .compasso-rotulo { font-weight: 700; opacity: 0.7; }
+.compasso-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  border: 1px solid var(--marrom-claro);
+  border-radius: 50%;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.compasso-toggle:active { transform: scale(0.92); }
+.compasso-toggle.ativo {
+  background: var(--laranja);
+  color: white;
+  border-color: var(--laranja);
+}
 
 /* Indicador rítmico (forma da letra) */
 .tempo-indicador {
@@ -751,13 +788,13 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   background: var(--papel-medio);
   border: 2px solid var(--marrom-claro);
   border-radius: 14px;
-  padding: 14px 18px;
+  padding: 16px 18px;
   font-family: var(--display); font-weight: 800;
-  font-size: clamp(20px, 5vw, 26px);
+  font-size: clamp(22px, 5.6vw, 28px);
   letter-spacing: 0.06em;
   color: var(--marrom);
   text-align: center;
-  min-height: 52px;
+  min-height: 60px;
   word-break: break-all;
   display: flex; align-items: center; justify-content: center;
   position: relative;
@@ -765,47 +802,54 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .teclado-input.vazio::before {
   content: 'toque as letras';
   font-family: var(--body); font-weight: 500;
-  font-size: 15px; color: var(--marrom-claro);
+  font-size: 16px; color: var(--marrom-claro);
   font-style: italic; letter-spacing: 0;
 }
 
 .teclado-grade {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: 7px;
 }
 .tecla {
   aspect-ratio: 1;
   background: var(--papel-medio);
   border: 2px solid var(--marrom-claro);
-  border-radius: 9px;
+  border-radius: 11px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   font-family: var(--display); font-weight: 800;
   color: var(--marrom);
   padding: 2px;
   transition: all 0.1s;
-  min-height: 44px;
+  min-height: 48px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
 }
 .tecla:active { background: var(--laranja); border-color: var(--laranja-vivo); color: white; transform: scale(0.92); }
-.tecla .nome { font-size: clamp(14px, 3.5vw, 18px); line-height: 1; }
-.tecla .codigo { font-size: clamp(7px, 1.8vw, 9px); letter-spacing: 0.04em; opacity: 0.55; margin-top: 2px; font-family: var(--body); font-weight: 700; }
+.tecla .nome { font-size: clamp(15px, 4vw, 20px); line-height: 1; }
+.tecla .codigo { font-size: clamp(8px, 2vw, 10px); letter-spacing: 0.04em; opacity: 0.6; margin-top: 3px; font-family: var(--body); font-weight: 700; }
 .tecla.especial { background: var(--folha); color: white; border-color: var(--folha-escura); }
 .tecla.especial:active { background: var(--folha-escura); }
 .tecla.deletar { background: var(--erro-suave); color: white; border-color: #C06850; }
+@media (max-width: 380px) {
+  .teclado-grade { gap: 5px; grid-template-columns: repeat(7, 1fr); }
+  .tecla { border-radius: 9px; min-height: 42px; }
+  .tecla .nome { font-size: 14px; }
+}
 
 .palavras-rapidas {
-  display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
 }
 .palavra-rapida {
   background: var(--ceu);
   border: 2px solid #B8C9D2;
-  border-radius: 16px;
-  padding: 5px 10px;
+  border-radius: 20px;
+  padding: 9px 14px;
   font-family: var(--display); font-weight: 700;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--tinta);
-  min-height: 32px;
+  min-height: 40px;
+  display: inline-flex; align-items: center;
 }
 .palavra-rapida.especial { background: var(--amarelo); border-color: var(--amarelo-bico); }
 .palavra-rapida:active { transform: scale(0.95); }
@@ -1157,8 +1201,11 @@ const Audio = (() => {
 
   async function carregarSoundfonts(progressCb) {
     const ENGINE = 'https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js';
-    const VIOLAO_URL = 'https://surikov.github.io/webaudiofontdata/sound/0240_GeneralUserGS_sf2_file.js';
-    const VIOLAO_NAME = '_tone_0240_GeneralUserGS_sf2_file';
+    // 0270 = Electric Guitar Clean (GeneralUser GS soundfont). Brilhante, sustain
+    // longo, sem distorção — boa pra solo nas cordas Ré4/Sol4. Antes era 0240
+    // (acústico steel), que ficava abafado em volume baixo no celular.
+    const VIOLAO_URL = 'https://surikov.github.io/webaudiofontdata/sound/0270_GeneralUserGS_sf2_file.js';
+    const VIOLAO_NAME = '_tone_0270_GeneralUserGS_sf2_file';
     const PASSARO_URL = 'https://surikov.github.io/webaudiofontdata/sound/01230_Aspirin_sf2_file.js';
     const PASSARO_NAME = '_tone_01230_Aspirin_sf2_file';
 
@@ -1591,40 +1638,59 @@ const Audio = (() => {
     }
   }
 
-  // ===== VIOLÃO (corda solta Sol4 / Ré4) =====
-  function playViolaoSintetico(when, midiNote, dur = 1.4, vol = 0.42) {
+  // ===== GUITARRA SOLO (corda solta Sol4 / Ré4) =====
+  // Síntese fallback usada quando WebAudioFont (preset 0270 Electric Clean)
+  // não carrega. Saw + harmônico 3º + leve waveshaper pra brilho de guitarra
+  // limpa, sustain longo (2.2s) pra notas cantadas em vez de violão pulsado.
+  function playViolaoSintetico(when, midiNote, dur = 2.0, vol = 0.4) {
     when = when || now();
     const freq = 440 * Math.pow(2, (midiNote - 69) / 12);
-    const osc = ctx.createOscillator();
-    osc.type = 'triangle';
-    osc.frequency.value = freq;
-    osc.detune.setValueAtTime(-3, when);
-    osc.detune.linearRampToValueAtTime(0, when + 0.05);
 
+    // Fundamental: sawtooth com leve detune pra encorpar
+    const osc = ctx.createOscillator();
+    osc.type = 'sawtooth';
+    osc.frequency.value = freq;
+    osc.detune.setValueAtTime(-4, when);
+    osc.detune.linearRampToValueAtTime(0, when + 0.06);
+
+    // Filtro com Q alto: faz o pluck "abrir" e voltar (lembra captador)
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(freq * 12, when);
-    filter.frequency.exponentialRampToValueAtTime(freq * 1.5, when + dur);
-    filter.Q.value = 1.2;
+    filter.frequency.setValueAtTime(freq * 8, when);
+    filter.frequency.exponentialRampToValueAtTime(freq * 2.5, when + dur);
+    filter.Q.value = 3.5;
+
+    // Waveshaper sutil pra adicionar brilho harmônico (sem distorcer demais)
+    const shaper = ctx.createWaveShaper();
+    const curve = new Float32Array(2048);
+    for (let i = 0; i < 2048; i++) {
+      const x = (i / 2048) * 2 - 1;
+      // tanh suave: drive baixo, mantém timbre limpo mas adiciona harmônicos
+      curve[i] = Math.tanh(x * 1.6);
+    }
+    shaper.curve = curve;
 
     const env = ctx.createGain();
     env.gain.setValueAtTime(0, when);
-    env.gain.linearRampToValueAtTime(vol, when + 0.005);
+    env.gain.linearRampToValueAtTime(vol, when + 0.004);
+    // Sustain longo: -3dB em metade da duração, fade-out exponencial até o fim
+    env.gain.exponentialRampToValueAtTime(vol * 0.5, when + dur * 0.6);
     env.gain.exponentialRampToValueAtTime(0.001, when + dur);
 
-    const osc2 = ctx.createOscillator();
-    osc2.type = 'sawtooth';
-    osc2.frequency.value = freq * 2;
-    const env2 = ctx.createGain();
-    env2.gain.setValueAtTime(0, when);
-    env2.gain.linearRampToValueAtTime(vol * 0.18, when + 0.003);
-    env2.gain.exponentialRampToValueAtTime(0.001, when + dur * 0.5);
+    // 3º harmônico discreto pra brilho de guitarra
+    const harm = ctx.createOscillator();
+    harm.type = 'sine';
+    harm.frequency.value = freq * 3;
+    const eHarm = ctx.createGain();
+    eHarm.gain.setValueAtTime(0, when);
+    eHarm.gain.linearRampToValueAtTime(vol * 0.12, when + 0.005);
+    eHarm.gain.exponentialRampToValueAtTime(0.001, when + dur * 0.7);
 
-    osc.connect(filter).connect(env).connect(masterGain);
-    osc2.connect(env2).connect(masterGain);
-    osc.start(when); osc2.start(when);
-    osc.stop(when + dur + 0.05); osc2.stop(when + dur * 0.5 + 0.05);
-    _track(osc, env); _track(osc2, env2);
+    osc.connect(filter).connect(shaper).connect(env).connect(masterGain);
+    harm.connect(eHarm).connect(masterGain);
+    osc.start(when); harm.start(when);
+    osc.stop(when + dur + 0.05); harm.stop(when + dur * 0.7 + 0.05);
+    _track(osc, env); _track(harm, eHarm);
   }
   function playViolaoReal(when, midiNote, dur = 1.4, vol = 0.5) {
     if (!sfPlayer || !sfInstruments.violao) return playViolaoSintetico(when, midiNote, dur, vol);
@@ -1676,6 +1742,25 @@ const Audio = (() => {
     seq.forEach((m, i) => playSabiaTom(when + i * 0.09, m, 0.18, 0.4));
   }
 
+  // Bumbo (kick drum) curto pro tique de tempo. Pitch desce de 150 Hz pra
+  // 60 Hz com envelope rápido — soa percussivo sem competir com o canto.
+  function playBumbo(when, vol = 0.55) {
+    if (!ctx) return;
+    const t = (typeof when === 'number') ? when : ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(150, t);
+    osc.frequency.exponentialRampToValueAtTime(60, t + 0.07);
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(vol, t + 0.005);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+    osc.connect(env).connect(masterGain);
+    osc.start(t);
+    osc.stop(t + 0.18);
+    _track(osc, env);
+  }
+
   return {
     init, unlock, now,
     carregarSoundfonts,
@@ -1683,6 +1768,7 @@ const Audio = (() => {
     playElemento,
     playSabiaTom, playCantoSabiaFloreio, playFeliz,
     playViolao,
+    playBumbo,
     pararTudo,
     estaUsandoSoundfont: () => useSoundfont,
     _activeSourcesSize: () => activeSources.size, // pra debug/teste
@@ -1735,6 +1821,7 @@ const State = {
   reproduzindo: false,
   cleanupAtual: null,
   elementoTimeouts: [], // setTimeouts dos onElemento callbacks (limpos em pararLoop)
+  bumboAudivel: false,  // toggle do tique do bumbo no compasso (default mudo)
   cumpridas: new Set(),
 };
 
@@ -1748,6 +1835,7 @@ function salvarEstado() {
       vozTeclado: State.vozTeclado,
       bpm: State.bpm,
       notacaoBinaria: State.notacaoBinaria,
+      bumboAudivel: State.bumboAudivel,
     }));
   } catch(e) {}
 }
@@ -1768,6 +1856,7 @@ function carregarEstado() {
         State.bpm = d.bpm;
       }
       if (typeof d.notacaoBinaria === 'boolean') State.notacaoBinaria = d.notacaoBinaria;
+      if (typeof d.bumboAudivel === 'boolean') State.bumboAudivel = d.bumboAudivel;
     }
   } catch(e) {}
 }
@@ -1905,16 +1994,48 @@ function pararLoop() {
 /* ============================================================
    CABEÇA DE COMPASSO — pulso visual sincronizado com BPM
    ============================================================ */
+// Bumbo + baqueta SVG: visual da batida do tempo. Mais figurativo do que a
+// bolinha que era usada antes — Lucas reportou desalinhamento e queria algo
+// mais óbvio pra criança. A pele "treme" no momento exato do beat (.batendo);
+// a baqueta gira em loop de cima pra baixo no tempo do BPM via CSS.
 function criarCompasso(rotulo) {
   const wrap = el('div', { class: 'compasso' });
   if (rotulo) wrap.appendChild(el('span', { class: 'compasso-rotulo' }, rotulo));
-  const trilho = el('div', { class: 'compasso-trilho' });
-  trilho.appendChild(el('div', { class: 'compasso-cabeca' }));
-  wrap.appendChild(trilho);
+
+  const bumbo = el('div', { class: 'compasso-bumbo' });
+  bumbo.innerHTML = `
+    <svg viewBox="0 0 92 64" xmlns="http://www.w3.org/2000/svg">
+      <ellipse class="bumbo-corpo" cx="46" cy="40" rx="34" ry="20"/>
+      <ellipse class="bumbo-pele"  cx="46" cy="40" rx="28" ry="15" style="transform-origin: 46px 40px;"/>
+      <ellipse class="bumbo-aro"   cx="46" cy="40" rx="28" ry="15" fill="none" stroke-width="2.5"
+               style="stroke: var(--marrom); fill: none;"/>
+      <g class="baqueta">
+        <rect class="baqueta-haste" x="62" y="2" width="3.2" height="38" rx="1.5"/>
+        <circle class="baqueta-ponta" cx="63.6" cy="40" r="3.5"/>
+      </g>
+    </svg>
+  `;
+  wrap.appendChild(bumbo);
+
+  // Toggle de áudio do bumbo: começa mudo, criança decide se quer ouvir.
+  const btn = el('button', {
+    class: 'compasso-toggle',
+    'aria-label': 'ouvir o bumbo',
+    title: 'ouvir o bumbo',
+    onClick: () => {
+      State.bumboAudivel = !State.bumboAudivel;
+      btn.classList.toggle('ativo', State.bumboAudivel);
+      btn.setAttribute('aria-pressed', State.bumboAudivel ? 'true' : 'false');
+      if (State.bumboAudivel) Audio.unlock();
+    }
+  }, '🥁');
+  if (State.bumboAudivel) btn.classList.add('ativo');
+  wrap.appendChild(btn);
+
   return wrap;
 }
 
-// Liga a cabeça de compasso ao tempo. beatMs = duração de um beat em ms.
+// Liga o pulso do bumbo ao tempo. beatMs = duração de um beat em ms.
 // Retorna função de cleanup. Se já houver um interval ativo no mesmo elemento,
 // limpa antes de criar novo (evita vazamento em re-ativação).
 function ativarCompasso(elementoCompasso, beatMs) {
@@ -1927,11 +2048,17 @@ function ativarCompasso(elementoCompasso, beatMs) {
   }
   elementoCompasso.style.setProperty('--beat-dur', (beatMs / 1000) + 's');
   elementoCompasso.classList.add('tocando');
-  const cabeca = elementoCompasso.querySelector('.compasso-cabeca');
+  const pele = elementoCompasso.querySelector('.bumbo-pele');
   const pulsar = () => {
-    if (!cabeca) return;
-    cabeca.classList.add('batendo');
-    setTimeout(() => cabeca && cabeca.classList.remove('batendo'), 80);
+    if (pele) {
+      pele.classList.remove('batendo');
+      // force reflow pra reiniciar a animação a cada beat
+      void pele.offsetWidth;
+      pele.classList.add('batendo');
+    }
+    if (State.bumboAudivel && Audio.playBumbo) {
+      Audio.playBumbo();
+    }
   };
   pulsar();
   const intervalo = setInterval(pulsar, beatMs);
@@ -2062,7 +2189,7 @@ const ROTEIRO = [
     fala: 'Hoje é o <b>primeiro dia</b> de escola!',
     falaSub: 'O sol acordou. To esticou as asas. Vai ouvir o canto do sabiá.',
     acao: { tipo: 'ouvir-canto' },
-    proximo: 'vamos! →',
+    proximo: '🚀 vamos!',
   },
   // Cena 1: encontro com Ben no caminho
   {
@@ -2076,7 +2203,7 @@ const ROTEIRO = [
     fala: '— Bom dia, <b>Ben</b>! / — Bom dia, <b>To</b>!',
     falaSub: 'Ben mora no galho do lado. São amigos. Vão juntos pra escola.',
     acao: { tipo: 'aprender-letras', letras: ['T', 'O', 'B', 'E', 'N'] },
-    proximo: 'voar pra escola →',
+    proximo: '🐦 voar pra escola',
   },
   // Cena 2: chegada na escola — Nena recebe e anuncia o tema
   {
@@ -2094,7 +2221,7 @@ const ROTEIRO = [
     fala: '— <em>Bem-vindos</em>, Ben e To! Eu sou a <b>Nena</b>, professora dos sabiás.',
     falaSub: 'A Nena olha pra turma: <em>"hoje a gente aprende o <b>SOS</b> e os <b>nomes</b> de todo mundo."</em>',
     acao: null,
-    proximo: 'começar a aula →',
+    proximo: '📚 começar a aula',
   },
   // Cena 3: aula SOS — três pontos, três traços, três pontos
   {
@@ -2106,7 +2233,7 @@ const ROTEIRO = [
     fala: 'O <b>SOS</b> é o pedido de ajuda mais famoso. <em>Três curtos, três longos, três curtos.</em>',
     falaSub: 'Nena ensina: ouve em canto sabiá, depois brinca com · e –.',
     acao: { tipo: 'aula-sos' },
-    proximo: 'agora a roda →',
+    proximo: '🎯 agora a roda',
   },
   // Cena 4: roda de apresentação — sequência guiada
   {
@@ -2129,7 +2256,7 @@ const ROTEIRO = [
         { quem: 'ben',  nome: 'Ben'  },
       ],
     },
-    proximo: 'parabéns! →',
+    proximo: '🎉 parabéns!',
   },
   // Cena 5: final — toda turma canta PARABÉNS NENA
   {
@@ -2147,7 +2274,7 @@ const ROTEIRO = [
     fala: '🎉 <b>PARABÉNS, turma!</b> 🎂',
     falaSub: 'Primeiro dia foi <em>maravilhoso</em>. A turma canta junto pra Nena.',
     acao: { tipo: 'parabens-nena' },
-    proximo: 'voltar pra escola →',
+    proximo: '🏠 voltar pra escola',
   },
 ];
 
@@ -2197,7 +2324,7 @@ function renderApp() {
     renderCena(tela, ROTEIRO[idx]);
   } else if (State.modo === 'teclado') {
     btnVoltar.classList.remove('escondido');
-    titulo.textContent = 'Teclado do Sabiá';
+    titulo.textContent = 'Teclado livre';
     renderTeclado(tela);
   } else if (State.modo === 'letras') {
     btnVoltar.classList.remove('escondido');
@@ -2260,7 +2387,7 @@ function renderLanding(tela) {
     el('div', { class: 'porta-icone' }, '🎹'),
     el('div', { class: 'porta-texto' }, [
       el('div', { class: 'porta-titulo' }, 'Teclado livre'),
-      el('div', { class: 'porta-desc' }, 'Escreve qualquer palavra. Sabiá, palma, telégrafo ou violão.'),
+      el('div', { class: 'porta-desc' }, 'Escreve qualquer palavra. Sabiá, palma, telégrafo ou guitarra.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
@@ -2613,7 +2740,7 @@ function renderAcaoCena(container, cena) {
           Audio.unlock();
           tocarSequencia(palavraParaMorse('BENTO'), { voz: 'violao' });
         }
-      }, '🎸 no violão'),
+      }, '🎸 na guitarra'),
     ]));
   } else if (a.tipo === 'parabens-nena') {
     // Sequência: PARABENS NENA NENA NENA NENA — toca o nome dela 4 vezes seguidas
@@ -2651,7 +2778,7 @@ function renderAcaoCena(container, cena) {
           tocarSequencia(seqMorse, { voz: 'violao' });
           setTimeout(() => celebrar(30), 200);
         }
-      }, '🎸 no violão'),
+      }, '🎸 na guitarra'),
     ]));
   } else if (a.tipo === 'surpresa-letras') {
     // Cada criança traz duas letras pra construir PARABENS NENA
@@ -2819,7 +2946,7 @@ function renderTeclado(tela) {
   const linhaVoz = el('div', { class: 'config-linha' });
   linhaVoz.appendChild(el('span', { class: 'config-rotulo' }, 'Voz'));
   ['sabia', 'palma', 'telegrafo', 'violao'].forEach(v => {
-    const labels = { sabia: ['🐦', 'sabiá'], palma: ['👏', 'palma'], telegrafo: ['⚡', 'telégrafo'], violao: ['🎸', 'violão'] };
+    const labels = { sabia: ['🐦', 'sabiá'], palma: ['👏', 'palma'], telegrafo: ['⚡', 'telégrafo'], violao: ['🎸', 'guitarra'] };
     const [emoji, txt] = labels[v];
     linhaVoz.appendChild(el('button', {
       class: 'chip' + (State.vozTeclado === v ? ' laranja-ativo' : ''),
@@ -2941,7 +3068,7 @@ function renderTeclado(tela) {
   // Botões principais
   const principal = el('div', { style: 'display:flex; gap:8px; justify-content:center; margin: 4px 0;' });
   principal.appendChild(el('button', {
-    class: 'botao laranja',
+    class: 'botao laranja grande',
     onClick: function() {
       Audio.unlock();
       if (!State.texto) return;
@@ -3154,7 +3281,7 @@ function renderLetraDetalhe(tela, letra) {
       Audio.unlock();
       tocarSequencia(codPalavra, { voz: 'violao' });
     }
-  }, '🎸 violão'));
+  }, '🎸 guitarra'));
   wrap.appendChild(botoes);
 
   // Navegação anterior/próxima
