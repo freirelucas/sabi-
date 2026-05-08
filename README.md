@@ -24,5 +24,10 @@ HTML + CSS + JS puro num único `index.html`. Sem build, sem deps de runtime. De
 
 ## Créditos
 
+- **Canto do sabiá**: [XC421912](https://xeno-canto.org/421912) — *Turdus rufiventris*, gravado por Fernando Igor de Godoy em 2017-03-30 (RPPN Estação Veracel, Porto Seguro, Bahia). Licença [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Convertido para mono 96 kbps, embutido como base64 inline (~37 KB).
 - Sabiá-laranjeira (*Turdus rufiventris*) — ave-símbolo do Brasil
 - Tipografia: [Fraunces](https://fonts.google.com/specimen/Fraunces) + [Nunito](https://fonts.google.com/specimen/Nunito)
+
+## Licença
+
+O canto do sabiá embutido é CC BY-NC-SA 4.0 — uso não-comercial, exigindo o mesmo licenciamento em derivados. Como esse é um app pessoal pedagógico (não comercial) e o repo é aberto, está em conformidade.
