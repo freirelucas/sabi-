@@ -1,6 +1,6 @@
 # Sabiá Morse
 
-App pedagógico em HTML standalone para ensinar código Morse ao Bento (5 anos), através da história do filhote-sabiá **To** e seu vizinho-amigo **Ben** na escola dos sabiás. A aula é especial: boas-vindas para Ben e To, e aniversário da **Nena** (mãe do Bento) — termina com toda a turma cantando **Parabéns** pra ela.
+App pedagógico em HTML standalone para ensinar código Morse ao Bento (5 anos), através da história do filhote-sabiá **To** e seu vizinho-amigo **Ben** na escola dos sabiás. A professora **Nena** recebe os dois e ensina que pássaros escrevem com música. No fim, a turma prepara uma surpresa: cada criança traz duas letras pra formar **PARABÉNS NENA** — é aniversário dela.
 
 > *"Pássaros escrevem com música."*
 
@@ -19,7 +19,7 @@ npx serve
 
 Três modos de uso (landing tem três portas):
 
-1. **História do To** — 9 cenas narrativas. To acorda no ninho, encontra Ben, vão pra escola, conhecem Caca (canarinho), aula especial do professor (boas-vindas + aniversário Nena), três colegas Jo/Tete/Tata se apresentam, contam história de Didi/Toto/Todi, professor apresenta palavras grandes (Mama, Papa, Mim), revelação BENTO = Ben + To, e final coletivo cantando **PARABÉNS NENA**.
+1. **História do To** — 10 cenas narrativas. To acorda no ninho, encontra Ben, vão pra escola, conhecem Caca (canarinho), a professora Nena dá boas-vindas, três colegas Jo/Tete/Tata se apresentam, contam história de Didi/Toto/Todi, Nena apresenta palavras grandes (Mama, Papa, Mim), revelação BENTO = Ben + To, **surpresa pra Nena** (cada criança traz duas letras que juntas formam PARABENS NENA), e final coletivo cantando **PARABÉNS NENA**.
 2. **Teclado do Sabiá** — escreve qualquer palavra e ouve em 4 vozes (sabiá / palma / telégrafo / violão), com slider de BPM (40–100), notação ·– ou 0/1, repetições 1×/2×/4×/8× ou loop infinito. Palavras prontas: BENTO, NENA, PARABENS NENA, TO, BEN, CACA, OI, MAMA, PAPA, MIM, JUDO.
 3. **Letra por letra** — 26 letras, 26 palavras-âncora (A→Asa, B→Bento, C→Casa, D→Didi, E→Estela, F→Flor, G→Galho, H→Homem, I→Ipê, J→Judo, K→Karatê, L→Lua, M→Mama, N→Nena, O→Oi, P→Papa, Q→Quintal, R→Rio, S→Sabiá, T→To, U→Uva, V→Vento, W→Wawe, X→Xícara, Y→Yo, Z→Zebra). Mostra forma rítmica e Morse, com botões pra ouvir letra e palavra inteira em sabiá ou violão.
 
@@ -41,7 +41,7 @@ HTML + CSS + JS puro. Sem bundler, sem build step, sem dependências de runtime 
 
 ## Status
 
-**v2 narrativa com final-aniversário** — funcional. Falta teste em iPhone real do Bento. Pendências e arquitetura detalhadas em [`CLAUDE.md`](./CLAUDE.md).
+**v3 Nena-professora** — funcional, 10 cenas. Falta teste em iPhone real do Bento. Pendências e arquitetura detalhadas em [`CLAUDE.md`](./CLAUDE.md).
 
 ## Créditos
 

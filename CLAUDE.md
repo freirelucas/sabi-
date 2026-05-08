@@ -14,7 +14,7 @@ App pedagógico standalone (1 arquivo HTML) pra ensinar Morse ao Bento. Mote cen
 
 A voz default em todo o fio narrativo é **sabiá** com inflexão melódica (Sol4 ponto / Ré4 traço, mesmas alturas das cordas soltas do violão do Bento). Outras vozes (palma, telégrafo, violão) só estão disponíveis no teclado de exploração livre.
 
-O app é também uma carta afetiva pra Nena: a história se passa no dia do aniversário dela, e termina com toda a turma da escola dos sabiás cantando Parabéns.
+O app é também uma carta afetiva pra Gabriela ("Nena"): na ficção, **Nena é a professora dos sabiás** que recebe Ben e To na escola. A história termina com a turma cantando Parabéns pra ela, surpresa preparada pelos próprios alunos. A maternidade real (Gabriela é mãe do Bento) fica fora do app — a homenagem se sustenta pelo arco professora ↔ alunos.
 
 ## Decisões narrativas
 
@@ -25,23 +25,26 @@ O app é também uma carta afetiva pra Nena: a história se passa no dia do aniv
 - **Caca** — colega da escola, **canarinho amarelo** (espécie diferente — variedade visual; a escola dos sabiás aceita amigos de outras espécies)
 - **Jo, Tete, Tata** — três colegas que se apresentam e contam histórias (Tete tem flor de ipê na cabeça; Tata tem fita)
 - **Didi, Toto, Todi** — personagens da história contada pelas três colegas (conjunto restritíssimo de letras D/I/T/O — pedagogicamente intencional)
-- **Professor Sabiá** — sabiá mais velho com óculos
-- **Bento** — filho do Lucas, revelação na cena 7 (To + Ben = Bento)
-- **Nena** — mãe do Bento, aniversariante invisível mas central na narrativa (a aula é em homenagem a ela)
+- **Nena** — **professora dos sabiás**, sabiá mais velha com óculos. Aniversariante (revelado como surpresa pela turma na cena 8). Tipo de personagem no código: `'nena'`.
+- **Bento** — filho do Lucas (mundo real, não personagem do app). Revelação na cena 7: BENTO = To + Ben.
 
-### Roteiro — 9 cenas
+### Roteiro — 10 cenas
 
 ```
 0. Amanhecer no ninho       To acorda, canto sabiá
 1. Encontro com Ben         Letras T, O, B, E, N
 2. Escola e Caca            Letras C, A
-3. Aula curto/longo         "boas-vindas Ben+To, aniversário Nena"
-                            Botões · e –
+3. Aula curto/longo         Nena se apresenta como professora,
+                            recebe Ben e To. Botões · e –
 4. Três colegas             Jo, Tete, Tata se apresentam
 5. História das irmãs       Didi, Toto, Todi (letras D, I)
-6. Palavras solenes         Mama, Papa, Mim (letras M, P)
+6. Palavras solenes         Mama, Papa, Mim (letras M, P) — Nena ensina
 7. Revelação BENTO          BENTO = Ben + To
-8. Final: PARABÉNS NENA     Toda a turma canta para a Nena.
+8. Surpresa pra Nena        Cada criança traz 2 letras, junta tudo
+                            forma PARABENS NENA. Distribuição:
+                            To→PA, Ben→RA, Caca→BE,
+                            Jo→NS, Tete→NE, Tata→NA
+9. Final: PARABÉNS NENA     Toda a turma canta para a Nena.
                             Sequência: PARABENS NENA NENA NENA NENA
                             (o nome dela ecoa 4 vezes seguidas)
 ```
@@ -100,7 +103,7 @@ Organizado em módulos lógicos dentro do mesmo `<script>`:
 2. **`MORSE`** — tabela A-Z, função `calcularTiming(bpm)` com Farnsworth (ponto = 60000/bpm, traço = 3×, espaçoLetra = 3.8×, espaçoPalavra = 7×).
 3. **`State`** — estado global (modo, cenaIdx, vozTeclado, bpm, loopInfinito, loopId, cumpridas Set). `localStorage` chave `sabia-morse-bento-v2`.
 4. **`tocarSequencia(seq, opts)`** — agendador principal. Recebe string com `.`, `-`, ` ` (entre letras), `/` (entre palavras). Suporta `repeticoes`, `infinito`, `onElemento`, `onFim`. Usa `State.loopId` pra cancelar.
-5. **`ROTEIRO`** — array de 9 cenas, cada uma com `{ id, fundo, decoracao, personagens, fala, falaSub, acao, proximo }`. Cenas referenciam personagens por tipo (`'to'`, `'ben'`, etc.). **Tipos de ação**: `ouvir-canto`, `aprender-letras`, `apresentar-nomes`, `curto-longo`, `revelar-bento`, `parabens-nena`, `final`.
+5. **`ROTEIRO`** — array de 10 cenas, cada uma com `{ id, fundo, decoracao, personagens, fala, falaSub, acao, proximo }`. Cenas referenciam personagens por tipo (`'to'`, `'ben'`, `'nena'`, etc.). **Tipos de ação**: `ouvir-canto`, `aprender-letras`, `apresentar-nomes`, `curto-longo`, `revelar-bento`, `surpresa-letras`, `parabens-nena`, `final`.
 6. **`PALAVRAS_LETRA`** — mapa A-Z → palavra-âncora. **Não editar sem consultar Lucas.**
 7. **`passaroSVG(personagem)`** — fábrica que retorna `<svg>` configurado por CSS variables. Acessórios via `<use href>` (`#topete`, `#flor-cabeca`, `#fita-cabeca`, `#oculos`).
 8. **Renderers** — `renderLanding`, `renderCena`, `renderTeclado`, `renderLetras`, `renderLetraDetalhe`. Todos usam helper `el(tag, props, children)` pra construir DOM.
@@ -155,4 +158,5 @@ Se Lucas pedir uma nova mudança:
 
 - **v1** (sessão original) — 7 etapas pedagógicas (pulso, curto/longo, contar, letras, violão, palavras, teclado livre). Final: desafio "PARABENS NENA" no modo livre. Áudio: síntese Web Audio pura. Funcional mas Lucas reportou que áudio não convencia.
 - **v2 narrativa** (segunda sessão) — pivot pra história em 9 cenas. Personagens To, Ben, Caca, Jo, Tete, Tata, Professor. Áudio: WebAudioFont via CDN. Final inicial: "BENTO = Ben + To".
-- **v2 final-aniversário** (último ajuste) — três mudanças do Lucas: (1) J→Judo no vocabulário (não Jo); (2) cena 3 da aula explica que é boas-vindas pro Ben+To e aniversário da Nena; (3) cena final vira PARABÉNS NENA, com o nome dela ecoando 4 vezes na sequência Morse final.
+- **v2 final-aniversário** (sessão anterior) — três mudanças do Lucas: (1) J→Judo no vocabulário (não Jo); (2) cena 3 da aula explica que é boas-vindas pro Ben+To e aniversário da Nena; (3) cena final vira PARABÉNS NENA, com o nome dela ecoando 4 vezes na sequência Morse final.
+- **v3 Nena-professora** (sessão atual) — pivot do arco: Nena deixa de ser "mãe do Bento aniversariante invisível" e vira a **professora dos sabiás** (substitui o tipo `professor` no código). O aniversário é revelado como surpresa da turma. **Nova cena 8 `surpresa-letras`**: cada uma das 6 crianças traz 2 letras (PA, RA, BE, NS, NE, NA) que se juntam pra formar PARABENS NENA — display vai construindo letra a letra, com Morse acompanhando, e botão final libera a cena de canto. Polish junto: `aria-live="polite"` na fala da cena, animação `letraPousa` quando letra chega no display, layout do Morse final em duas linhas pra não transbordar em telas pequenas.
