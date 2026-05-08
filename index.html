@@ -755,9 +755,9 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   <svg class="loader-passaro" viewBox="0 0 200 200">
     <use href="#sabia-base"/>
   </svg>
-  <div class="loader-texto" id="loader-texto">o sabiá está afinando o bico…</div>
+  <div class="loader-texto" id="loader-texto">preparando o sabiá…</div>
   <div class="loader-progresso"><div class="loader-barra" id="loader-barra"></div></div>
-  <button class="loader-pular" id="loader-pular">continuar com som simples →</button>
+  <button class="loader-pular" id="loader-pular">pular →</button>
 </div>
 
 <div id="app">
@@ -941,6 +941,30 @@ const Audio = (() => {
   let sfInstruments = {}; // { violao: preset, sabia: preset }
   let sabiaBuffer = null;  // AudioBuffer com canto real (XC421912), null se ainda não decodificou
 
+  // ----- Tracking de fontes ativas -----
+  // Toda BufferSourceNode/OscillatorNode entra aqui ao ser criada e sai automaticamente
+  // no .onended. pararTudo() força .stop(0) em tudo que sobrou — resolve a sobreposição
+  // de sons quando o usuário aperta vários botões em sequência rápida.
+  const activeSources = new Set();
+  const activeGains = new Set();
+  function _track(src, gain) {
+    activeSources.add(src);
+    if (gain) activeGains.add(gain);
+    src.onended = () => {
+      activeSources.delete(src);
+      if (gain) activeGains.delete(gain);
+    };
+    return src;
+  }
+  function pararTudo() {
+    activeSources.forEach(s => { try { s.stop(0); } catch(e) {} });
+    activeGains.forEach(g => {
+      try { g.gain.cancelScheduledValues(0); g.gain.value = 0; } catch(e) {}
+    });
+    activeSources.clear();
+    activeGains.clear();
+  }
+
   // Offsets escolhidos dentro do sample pra cada papel (ver header sobre as 5 frases)
   const SAB = {
     pontoOff: 1.95,   pontoDur: 0.18,    // frase 4: ataque curto e nítido
@@ -1014,19 +1038,19 @@ const Audio = (() => {
       // 1. Engine
       await Promise.race([
         loadScript(ENGINE),
-        new Promise((_, r) => setTimeout(() => r(new Error('timeout engine')), 6000))
+        new Promise((_, r) => setTimeout(() => r(new Error('timeout engine')), 2500))
       ]);
       avanca();
       // 2. Violão
       await Promise.race([
         loadScript(VIOLAO_URL),
-        new Promise((_, r) => setTimeout(() => r(new Error('timeout violão')), 6000))
+        new Promise((_, r) => setTimeout(() => r(new Error('timeout violão')), 2500))
       ]);
       avanca();
       // 3. Pássaro
       await Promise.race([
         loadScript(PASSARO_URL),
-        new Promise((_, r) => setTimeout(() => r(new Error('timeout pássaro')), 6000))
+        new Promise((_, r) => setTimeout(() => r(new Error('timeout pássaro')), 2500))
       ]);
       avanca();
 
@@ -1097,6 +1121,7 @@ const Audio = (() => {
     src.connect(filter).connect(env).connect(masterGain);
     src.start(when);
     src.stop(when + 0.1);
+    _track(src, env);
   }
 
   // ===== VOZ "SABIÁ" (canto melódico, FM synth aprimorada) =====
@@ -1113,35 +1138,45 @@ const Audio = (() => {
 
   // ===== AMOSTRA REAL DO SABIÁ =====
   // Toca um trecho do sample real (se carregado). Fallback é síntese.
-  function _playSabiaSlice(when, offset, dur, vol = 0.6, rate = 1) {
+  // Mantém slice em duração natural pra não amputar timbre, mas a duração-alvo (durMorse)
+  // controla envelope + stop pra encaixar no BPM sem overlap.
+  function _playSabiaSlice(when, offset, sliceDur, vol = 0.6, rate = 1, durMorse = null) {
     if (!sabiaBuffer) return false;
+    if (window.__sabiaSampleOff) return false;  // flag de debug: força síntese
     when = when || now();
+    durMorse = durMorse || sliceDur;
     const src = ctx.createBufferSource();
     src.buffer = sabiaBuffer;
     src.playbackRate.value = rate;
     const env = ctx.createGain();
+    const fim = when + durMorse;
     env.gain.setValueAtTime(0, when);
     env.gain.linearRampToValueAtTime(vol, when + 0.012);
-    env.gain.linearRampToValueAtTime(vol, when + Math.max(0.04, dur - 0.06));
-    env.gain.exponentialRampToValueAtTime(0.001, when + dur);
+    env.gain.linearRampToValueAtTime(vol, fim - 0.02);   // sustain até 20ms antes do fim
+    env.gain.exponentialRampToValueAtTime(0.001, fim);   // release 20ms
     src.connect(env).connect(masterGain);
-    src.start(when, offset, dur + 0.05);
-    src.stop(when + dur + 0.1);
+    // Lê só o necessário do source pra cobrir durMorse, considerando rate
+    src.start(when, offset, durMorse * rate + 0.05);
+    src.stop(fim + 0.03);                                 // hard stop logo após release
+    _track(src, env);
+    if (window.__debugAudio) {
+      console.debug('slice', { offset, durMorse, sliceDur, rate });
+    }
     return true;
   }
 
   function playSabiaPontoReal(when, durSec, vol = 0.55) {
     durSec = durSec || 0.18;
-    // Se BPM pediu um ponto mais curto que o slice (180ms), acelera levemente.
-    // Limita rate em [0.85, 1.4] pra não distorcer demais o timbre.
-    const rate = Math.max(0.85, Math.min(1.4, SAB.pontoDur / Math.max(0.10, durSec)));
-    return _playSabiaSlice(when, SAB.pontoOff, Math.min(SAB.pontoDur, durSec * rate), vol, rate);
+    // rate ≈ slice/durMorse mas clamped pra não distorcer timbre.
+    // O envelope + stop respeitam durSec, então não importa se rate satura — não há overlap.
+    const rate = Math.max(0.85, Math.min(1.4, SAB.pontoDur / Math.max(0.08, durSec)));
+    return _playSabiaSlice(when, SAB.pontoOff, SAB.pontoDur, vol, rate, durSec);
   }
 
   function playSabiaTracoReal(when, durSec, vol = 0.55) {
     durSec = durSec || 0.55;
-    const rate = Math.max(0.85, Math.min(1.4, SAB.tracoDur / Math.max(0.20, durSec)));
-    return _playSabiaSlice(when, SAB.tracoOff, Math.min(SAB.tracoDur, durSec * rate), vol, rate);
+    const rate = Math.max(0.85, Math.min(1.4, SAB.tracoDur / Math.max(0.18, durSec)));
+    return _playSabiaSlice(when, SAB.tracoOff, SAB.tracoDur, vol, rate, durSec);
   }
 
   function _playBicoBurst(when, vol, freqBP, durMs) {
@@ -1156,6 +1191,7 @@ const Audio = (() => {
     e.gain.exponentialRampToValueAtTime(0.001, when + durMs / 1000);
     noise.connect(f).connect(e).connect(masterGain);
     noise.start(when); noise.stop(when + durMs / 1000 + 0.01);
+    _track(noise, e);
   }
 
   function playSabiaPontoSintetico(when, durSec, vol = 0.55) {
@@ -1192,6 +1228,7 @@ const Audio = (() => {
     osc2.connect(env2).connect(masterGain);
     osc.start(when); osc2.start(when);
     osc.stop(tFim + 0.04); osc2.stop(tFim + 0.04);
+    _track(osc, env); _track(osc2, env2);
 
     _playBicoBurst(when, vol * 0.18, 3500, 25);
   }
@@ -1263,6 +1300,7 @@ const Audio = (() => {
     osc.start(when); osc2.start(when); osc3.start(when); lfo.start(when);
     const fim = tFim + 0.05;
     osc.stop(fim); osc2.stop(fim); osc3.stop(fim); lfo.stop(fim);
+    _track(osc, env); _track(osc2, env2); _track(osc3, env3); _track(lfo, lfoG);
 
     _playBicoBurst(when, vol * 0.14, 3000, 35);
   }
@@ -1302,6 +1340,7 @@ const Audio = (() => {
     osc.start(when); lfo.start(when); osc2.start(when);
     const fim = when + dur + 0.04;
     osc.stop(fim); lfo.stop(fim); osc2.stop(fim);
+    _track(osc, env); _track(osc2, env2); _track(lfo, lfoG);
   }
 
   function playSabiaTomReal(when, midiNote, dur, vol = 0.5) {
@@ -1356,6 +1395,7 @@ const Audio = (() => {
     env.gain.exponentialRampToValueAtTime(0.001, when + 0.05);
     src.connect(filter).connect(env).connect(masterGain);
     src.start(when); src.stop(when + 0.08);
+    _track(src, env);
   }
   function playPalmaLongo(when, vol = 0.65) {
     when = when || now();
@@ -1371,6 +1411,7 @@ const Audio = (() => {
     env.gain.exponentialRampToValueAtTime(0.001, when + 0.16);
     src.connect(filter).connect(env).connect(masterGain);
     src.start(when); src.stop(when + 0.2);
+    _track(src, env);
   }
 
   // ===== VOZ "TELÉGRAFO" =====
@@ -1387,6 +1428,7 @@ const Audio = (() => {
     eClick.gain.exponentialRampToValueAtTime(0.001, when + 0.025);
     click.connect(fClick).connect(eClick).connect(masterGain);
     click.start(when); click.stop(when + 0.05);
+    _track(click, eClick);
 
     const body = ctx.createOscillator();
     body.type = 'square'; body.frequency.value = 220;
@@ -1399,6 +1441,7 @@ const Audio = (() => {
     eBody.gain.exponentialRampToValueAtTime(0.001, when + dur);
     body.connect(fBody).connect(eBody).connect(masterGain);
     body.start(when); body.stop(when + dur + 0.02);
+    _track(body, eBody);
 
     if (longo) {
       const click2 = ctx.createBufferSource();
@@ -1411,6 +1454,7 @@ const Audio = (() => {
       ec2.gain.exponentialRampToValueAtTime(0.001, when + dur + 0.02);
       click2.connect(fc2).connect(ec2).connect(masterGain);
       click2.start(when + dur); click2.stop(when + dur + 0.04);
+      _track(click2, ec2);
     }
   }
 
@@ -1447,6 +1491,7 @@ const Audio = (() => {
     osc2.connect(env2).connect(masterGain);
     osc.start(when); osc2.start(when);
     osc.stop(when + dur + 0.05); osc2.stop(when + dur * 0.5 + 0.05);
+    _track(osc, env); _track(osc2, env2);
   }
   function playViolaoReal(when, midiNote, dur = 1.4, vol = 0.5) {
     if (!sfPlayer || !sfInstruments.violao) return playViolaoSintetico(when, midiNote, dur, vol);
@@ -1505,7 +1550,9 @@ const Audio = (() => {
     playElemento,
     playSabiaTom, playCantoSabiaFloreio, playFeliz,
     playViolao,
+    pararTudo,
     estaUsandoSoundfont: () => useSoundfont,
+    _activeSourcesSize: () => activeSources.size, // pra debug/teste
   };
 })();
 
@@ -1554,6 +1601,7 @@ const State = {
   texto: '',           // input do teclado
   reproduzindo: false,
   cleanupAtual: null,
+  elementoTimeouts: [], // setTimeouts dos onElemento callbacks (limpos em pararLoop)
   cumpridas: new Set(),
 };
 
@@ -1576,12 +1624,29 @@ function carregarEstado() {
     if (raw) {
       const d = JSON.parse(raw);
       if (d.cumpridas) State.cumpridas = new Set(d.cumpridas);
-      if (d.vozTeclado) State.vozTeclado = d.vozTeclado;
-      if (typeof d.bpm === 'number') State.bpm = d.bpm;
+      if (typeof d.vozTeclado === 'string' && ['sabia','palma','telegrafo','violao'].includes(d.vozTeclado)) {
+        State.vozTeclado = d.vozTeclado;
+      }
+      // Só aceita BPM que existe no slider atual; senão fica no default 120.
+      if (typeof d.bpm === 'number' && Array.isArray(window.VALORES_BPM ? VALORES_BPM : null) && VALORES_BPM.includes(d.bpm)) {
+        State.bpm = d.bpm;
+      } else if (typeof d.bpm === 'number' && d.bpm >= 60 && d.bpm <= 180) {
+        // Fallback: aceita qualquer BPM no range válido (caso VALORES_BPM ainda não carregou)
+        State.bpm = d.bpm;
+      }
       if (typeof d.notacaoBinaria === 'boolean') State.notacaoBinaria = d.notacaoBinaria;
     }
   } catch(e) {}
 }
+
+// Flags de debug via querystring (?debug=audio, ?samplesabia=off)
+(function processarFlags() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('debug') === 'audio') window.__debugAudio = true;
+    if (params.get('samplesabia') === 'off') window.__sabiaSampleOff = true;
+  } catch(e) {}
+})();
 
 /* ============================================================
    UTILIDADES DOM
@@ -1685,9 +1750,21 @@ function pararLoop() {
     clearTimeout(State.loopId);
     State.loopId = null;
   }
+  // Cancela todos os setTimeouts de onElemento callbacks (visual feedback)
+  if (State.elementoTimeouts && State.elementoTimeouts.length) {
+    State.elementoTimeouts.forEach(id => clearTimeout(id));
+    State.elementoTimeouts = [];
+  }
   State.reproduzindo = false;
-  // Limpa cabeças de compasso ativas
-  document.querySelectorAll('.compasso.tocando').forEach(c => c.classList.remove('tocando'));
+  // Para qualquer source/oscillator ativo no engine de áudio
+  try { Audio.pararTudo && Audio.pararTudo(); } catch(e) {}
+  // Limpa cabeças de compasso ativas (interval + classe)
+  document.querySelectorAll('.compasso.tocando').forEach(c => {
+    const id = c.dataset.intervalId;
+    if (id) clearInterval(parseInt(id, 10));
+    delete c.dataset.intervalId;
+    c.classList.remove('tocando');
+  });
 }
 
 // Toca uma sequência string com '.', '-', ' ' (entre letras), '/' (entre palavras)
@@ -1705,13 +1782,19 @@ function criarCompasso(rotulo) {
 }
 
 // Liga a cabeça de compasso ao tempo. beatMs = duração de um beat em ms.
-// Retorna função de cleanup.
+// Retorna função de cleanup. Se já houver um interval ativo no mesmo elemento,
+// limpa antes de criar novo (evita vazamento em re-ativação).
 function ativarCompasso(elementoCompasso, beatMs) {
   if (!elementoCompasso) return () => {};
+  // Limpa interval anterior se existir
+  const previa = elementoCompasso.dataset.intervalId;
+  if (previa) {
+    clearInterval(parseInt(previa, 10));
+    delete elementoCompasso.dataset.intervalId;
+  }
   elementoCompasso.style.setProperty('--beat-dur', (beatMs / 1000) + 's');
   elementoCompasso.classList.add('tocando');
   const cabeca = elementoCompasso.querySelector('.compasso-cabeca');
-  // Pulsinho extra no início de cada beat
   const pulsar = () => {
     if (!cabeca) return;
     cabeca.classList.add('batendo');
@@ -1719,8 +1802,10 @@ function ativarCompasso(elementoCompasso, beatMs) {
   };
   pulsar();
   const intervalo = setInterval(pulsar, beatMs);
+  elementoCompasso.dataset.intervalId = String(intervalo);
   return () => {
     clearInterval(intervalo);
+    delete elementoCompasso.dataset.intervalId;
     elementoCompasso.classList.remove('tocando');
   };
 }
@@ -1756,7 +1841,9 @@ function tocarSequencia(seq, opts = {}) {
         const myIdx = idxElem++;
         const myCh = ch;
         const myAcum = acumulado;
-        setTimeout(() => onElemento && onElemento(myCh, myIdx), myAcum);
+        // Track o timeout pra cancelar limpo em pararLoop (caso mude de cena/voz)
+        const id = setTimeout(() => onElemento && onElemento(myCh, myIdx), myAcum);
+        State.elementoTimeouts.push(id);
         t += dur / 1000;
         acumulado += dur;
         const next = seq[i + 1];
@@ -2862,47 +2949,33 @@ async function inicializar() {
   const loaderEl = $('#loader');
   const loaderBarra = $('#loader-barra');
   const loaderPular = $('#loader-pular');
-  const loaderTexto = $('#loader-texto');
 
-  // Mostra botão "pular" depois de 4 segundos
-  const timeoutPular = setTimeout(() => {
-    loaderPular.classList.add('visivel');
-  }, 4000);
-
-  loaderPular.addEventListener('click', () => {
-    clearTimeout(timeoutPular);
+  let appJaIniciado = false;
+  function fecharLoader() {
+    if (appJaIniciado) return;
+    appJaIniciado = true;
     loaderEl.classList.add('escondido');
-    setTimeout(() => loaderEl.remove(), 600);
+    setTimeout(() => loaderEl && loaderEl.parentNode && loaderEl.remove(), 600);
     renderApp();
-  });
-
-  // Carrega WebAudioFont
-  try {
-    const sucesso = await Audio.carregarSoundfonts(p => {
-      loaderBarra.style.width = (p * 100) + '%';
-      if (p < 0.4) loaderTexto.textContent = 'o sabiá está afinando o bico…';
-      else if (p < 0.8) loaderTexto.textContent = 'o violão está sendo dedilhado…';
-      else loaderTexto.textContent = 'tudo pronto!';
-    });
-    if (!sucesso) {
-      loaderTexto.textContent = 'sem internet, mas vamos brincar!';
-    }
-  } catch(e) {
-    loaderTexto.textContent = 'tudo bem, vamos com som simples!';
   }
 
-  clearTimeout(timeoutPular);
-  loaderBarra.style.width = '100%';
-  setTimeout(() => {
-    loaderEl.classList.add('escondido');
-    setTimeout(() => loaderEl.remove(), 600);
-  }, 400);
+  // Botão "pular →" desde 0.5s — usuário sai rápido se quiser.
+  setTimeout(() => loaderPular.classList.add('visivel'), 500);
+  loaderPular.addEventListener('click', fecharLoader);
 
-  // Desbloqueio universal de áudio
-  document.body.addEventListener('touchend', () => Audio.unlock(), { once: true });
-  document.body.addEventListener('click', () => Audio.unlock(), { once: true });
+  // App inicializa imediatamente: o sample real do sabiá está embedded inline.
+  // WebAudioFont (violão) carrega em background, cai pra síntese silenciosamente se falhar.
+  Audio.carregarSoundfonts(p => {
+    loaderBarra.style.width = (p * 100) + '%';
+  }).catch(() => {/* sem mensagem alarmista — violão usa síntese */});
 
-  renderApp();
+  // Esconde loader em 1.2s — tempo pra ler "preparando" sem travar offline.
+  setTimeout(fecharLoader, 1200);
+
+  // Desbloqueio: cada gesto reabre o AudioContext (iOS suspende após inatividade).
+  const unlockHandler = () => Audio.unlock();
+  document.body.addEventListener('touchend', unlockHandler);
+  document.body.addEventListener('click', unlockHandler);
 }
 
 window.addEventListener('load', inicializar);
