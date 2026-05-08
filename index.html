@@ -644,6 +644,27 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .botao-grande-icone:active { transform: scale(0.94); }
 .botao-grande-icone.amarelo { background: var(--amarelo); color: var(--marrom); }
 .botao-grande-icone.maior { width: 110px; height: 110px; font-size: 44px; }
+/* v7: variante com legenda da corda (Sol/Ré) abaixo do símbolo */
+.botao-grande-icone.com-legenda {
+  grid-template-rows: 1fr auto;
+  row-gap: 0;
+  padding-top: 4px;
+  padding-bottom: 6px;
+  height: 88px;
+}
+.botao-grande-icone.com-legenda .sinal {
+  font-size: inherit;
+  line-height: 1;
+}
+.botao-grande-icone.com-legenda .legenda-corda {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  opacity: 0.92;
+  line-height: 1;
+  margin-top: 2px;
+}
 
 /* ===== MORSE / SÍMBOLOS ===== */
 .morse-display {
@@ -695,43 +716,53 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-family: var(--display); font-size: 12px;
   color: var(--tinta-suave);
 }
-/* Metrônomo: caixa trapezoidal + haste oscilando como pêndulo. Substituiu
-   o bumbo+baqueta da v5 (Lucas: "reveja de maneira crítica" — visual saturado).
-   A haste gira de -25deg a +25deg em cada beat via CSS (var --beat-dur). */
-.compasso-metronomo {
+/* Coração: substituiu o metrônomo da v6. Lucas pediu "introduzir o pulso como
+   coração da tartaruga, menino, coelho e guepardo". A criança escolhe um chip
+   de velocidade e o coração no centro assume o ritmo cardíaco daquele animal.
+   Pedagogia direta: BPM = batidas por minuto = batimento cardíaco. A animação
+   é uma escala (sístole/diástole) sincronizada com var(--beat-dur). */
+.compasso-coracao {
   position: relative;
-  width: 56px; height: 80px;
+  width: 64px; height: 60px;
+  filter: drop-shadow(0 2px 1px rgba(0,0,0,0.12));
 }
-.compasso-metronomo svg { width: 100%; height: 100%; overflow: visible; }
-.metronomo-caixa { fill: var(--marrom); stroke: var(--marrom-fundo); stroke-width: 1.5; }
-.metronomo-painel { fill: #f6efe2; stroke: var(--marrom-claro); stroke-width: 1; }
-.metronomo-base   { fill: var(--marrom-fundo); }
-.metronomo-pivot  { fill: var(--laranja-vivo); }
-.metronomo-haste {
-  transform-origin: 28px 70px;
-  animation: pendulo var(--beat-dur, 0.8s) ease-in-out infinite alternate;
+.compasso-coracao svg { width: 100%; height: 100%; overflow: visible; }
+.coracao-corpo {
+  fill: #d94a4a;
+  stroke: #8a2222;
+  stroke-width: 2;
+  transform-origin: 32px 36px;
+  animation: bater var(--beat-dur, 0.8s) ease-in-out infinite;
 }
-.compasso:not(.tocando) .metronomo-haste {
+.coracao-brilho {
+  fill: #ff8a8a;
+  opacity: 0.55;
+  transform-origin: 32px 36px;
+  animation: bater var(--beat-dur, 0.8s) ease-in-out infinite;
+}
+.compasso:not(.tocando) .coracao-corpo,
+.compasso:not(.tocando) .coracao-brilho {
   animation: none;
-  transform: rotate(0deg);
+  transform: scale(1);
 }
-@keyframes pendulo {
-  from { transform: rotate(-22deg); }
-  to   { transform: rotate( 22deg); }
+@keyframes bater {
+  0%   { transform: scale(1);    }
+  18%  { transform: scale(1.18); }
+  36%  { transform: scale(0.96); }
+  54%  { transform: scale(1.08); }
+  100% { transform: scale(1);    }
 }
-.metronomo-haste-corpo { fill: #c9a06b; stroke: #8e6a3f; stroke-width: 0.6; }
-.metronomo-peso        { fill: var(--marrom-fundo); }
-.metronomo-pulso {
-  fill: var(--laranja);
+.coracao-pulso {
+  fill: #ffd5d5;
   opacity: 0;
 }
-.metronomo-pulso.ativo {
-  animation: metronomoBate 0.18s ease-out;
+.coracao-pulso.ativo {
+  animation: coracaoPulso 0.25s ease-out;
 }
-@keyframes metronomoBate {
-  0%   { opacity: 0;   transform: scale(0.6); }
-  40%  { opacity: 0.9; transform: scale(1);   }
-  100% { opacity: 0;   transform: scale(0.6); }
+@keyframes coracaoPulso {
+  0%   { opacity: 0;   transform: scale(0.4); }
+  35%  { opacity: 0.9; transform: scale(1.1); }
+  100% { opacity: 0;   transform: scale(1.6); }
 }
 .compasso-rotulo { font-weight: 700; opacity: 0.7; }
 .compasso-toggle {
@@ -746,9 +777,9 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 }
 .compasso-toggle:active { transform: scale(0.92); }
 .compasso-toggle.ativo {
-  background: var(--laranja);
+  background: #d94a4a;
   color: white;
-  border-color: var(--laranja);
+  border-color: #8a2222;
 }
 
 /* ===== DECOMPOSIÇÃO DE NOMES — letras visíveis + loop + highlight ===== */
@@ -1904,13 +1935,26 @@ const Audio = (() => {
     const src = ctx.createBufferSource();
     src.buffer = audioBuf;
 
+    // v7: filter highshelf pra dar brilho de pickup elétrico. Lucas pediu
+    // "qualidade do som na guitarra". KS puro soava abafado; +6dB acima de
+    // 2.5kHz dá cintilação sem aumentar a magnitude global. Lowpass de
+    // segurança em 6kHz pra cortar harmonics agudos do KS sem alma.
+    const shelf = ctx.createBiquadFilter();
+    shelf.type = 'highshelf';
+    shelf.frequency.value = 2500;
+    shelf.gain.value = 6;
+    const cut = ctx.createBiquadFilter();
+    cut.type = 'lowpass';
+    cut.frequency.value = 6000;
+    cut.Q.value = 0.7;
+
     // Envelope: ataque rápido (5ms), sustain proporcional, fade-out exp
     const env = ctx.createGain();
     env.gain.setValueAtTime(0, when);
     env.gain.linearRampToValueAtTime(vol, when + 0.005);
     env.gain.exponentialRampToValueAtTime(0.001, when + dur);
 
-    src.connect(env).connect(masterGain);
+    src.connect(shelf).connect(cut).connect(env).connect(masterGain);
     src.start(when);
     src.stop(when + dur + 0.1);
     _track(src, env);
@@ -1967,23 +2011,51 @@ const Audio = (() => {
     seq.forEach((m, i) => playSabiaTom(when + i * 0.09, m, 0.18, 0.4));
   }
 
-  // Bumbo (kick drum) curto pro tique de tempo. Pitch desce de 150 Hz pra
-  // 60 Hz com envelope rápido — soa percussivo sem competir com o canto.
-  function playBumbo(when, vol = 0.55) {
+  // Batida cardíaca (lub-dub): duas batidas curtas próximas, em vez de
+  // kick drum único. Lucas (v7): pulso virou coração — o som tem que ter
+  // a forma do coração também. Lub (S1, mais grave) seguido de dub (S2,
+  // mais alto) ~120ms depois — anatomia real do batimento.
+  function playBumbo(when, vol = 0.45) {
     if (!ctx) return;
     const t = (typeof when === 'number') ? when : ctx.currentTime;
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(150, t);
-    osc.frequency.exponentialRampToValueAtTime(60, t + 0.07);
-    const env = ctx.createGain();
-    env.gain.setValueAtTime(0.0001, t);
-    env.gain.linearRampToValueAtTime(vol, t + 0.005);
-    env.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
-    osc.connect(env).connect(masterGain);
-    osc.start(t);
-    osc.stop(t + 0.18);
-    _track(osc, env);
+    // Lub: 90 → 50 Hz, mais grave (fechamento das válvulas mitral/tricúspide)
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(90, t);
+    osc1.frequency.exponentialRampToValueAtTime(50, t + 0.05);
+    const env1 = ctx.createGain();
+    env1.gain.setValueAtTime(0.0001, t);
+    env1.gain.linearRampToValueAtTime(vol, t + 0.005);
+    env1.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+    osc1.connect(env1).connect(masterGain);
+    osc1.start(t);
+    osc1.stop(t + 0.15);
+    _track(osc1, env1);
+    // Dub: 130 → 70 Hz, mais agudo (fechamento das válvulas aórtica/pulmonar)
+    const t2 = t + 0.12;
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(130, t2);
+    osc2.frequency.exponentialRampToValueAtTime(70, t2 + 0.04);
+    const env2 = ctx.createGain();
+    env2.gain.setValueAtTime(0.0001, t2);
+    env2.gain.linearRampToValueAtTime(vol * 0.85, t2 + 0.005);
+    env2.gain.exponentialRampToValueAtTime(0.0001, t2 + 0.10);
+    osc2.connect(env2).connect(masterGain);
+    osc2.start(t2);
+    osc2.stop(t2 + 0.12);
+    _track(osc2, env2);
+  }
+
+  // v7: corda Sol4 (ponto) ou Ré4 (traço) tocando em paralelo com a voz
+  // principal pra Bento associar · = Sol e – = Ré. Volume baixo (0.22) pra
+  // não competir com o sabiá da história — fica como referência sussurrada.
+  function playReferenciaCorda(elemento /* '.' | '-' */, when, durMs) {
+    when = when || now();
+    durMs = durMs || (elemento === '.' ? 180 : 540);
+    const durSec = durMs / 1000;
+    const midi = elemento === '-' ? MIDI_RE4 : MIDI_SOL4;
+    playViolao(when, midi, Math.max(durSec * 1.6, 0.35), 0.22);
   }
 
   return {
@@ -1993,6 +2065,7 @@ const Audio = (() => {
     playElemento,
     playSabiaTom, playCantoSabiaFloreio, playFeliz,
     playViolao,
+    playReferenciaCorda,
     playBumbo,
     pararTudo,
     estaUsandoSoundfont: () => useSoundfont,
@@ -2223,55 +2296,55 @@ function pararLoop() {
 /* ============================================================
    CABEÇA DE COMPASSO — pulso visual sincronizado com BPM
    ============================================================ */
-// Metrônomo SVG: caixa trapezoidal com haste oscilando como pêndulo.
-// Visual muito mais nítido que bumbo+baqueta+treme da pele (Lucas: "reveja
-// de maneira crítica"). A haste vai de -22deg a +22deg em cada beat via CSS,
-// sincronizada com --beat-dur. O ponto laranja pisca no exato momento do tick.
+// Coração SVG: substituiu o metrônomo de pêndulo da v6. O pulso = batimento
+// cardíaco. Lucas: "introduzir o pulso como coração da tartaruga, menino,
+// coelho e guepardo". A criança escolhe um chip de velocidade e o coração
+// assume o ritmo daquele animal. A animação é uma sístole/diástole
+// (escala 1 → 1.18 → 0.96 → 1.08 → 1) sincronizada com --beat-dur.
 function criarCompasso(rotulo) {
   const wrap = el('div', { class: 'compasso' });
   if (rotulo) wrap.appendChild(el('span', { class: 'compasso-rotulo' }, rotulo));
 
-  const metro = el('div', { class: 'compasso-metronomo' });
-  metro.innerHTML = `
-    <svg viewBox="0 0 56 80" xmlns="http://www.w3.org/2000/svg">
-      <!-- caixa trapezoidal -->
-      <polygon class="metronomo-caixa" points="14,12 42,12 50,76 6,76"/>
-      <!-- painel claro central -->
-      <polygon class="metronomo-painel" points="18,18 38,18 44,72 12,72"/>
-      <!-- pivot da haste -->
-      <circle class="metronomo-pivot" cx="28" cy="70" r="3"/>
-      <!-- haste do pêndulo (vai do pivot pra cima) -->
-      <g class="metronomo-haste">
-        <rect class="metronomo-haste-corpo" x="26.6" y="22" width="2.8" height="48" rx="0.8"/>
-        <rect class="metronomo-peso" x="24" y="34" width="8" height="6" rx="1"/>
-      </g>
-      <!-- pulso piscante (laranja) no topo -->
-      <circle class="metronomo-pulso" cx="28" cy="8" r="4" style="transform-origin: 28px 8px;"/>
+  const cor = el('div', { class: 'compasso-coracao' });
+  cor.innerHTML = `
+    <svg viewBox="0 0 64 60" xmlns="http://www.w3.org/2000/svg">
+      <!-- onda de pulso (atrás do coração, expande no tick) -->
+      <circle class="coracao-pulso" cx="32" cy="32" r="22" style="transform-origin: 32px 32px;"/>
+      <!-- corpo do coração: 2 lóbulos no topo + ponta embaixo -->
+      <path class="coracao-corpo" d="M32 54
+        C 32 54, 6 38, 6 22
+        C 6 12, 14 6, 20 6
+        C 26 6, 30 10, 32 14
+        C 34 10, 38 6, 44 6
+        C 50 6, 58 12, 58 22
+        C 58 38, 32 54, 32 54 Z"/>
+      <!-- brilho leve (highlight em cima do lóbulo esquerdo) -->
+      <ellipse class="coracao-brilho" cx="22" cy="16" rx="5" ry="3"/>
     </svg>
   `;
-  wrap.appendChild(metro);
+  wrap.appendChild(cor);
 
-  // Toggle de áudio do tique: começa mudo. Lucas: criança decide se quer ouvir.
+  // Toggle 🫀 (era 🥁): toca o som de batida cardíaca audível. Default mudo.
   const btn = el('button', {
     class: 'compasso-toggle',
-    'aria-label': 'ouvir o tique do metrônomo',
-    title: 'ouvir o tique',
+    'aria-label': 'ouvir as batidas do coração',
+    title: 'ouvir as batidas',
     onClick: () => {
       State.bumboAudivel = !State.bumboAudivel;
       btn.classList.toggle('ativo', State.bumboAudivel);
       btn.setAttribute('aria-pressed', State.bumboAudivel ? 'true' : 'false');
       if (State.bumboAudivel) Audio.unlock();
     }
-  }, '🥁');
+  }, '🫀');
   if (State.bumboAudivel) btn.classList.add('ativo');
   wrap.appendChild(btn);
 
   return wrap;
 }
 
-// Liga o pulso do metrônomo ao tempo. beatMs = duração de um beat em ms.
-// O setInterval pisca o ponto laranja no exato momento do tick (sincroniza
-// com a posição da haste no extremo da oscilação).
+// Liga o coração ao tempo. beatMs = duração de um beat em ms. A onda de pulso
+// (.coracao-pulso) anima na sístole; o som de batida cardíaca (se audível)
+// dispara junto. CSS animation já bate em loop quando .tocando está ativo.
 function ativarCompasso(elementoCompasso, beatMs) {
   if (!elementoCompasso) return () => {};
   const previa = elementoCompasso.dataset.intervalId;
@@ -2281,7 +2354,7 @@ function ativarCompasso(elementoCompasso, beatMs) {
   }
   elementoCompasso.style.setProperty('--beat-dur', (beatMs / 1000) + 's');
   elementoCompasso.classList.add('tocando');
-  const pulso = elementoCompasso.querySelector('.metronomo-pulso');
+  const pulso = elementoCompasso.querySelector('.coracao-pulso');
   const pulsar = () => {
     if (pulso) {
       pulso.classList.remove('ativo');
@@ -2892,32 +2965,41 @@ function renderAcaoCena(container, cena) {
     const dispEl = el('div', { class: 'morse-display', style: 'font-size:48px; min-height:60px;' });
     container.appendChild(dispEl);
 
+    // v7: botões grandes com legenda Sol/Ré + corda paralela (referência).
     const fileira = el('div', { style: 'display:flex; gap:14px; justify-content:center; margin: 8px 0;' });
     fileira.appendChild(el('button', {
-      class: 'botao-grande-icone amarelo',
-      'aria-label': 'tocar um ponto curto',
+      class: 'botao-grande-icone amarelo com-legenda',
+      'aria-label': 'tocar um ponto curto, corda Sol',
       onClick: () => {
         Audio.unlock();
         Audio.playElemento('.', 'sabia', undefined, T.ponto);
+        Audio.playReferenciaCorda('.', undefined, T.ponto);
         const s = el('span', { class: 'ponto', html: State.notacaoBinaria ? '0' : '·' });
         s.style.fontSize = '40px'; s.style.color = 'var(--sol-violao)';
         dispEl.appendChild(s);
         if (dispEl.children.length > 12) dispEl.firstChild.remove();
       }
-    }, State.notacaoBinaria ? '0' : '·'));
+    }, [
+      el('span', { class: 'sinal' }, State.notacaoBinaria ? '0' : '·'),
+      el('span', { class: 'legenda-corda' }, 'Sol'),
+    ]));
     fileira.appendChild(el('button', {
-      class: 'botao-grande-icone',
+      class: 'botao-grande-icone com-legenda',
       style: 'background: var(--re-violao); width:120px; border-radius:40px;',
-      'aria-label': 'tocar um traço longo',
+      'aria-label': 'tocar um traço longo, corda Ré',
       onClick: () => {
         Audio.unlock();
         Audio.playElemento('-', 'sabia', undefined, T.traco);
+        Audio.playReferenciaCorda('-', undefined, T.traco);
         const s = el('span', { class: 'traco', html: State.notacaoBinaria ? '1' : '–' });
         s.style.fontSize = '48px'; s.style.color = 'var(--re-violao)';
         dispEl.appendChild(s);
         if (dispEl.children.length > 12) dispEl.firstChild.remove();
       }
-    }, State.notacaoBinaria ? '1' : '–'));
+    }, [
+      el('span', { class: 'sinal' }, State.notacaoBinaria ? '1' : '–'),
+      el('span', { class: 'legenda-corda' }, 'Ré'),
+    ]));
     container.appendChild(fileira);
   } else if (a.tipo === 'aula-sos') {
     // Aula sobre SOS: três pontos / três traços / três pontos.
@@ -2981,14 +3063,22 @@ function renderAcaoCena(container, cena) {
     }, '🆘 ouvir SOS'));
     acoesEl.appendChild(el('button', {
       class: 'botao secundario pequeno',
-      'aria-label': 'tocar um ponto curto',
-      onClick: () => { Audio.unlock(); Audio.playElemento('.', 'sabia', undefined, T.ponto); }
-    }, State.notacaoBinaria ? '0 curto' : '· curto'));
+      'aria-label': 'tocar um ponto curto, corda Sol',
+      onClick: () => {
+        Audio.unlock();
+        Audio.playElemento('.', 'sabia', undefined, T.ponto);
+        Audio.playReferenciaCorda('.', undefined, T.ponto);
+      }
+    }, State.notacaoBinaria ? '0 curto · Sol' : '· curto · Sol'));
     acoesEl.appendChild(el('button', {
       class: 'botao secundario pequeno',
-      'aria-label': 'tocar um traço longo',
-      onClick: () => { Audio.unlock(); Audio.playElemento('-', 'sabia', undefined, T.traco); }
-    }, State.notacaoBinaria ? '1 longo' : '– longo'));
+      'aria-label': 'tocar um traço longo, corda Ré',
+      onClick: () => {
+        Audio.unlock();
+        Audio.playElemento('-', 'sabia', undefined, T.traco);
+        Audio.playReferenciaCorda('-', undefined, T.traco);
+      }
+    }, State.notacaoBinaria ? '1 longo · Ré' : '– longo · Ré'));
     container.appendChild(acoesEl);
   } else if (a.tipo === 'aprender-toques') {
     // E1: lógica geral dos toques. Compasso + display que acumula + botões
@@ -3012,32 +3102,43 @@ function renderAcaoCena(container, cena) {
     const dispEl = el('div', { class: 'morse-display', style: 'font-size:48px; min-height:60px;' });
     container.appendChild(dispEl);
 
+    // v7: cada botão tem o símbolo + legenda da corda (Sol/Ré). Lucas pediu
+    // "sempre as notas ré e sol soltas da guitarra como referência". Toque
+    // dispara sabiá + corda paralela (vol baixo) pra Bento associar · = Sol.
     const fileira = el('div', { style: 'display:flex; gap:18px; justify-content:center; margin: 8px 0;' });
     fileira.appendChild(el('button', {
-      class: 'botao-grande-icone amarelo',
-      'aria-label': 'tocar um ponto curto',
+      class: 'botao-grande-icone amarelo com-legenda',
+      'aria-label': 'tocar um ponto curto, corda Sol',
       onClick: () => {
         Audio.unlock();
         Audio.playElemento('.', 'sabia', undefined, T.ponto);
+        Audio.playReferenciaCorda('.', undefined, T.ponto);
         const s = el('span', { class: 'ponto', html: State.notacaoBinaria ? '0' : '·' });
         s.style.fontSize = '40px'; s.style.color = 'var(--sol-violao)';
         dispEl.appendChild(s);
         if (dispEl.children.length > 12) dispEl.firstChild.remove();
       }
-    }, State.notacaoBinaria ? '0' : '·'));
+    }, [
+      el('span', { class: 'sinal' }, State.notacaoBinaria ? '0' : '·'),
+      el('span', { class: 'legenda-corda' }, 'Sol'),
+    ]));
     fileira.appendChild(el('button', {
-      class: 'botao-grande-icone',
+      class: 'botao-grande-icone com-legenda',
       style: 'background: var(--re-violao); width:120px; border-radius:40px;',
-      'aria-label': 'tocar um traço longo',
+      'aria-label': 'tocar um traço longo, corda Ré',
       onClick: () => {
         Audio.unlock();
         Audio.playElemento('-', 'sabia', undefined, T.traco);
+        Audio.playReferenciaCorda('-', undefined, T.traco);
         const s = el('span', { class: 'traco', html: State.notacaoBinaria ? '1' : '–' });
         s.style.fontSize = '48px'; s.style.color = 'var(--re-violao)';
         dispEl.appendChild(s);
         if (dispEl.children.length > 12) dispEl.firstChild.remove();
       }
-    }, State.notacaoBinaria ? '1' : '–'));
+    }, [
+      el('span', { class: 'sinal' }, State.notacaoBinaria ? '1' : '–'),
+      el('span', { class: 'legenda-corda' }, 'Ré'),
+    ]));
     container.appendChild(fileira);
   } else if (a.tipo === 'time-apresentacao') {
     // E2/E3 v6: Lucas pediu decomposição completa. Quando clica em quem está
