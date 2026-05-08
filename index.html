@@ -285,20 +285,20 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .cena-palco .passaro-svg { width: 90px; height: 90px; flex-shrink: 0; }
 .cena-palco .passaro-svg.protagonista { width: 110px; height: 110px; }
 .cena-palco .passaro-svg.menor { width: 64px; height: 64px; }
-.cena-palco .passaro-svg.professor { width: 120px; height: 120px; }
+.cena-palco .passaro-svg.nena { width: 120px; height: 120px; }
 
 @media (max-width: 480px) {
   .cena-palco { gap: 2px; padding-bottom: 14px; min-height: 100px; }
   .cena-palco .passaro-svg { width: 72px; height: 72px; }
   .cena-palco .passaro-svg.protagonista { width: 90px; height: 90px; }
   .cena-palco .passaro-svg.menor { width: 54px; height: 54px; }
-  .cena-palco .passaro-svg.professor { width: 96px; height: 96px; }
+  .cena-palco .passaro-svg.nena { width: 96px; height: 96px; }
 }
 @media (max-width: 380px) {
   .cena-palco .passaro-svg { width: 60px; height: 60px; }
   .cena-palco .passaro-svg.protagonista { width: 76px; height: 76px; }
   .cena-palco .passaro-svg.menor { width: 46px; height: 46px; }
-  .cena-palco .passaro-svg.professor { width: 80px; height: 80px; }
+  .cena-palco .passaro-svg.nena { width: 80px; height: 80px; }
 }
 .cena-palco .passaro-svg.feliz { animation: pulinho 0.8s ease infinite; }
 .cena-palco .passaro-svg.pulando { animation: pulinhoUma 0.6s ease; }
@@ -306,6 +306,12 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 @keyframes pulinho {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
+}
+
+@keyframes letraPousa {
+  0% { transform: translateY(-12px) scale(0.6); opacity: 0; }
+  60% { transform: translateY(2px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 @keyframes pulinhoUma {
   0%, 100% { transform: translateY(0); }
@@ -695,7 +701,7 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   .cena-palco { min-height: 110px; padding-bottom: 16px; }
   .cena-palco .passaro-svg { width: 84px; height: 84px; }
   .cena-palco .passaro-svg.protagonista { width: 100px; height: 100px; }
-  .cena-palco .passaro-svg.professor { width: 110px; height: 110px; }
+  .cena-palco .passaro-svg.nena { width: 110px; height: 110px; }
   .cena-fala { padding: 10px 14px; }
   .landing-personagens .passaro-svg { width: 80px; height: 80px; }
 }
@@ -1346,7 +1352,7 @@ function el(tag, props = {}, children = []) {
    PERSONAGENS — fábrica de SVGs estilizados
    ============================================================ */
 function passaroSVG(personagem) {
-  // personagem: 'to' | 'ben' | 'caca' | 'jo' | 'tete' | 'tata' | 'professor' | 'sabia'
+  // personagem: 'to' | 'ben' | 'caca' | 'jo' | 'tete' | 'tata' | 'nena' | 'sabia'
   // Retorna um SVG configurado.
   const wrap = el('div', { class: 'passaro-' + personagem });
   let svgInner = '';
@@ -1359,13 +1365,13 @@ function passaroSVG(personagem) {
     bico: '#F9C74F', bicoEscuro: '#E8A845',
   };
   const config = {
-    to:        { cores: COR_PADRAO, acessorio: null, scale: 1 },
-    ben:       { cores: { ...COR_PADRAO, peito: '#F4B860', cabeca: '#8C6F4F' }, acessorio: 'topete', scale: 1 },
-    jo:        { cores: { ...COR_PADRAO, peito: '#D88841', dorso: '#5F4329' }, acessorio: null, scale: 1.1 },
-    tete:      { cores: { ...COR_PADRAO, peito: '#F4B860' }, acessorio: 'flor', scale: 0.9 },
-    tata:      { cores: { ...COR_PADRAO, peito: '#E8A45C', dorso: '#9B7553' }, acessorio: 'fita', scale: 0.95 },
-    professor: { cores: { ...COR_PADRAO, dorso: '#5F4329', peito: '#C99A6A' }, acessorio: 'oculos', scale: 1.2 },
-    sabia:     { cores: COR_PADRAO, acessorio: null, scale: 1 },
+    to:    { cores: COR_PADRAO, acessorio: null, scale: 1 },
+    ben:   { cores: { ...COR_PADRAO, peito: '#F4B860', cabeca: '#8C6F4F' }, acessorio: 'topete', scale: 1 },
+    jo:    { cores: { ...COR_PADRAO, peito: '#D88841', dorso: '#5F4329' }, acessorio: null, scale: 1.1 },
+    tete:  { cores: { ...COR_PADRAO, peito: '#F4B860' }, acessorio: 'flor', scale: 0.9 },
+    tata:  { cores: { ...COR_PADRAO, peito: '#E8A45C', dorso: '#9B7553' }, acessorio: 'fita', scale: 0.95 },
+    nena:  { cores: { ...COR_PADRAO, dorso: '#5F4329', peito: '#C99A6A' }, acessorio: 'oculos', scale: 1.2 },
+    sabia: { cores: COR_PADRAO, acessorio: null, scale: 1 },
   };
   const cfg = config[personagem];
 
@@ -1564,18 +1570,18 @@ const ROTEIRO = [
     acao: { tipo: 'aprender-letras', letras: ['C', 'A'] },
     proximo: 'tocar a campainha →',
   },
-  // Cena 3: aula curto/longo, com boas-vindas + aniversário Nena
+  // Cena 3: aula curto/longo — Nena (professora) recebe Ben e To
   {
     id: 'aula-curto-longo',
     fundo: 'escola',
     personagens: [
-      { tipo: 'professor', classe: 'professor' },
+      { tipo: 'nena', classe: 'nena' },
       { tipo: 'to', classe: 'menor' },
       { tipo: 'ben', classe: 'menor' },
       { tipo: 'caca', classe: 'menor' },
     ],
-    fala: '— Hoje é aula especial: <em>boas-vindas</em> ao Ben e ao To, e é <b>aniversário da Nena</b>!',
-    falaSub: 'O professor explica: pássaros escrevem com música. Todo som é <b>curto</b> ou <b>longo</b>.',
+    fala: '— <em>Bem-vindos</em>, Ben e To! Eu sou a <b>Nena</b>, professora dos sabiás.',
+    falaSub: 'A Nena explica: pássaros escrevem com música. Todo som é <b>curto</b> ou <b>longo</b>.',
     acao: { tipo: 'curto-longo' },
     proximo: 'entendi! →',
   },
@@ -1607,15 +1613,15 @@ const ROTEIRO = [
     acao: { tipo: 'apresentar-nomes', nomes: ['DIDI', 'TOTO', 'TODI'] },
     proximo: 'mais palavras →',
   },
-  // Cena 6: professor apresenta palavras solenes
+  // Cena 6: Nena apresenta palavras solenes
   {
     id: 'palavras-solenes',
     fundo: 'tarde',
     personagens: [
-      { tipo: 'professor', classe: 'professor' },
+      { tipo: 'nena', classe: 'nena' },
     ],
     fala: 'Agora as palavras grandes. <em>Mama. Papa. Mim.</em> E uma palavra muito especial…',
-    falaSub: 'O professor abre as asas e olha pra todo mundo.',
+    falaSub: 'A Nena abre as asas e olha pra todo mundo.',
     acao: { tipo: 'apresentar-nomes', nomes: ['MAMA', 'PAPA', 'MIM'] },
     proximo: 'qual é a especial? →',
   },
@@ -1628,11 +1634,38 @@ const ROTEIRO = [
       { tipo: 'ben' },
     ],
     fala: '<b>BENTO</b> = <em>Ben</em> + <em>To</em>!',
-    falaSub: 'O professor escreve no galho. Todo mundo olha. Bento é nome de quem ama.',
+    falaSub: 'A Nena escreve no galho. Todo mundo olha. Bento é nome de quem ama.',
     acao: { tipo: 'revelar-bento' },
-    proximo: 'celebrar! 🎉',
+    proximo: 'preparar surpresa! 🤫',
   },
-  // Cena 8: final — Parabéns pra Nena! (aniversário dela)
+  // Cena 8: surpresa — cada criança traz duas letras pra Nena
+  {
+    id: 'surpresa-letras',
+    fundo: 'tarde',
+    personagens: [
+      { tipo: 'to', classe: 'protagonista' },
+      { tipo: 'ben' },
+      { tipo: 'caca' },
+      { tipo: 'jo' },
+      { tipo: 'tete' },
+      { tipo: 'tata' },
+    ],
+    fala: '— <em>Pssssiu!</em> A turma tem uma surpresa pra Nena: hoje é o <b>aniversário</b> dela.',
+    falaSub: 'Cada criança traz <b>duas letras</b>. Junta tudo: parabéns Nena!',
+    acao: {
+      tipo: 'surpresa-letras',
+      distribuicao: [
+        { quem: 'to',   nome: 'To',   letras: ['P', 'A'] },
+        { quem: 'ben',  nome: 'Ben',  letras: ['R', 'A'] },
+        { quem: 'caca', nome: 'Caca', letras: ['B', 'E'] },
+        { quem: 'jo',   nome: 'Jo',   letras: ['N', 'S'] },
+        { quem: 'tete', nome: 'Tete', letras: ['N', 'E'] },
+        { quem: 'tata', nome: 'Tata', letras: ['N', 'A'] },
+      ],
+    },
+    proximo: 'agora cantar pra Nena! →',
+  },
+  // Cena 9: final — Parabéns pra Nena!
   {
     id: 'final',
     fundo: 'celebracao',
@@ -1643,7 +1676,7 @@ const ROTEIRO = [
       { tipo: 'jo' },
       { tipo: 'tete' },
       { tipo: 'tata' },
-      { tipo: 'professor', classe: 'professor' },
+      { tipo: 'nena', classe: 'nena' },
     ],
     fala: '🎂 <b>PARABÉNS, NENA!</b> 🎉',
     falaSub: 'Toda a escola canta para a Nena. <em>Nena, Nena, Nena…</em>',
@@ -1792,7 +1825,11 @@ function renderCena(tela, cena) {
   wrap.appendChild(fundo);
 
   // Fala principal
-  const fala = el('div', { class: 'cena-fala maior', html: cena.fala });
+  const fala = el('div', {
+    class: 'cena-fala maior',
+    'aria-live': 'polite',
+    html: cena.fala,
+  });
   wrap.appendChild(fala);
 
   if (cena.falaSub) {
@@ -1939,11 +1976,19 @@ function renderAcaoCena(container, cena) {
     // Sequência: PARABENS NENA NENA NENA NENA — toca o nome dela 4 vezes seguidas
     const seqMorse = palavraParaMorse('PARABENS NENA NENA NENA NENA');
     container.appendChild(el('div', { class: 'palavra-display' }, 'PARABÉNS NENA'));
-    container.appendChild(el('div', {
+    // Morse em duas linhas (PARABENS / NENA) pra não transbordar em telas pequenas
+    const morseWrap = el('div', { style: 'display:flex; flex-direction:column; align-items:center; gap:4px; margin: 6px 0;' });
+    morseWrap.appendChild(el('div', {
       class: 'morse-display',
-      style: 'font-size: clamp(18px, 4.5vw, 26px); min-height: 36px;',
-      html: renderMorse(palavraParaMorse('PARABENS NENA'))
+      style: 'font-size: clamp(16px, 4vw, 22px); min-height: 28px; margin: 0;',
+      html: renderMorse(palavraParaMorse('PARABENS'))
     }));
+    morseWrap.appendChild(el('div', {
+      class: 'morse-display',
+      style: 'font-size: clamp(16px, 4vw, 22px); min-height: 28px; margin: 0;',
+      html: renderMorse(palavraParaMorse('NENA'))
+    }));
+    container.appendChild(morseWrap);
     container.appendChild(el('div', {
       style: 'text-align:center; font-family: var(--display); font-style:italic; color: var(--marrom-claro); font-size: 14px; margin-top: 4px;'
     }, 'Nena · Nena · Nena · Nena'));
@@ -1965,6 +2010,141 @@ function renderAcaoCena(container, cena) {
         }
       }, '🎸 no violão'),
     ]));
+  } else if (a.tipo === 'surpresa-letras') {
+    // Cada criança traz duas letras pra construir PARABENS NENA
+    const dist = a.distribuicao;
+    const palavraAlvo = 'PARABENS NENA';
+    const entregues = []; // [{ letra, quem }]
+    const entregueSet = new Set();
+
+    // Display da palavra com slots vazios → preenchidos
+    const palavraDisplay = el('div', {
+      class: 'palavra-display',
+      style: 'font-size: clamp(26px, 7vw, 38px); letter-spacing: 0.16em; min-height: 1.3em; margin-top: 4px;',
+      'aria-live': 'polite',
+      'aria-label': 'palavra sendo formada',
+    });
+    const renderDisplay = () => {
+      palavraDisplay.innerHTML = '';
+      let idx = 0;
+      palavraAlvo.split('').forEach((ch) => {
+        if (ch === ' ') {
+          const sp = document.createElement('span');
+          sp.style.cssText = 'display:inline-block; width:0.6em;';
+          palavraDisplay.appendChild(sp);
+        } else {
+          const filled = idx < entregues.length;
+          const span = document.createElement('span');
+          span.textContent = filled ? entregues[idx].letra : '_';
+          span.style.cssText = filled
+            ? 'color: var(--marrom); animation: letraPousa 0.35s ease;'
+            : 'color: var(--marrom-claro); opacity: 0.32;';
+          palavraDisplay.appendChild(span);
+          idx++;
+        }
+      });
+    };
+    renderDisplay();
+    container.appendChild(palavraDisplay);
+
+    // Morse em construção (pequeno, abaixo)
+    const morseDisplay = el('div', {
+      class: 'morse-display',
+      style: 'font-size: clamp(13px, 3.2vw, 17px); min-height: 22px; opacity: 0.55; margin: 4px 0 6px;',
+    });
+    const renderMorseProgresso = () => {
+      const txt = entregues.map(e => e.letra).join('');
+      if (!txt) { morseDisplay.innerHTML = ''; return; }
+      const comEspaco = txt.length > 8 ? txt.slice(0, 8) + ' ' + txt.slice(8) : txt;
+      morseDisplay.innerHTML = renderMorse(palavraParaMorse(comEspaco));
+    };
+    renderMorseProgresso();
+    container.appendChild(morseDisplay);
+
+    // Status / contador
+    const status = el('div', {
+      style: 'text-align:center; font-family: var(--display); font-style:italic; color: var(--marrom-claro); font-size: 13px; margin: 2px 0 8px;',
+      'aria-live': 'polite',
+    }, '0 de 12 letras');
+    container.appendChild(status);
+
+    // Grid 3×2 das crianças
+    const grid = el('div', {
+      style: 'display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 4px 4px;',
+    });
+
+    const renderGrid = () => {
+      grid.innerHTML = '';
+      dist.forEach(item => {
+        const ja = entregueSet.has(item.quem);
+        const card = el('button', {
+          style: `display:flex; flex-direction:column; align-items:center; gap:3px;
+                  padding: 8px 4px;
+                  background: ${ja ? 'var(--papel-fundo)' : 'white'};
+                  border: 2px solid ${ja ? 'var(--folha)' : 'var(--marrom-claro)'};
+                  border-radius: 14px;
+                  box-shadow: var(--sombra-suave);
+                  opacity: ${ja ? 0.6 : 1};
+                  transition: transform 0.1s, opacity 0.2s;
+                  min-height: 110px;`,
+          'aria-label': ja
+            ? `${item.nome} já entregou ${item.letras.join(' e ')}`
+            : `${item.nome} traz as letras ${item.letras.join(' e ')}`,
+          ...(ja ? { disabled: 'true' } : {}),
+          onClick: () => {
+            if (entregueSet.has(item.quem)) return;
+            entregueSet.add(item.quem);
+            item.letras.forEach(l => entregues.push({ letra: l, quem: item.quem }));
+            renderDisplay();
+            renderMorseProgresso();
+            renderGrid();
+            atualizaStatus();
+            Audio.unlock();
+            // Toca as duas letras em Morse, com espaço entre
+            const seq = item.letras.map(l => MORSE[l]).join(' ');
+            tocarSequencia(seq, { voz: 'sabia' });
+          },
+        });
+
+        // Mini SVG do passarinho
+        const svgWrap = passaroSVG(item.quem);
+        const svgEl = svgWrap.querySelector('svg');
+        if (svgEl) {
+          svgEl.style.width = '48px';
+          svgEl.style.height = '48px';
+          svgEl.style.transform = 'scale(1)';
+          svgEl.style.flexShrink = '0';
+        }
+        card.appendChild(svgWrap);
+
+        card.appendChild(el('div', {
+          style: 'font-family: var(--display); font-weight: 700; font-size: 12px; color: var(--marrom);'
+        }, item.nome));
+
+        card.appendChild(el('div', {
+          style: `font-family: var(--display); font-weight: 900; font-size: 17px;
+                  color: ${ja ? 'var(--folha)' : 'var(--laranja-vivo)'};
+                  letter-spacing: 0.12em;`
+        }, ja ? '✓ ' + item.letras.join('') : item.letras.join('')));
+
+        grid.appendChild(card);
+      });
+    };
+
+    const atualizaStatus = () => {
+      const n = entregues.length;
+      if (n === 12) {
+        status.innerHTML = '🎉 <b>pronto!</b> agora cantar pra Nena';
+        status.style.color = 'var(--laranja-vivo)';
+        status.style.fontStyle = 'normal';
+        setTimeout(() => celebrar(20), 100);
+      } else {
+        status.textContent = `${n} de 12 letras`;
+      }
+    };
+
+    renderGrid();
+    container.appendChild(grid);
   } else if (a.tipo === 'final') {
     container.appendChild(el('div', { class: 'cena-acoes' }, [
       el('button', {
