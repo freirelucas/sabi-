@@ -2226,10 +2226,21 @@ const Audio = (() => {
     // v8.4: fade-out rápido (15ms) em cada gain antes de stop(0) — evita
     // o "click" audível que aparecia ao cortar amostra abruptamente. Total
     // imperceptível na latência mas elimina o pop. Master continua intacto.
+    //
+    // v8.7 BUGFIX: SNAPSHOT estático das sources/gains ativos no momento
+    // da chamada. Antes, o setTimeout iterava activeSources LIVE — qualquer
+    // source criada nos 25ms entre fade-out e stop entrava no set e era
+    // imediatamente stop(0). Resultado: a Tela Pulso (que chama parar() →
+    // pararTudo() ANTES do for-loop que agenda 64 notas em t = now+0.1s)
+    // tinha TODAS as 64 sources stopadas antes de tocar. Mudo total. O
+    // snapshot estático corrige: só as fontes que JÁ estavam ativas são
+    // afetadas. As novas, criadas após pararTudo, sobrevivem.
     if (!ctx) return;
     const t = ctx.currentTime;
     const FADE = 0.015;
-    activeGains.forEach(g => {
+    const snapshotSources = Array.from(activeSources);
+    const snapshotGains = Array.from(activeGains);
+    snapshotGains.forEach(g => {
       try {
         g.gain.cancelScheduledValues(t);
         const v = g.gain.value;
@@ -2237,11 +2248,12 @@ const Audio = (() => {
         g.gain.linearRampToValueAtTime(0, t + FADE);
       } catch(e) {}
     });
-    // Stops também, mas com pequeno delay (após o fade) pra silenciar sem pop.
     setTimeout(() => {
-      activeSources.forEach(s => { try { s.stop(0); } catch(e) {} });
-      activeSources.clear();
-      activeGains.clear();
+      snapshotSources.forEach(s => {
+        try { s.stop(0); } catch(e) {}
+        activeSources.delete(s);
+      });
+      snapshotGains.forEach(g => activeGains.delete(g));
     }, 25);
     // v8.5: limpa também a fila de callbacks visuais agendados
     cancelVisualQueue();
