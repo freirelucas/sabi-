@@ -150,7 +150,12 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 /* ===== LANDING ===== */
 .landing {
   flex: 1; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 16px; padding: 8px;
+  justify-content: flex-start; gap: 14px; padding: 12px 8px 24px;
+  position: relative;
+  /* v8.3 polish: gradiente quente sutil pra dar presença visual */
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(244,211,94,0.22), transparent 75%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(232,164,92,0.15), transparent 70%);
 }
 .landing-titulo {
   font-family: var(--display); font-weight: 900;
@@ -160,6 +165,16 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   letter-spacing: -0.02em;
   line-height: 1;
   text-align: center;
+  /* v8.3 polish: sombra dupla pra dar peso de "carimbo" */
+  text-shadow:
+    0 1px 0 rgba(244, 211, 94, 0.6),
+    0 4px 8px rgba(120, 60, 20, 0.12);
+  animation: landing-titulo-entra 0.7s cubic-bezier(0.2, 0.7, 0.3, 1.1);
+}
+@keyframes landing-titulo-entra {
+  0%   { opacity: 0; transform: translateY(-8px) scale(0.9); }
+  60%  { opacity: 1; transform: translateY(2px) scale(1.04); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 }
 .landing-sub {
   font-family: var(--display); font-weight: 500;
@@ -168,37 +183,72 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   color: var(--tinta-suave);
   text-align: center;
   font-variation-settings: "opsz" 144, "SOFT" 80;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  animation: landing-sub-entra 0.5s ease-out 0.3s both;
+}
+@keyframes landing-sub-entra {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .landing-personagens {
   display: flex; gap: 0; align-items: flex-end; justify-content: center;
   margin: 4px 0;
+  animation: landing-personagens-entra 0.6s ease-out 0.1s both;
+}
+@keyframes landing-personagens-entra {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .landing-personagens .passaro-svg {
   width: 110px; height: 110px;
+  animation: landing-passaro-flutuar 3.2s ease-in-out infinite;
+}
+.landing-personagens .passaro-svg:nth-child(1) { animation-delay: 0.1s; }
+.landing-personagens .passaro-svg:nth-child(2) { animation-delay: 0.4s; }
+.landing-personagens .passaro-svg:nth-child(3) { animation-delay: 0.7s; }
+@keyframes landing-passaro-flutuar {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
 }
 .landing-personagens .passaro-svg.menor { width: 84px; height: 84px; }
 
 .landing-portas {
-  display: flex; flex-direction: column; gap: 12px; width: 100%;
-  max-width: 360px; margin-top: 8px;
+  display: flex; flex-direction: column; gap: 10px; width: 100%;
+  max-width: 360px; margin-top: 4px;
 }
 .porta {
   background: var(--papel-medio);
   border: 2px solid var(--marrom-claro);
   border-radius: 18px;
-  padding: 16px 20px;
-  display: flex; align-items: center; gap: 14px;
-  transition: transform 0.15s, background 0.15s, border-color 0.15s;
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 12px;
+  transition: transform 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
   text-align: left;
-  min-height: 76px;
+  min-height: 70px;
+  /* v8.3: sombra suave pra "lift" leve */
+  box-shadow: 0 1px 3px rgba(120, 60, 20, 0.08),
+              0 4px 8px rgba(120, 60, 20, 0.05);
+  animation: landing-porta-entra 0.5s ease-out both;
 }
-.porta:active { transform: scale(0.97); }
+.porta:nth-of-type(1) { animation-delay: 0.4s; }
+.porta:nth-of-type(2) { animation-delay: 0.5s; }
+.porta:nth-of-type(3) { animation-delay: 0.6s; }
+.porta:nth-of-type(4) { animation-delay: 0.7s; }
+@keyframes landing-porta-entra {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.porta:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 2px rgba(120, 60, 20, 0.12);
+}
 .porta.principal {
-  background: var(--laranja);
+  background: linear-gradient(135deg, var(--laranja) 0%, var(--laranja-vivo) 100%);
   border-color: var(--laranja-vivo);
   color: white;
-  box-shadow: var(--sombra-media);
+  box-shadow:
+    0 2px 6px rgba(201, 98, 46, 0.35),
+    0 6px 14px rgba(201, 98, 46, 0.25);
 }
 .porta-icone {
   width: 48px; height: 48px;
@@ -457,6 +507,141 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-size: 14px;
   color: var(--tinta-suave);
   margin: 4px 0 8px;
+}
+
+/* v8.3 LETRAS-PARABENS: novo final da Temporada 1. Frase incremental no
+   topo + símbolos Morse abaixo + fila de coleguinhas que entregam letras.
+   Sem overlay fullscreen — o botão "voltar" do renderCena fica visível. */
+.letras-frase {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 4px;
+  font-family: var(--display); font-weight: 800;
+  font-size: clamp(22px, 6vw, 30px);
+  color: var(--tinta);
+  margin: 6px 4px 2px;
+}
+.letras-frase-letra {
+  display: inline-block;
+  min-width: 22px;
+  text-align: center;
+  padding: 2px 4px;
+  border-radius: 6px;
+  background: rgba(120, 90, 60, 0.08);
+  color: rgba(120, 90, 60, 0.4);
+  transition: all 0.3s;
+}
+.letras-frase-letra.revelada {
+  background: var(--amarelo, #F4D35E);
+  color: #5C4321;
+  animation: letras-pousa 0.4s ease-out;
+}
+.letras-frase-espaco {
+  display: inline-block;
+  width: 14px;
+}
+@keyframes letras-pousa {
+  0%   { transform: translateY(-12px) scale(0.5); opacity: 0; }
+  60%  { transform: translateY(2px) scale(1.15); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.letras-morse {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--tinta-suave);
+  margin: 0 4px 8px;
+  min-height: 24px;
+}
+.letras-morse-letra {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+  opacity: 0.4;
+  transition: opacity 0.3s, color 0.3s;
+}
+.letras-morse-letra.revelada {
+  opacity: 1;
+  color: var(--cor-acento, #C9622E);
+  font-weight: 700;
+}
+.letras-morse-espaco {
+  opacity: 0.5;
+}
+
+.letras-fila {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  margin: 12px 4px;
+}
+.letras-coleguinha {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: var(--cor-papel);
+  border: 2px solid rgba(120,90,60,0.25);
+  border-radius: 14px;
+  padding: 6px 4px;
+  cursor: pointer;
+  min-height: 92px;
+  transition: transform 0.1s, border-color 0.15s, opacity 0.2s;
+}
+.letras-coleguinha[disabled] { opacity: 0.4; cursor: not-allowed; }
+.letras-coleguinha.ativo {
+  border-color: var(--cor-acento, #C9622E);
+  background: rgba(244,211,94,0.3);
+  animation: letras-coleguinha-pulsar 1.4s ease-in-out infinite;
+}
+.letras-coleguinha.feito {
+  background: rgba(120, 200, 120, 0.15);
+  border-color: rgba(80, 160, 80, 0.4);
+  opacity: 0.85;
+}
+.letras-coleguinha:active:not([disabled]) { transform: scale(0.95); }
+@keyframes letras-coleguinha-pulsar {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+.letras-coleguinha-letras {
+  font-weight: 800; font-size: 16px;
+  color: var(--cor-acento, #C9622E);
+  letter-spacing: 1px;
+}
+.letras-coleguinha.feito .letras-coleguinha-letras {
+  color: rgba(80, 160, 80, 0.9);
+}
+.letras-coleguinha-nome {
+  font-size: 12px; color: var(--tinta-suave);
+}
+
+.letras-final {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  background: rgba(244,211,94,0.25);
+  border: 2px dashed rgba(120,90,60,0.3);
+  border-radius: 16px;
+  padding: 14px 12px;
+  margin: 10px 4px;
+  animation: letras-final-aparece 0.6s ease-out;
+}
+.letras-final.escondido { display: none; }
+@keyframes letras-final-aparece {
+  0%   { opacity: 0; transform: translateY(12px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.letras-final-titulo {
+  font-family: var(--display); font-weight: 800;
+  font-size: 18px;
+  color: var(--cor-acento, #C9622E);
+  text-align: center;
+}
+.letras-final-bolo {
+  display: flex; flex-direction: column; align-items: center;
+  animation: bolo-pop 0.6s ease-out;
+}
+.letras-final-temporada {
+  font-family: var(--display); font-weight: 700;
+  font-size: 14px;
+  color: var(--cor-acento, #C9622E);
+  letter-spacing: 0.3px;
+}
+.letras-final-acoes {
+  display: flex; gap: 8px;
 }
 
 /* Cena curta — pegadinhas pra caminho */
@@ -1453,6 +1638,78 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 /* Tela de detalhe da letra */
 .letra-detalhe {
   display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+
+/* v8.3: tela COLEGUINHAS — explora o nome de cada um da turma */
+.coleguinhas {
+  display: flex; flex-direction: column; gap: 14px;
+}
+.coleguinhas-intro {
+  text-align: center;
+  padding: 6px 12px;
+}
+.coleguinhas-titulo {
+  font-family: var(--display); font-weight: 800;
+  font-size: 18px; color: var(--tinta);
+  margin-bottom: 4px;
+}
+.coleguinhas-sub {
+  font-family: var(--display); font-style: italic;
+  font-size: 14px; color: var(--tinta-suave);
+}
+.coleguinhas-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  padding: 0 4px;
+}
+@media (max-width: 380px) {
+  .coleguinhas-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.coleguinha-card {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: var(--cor-papel);
+  border: 2px solid rgba(120,90,60,0.25);
+  border-radius: 14px;
+  padding: 8px 4px;
+  cursor: pointer;
+  min-height: 124px;
+  transition: transform 0.1s, border-color 0.15s, background 0.15s;
+}
+.coleguinha-card:active { transform: scale(0.95); }
+.coleguinha-card.selecionado {
+  background: rgba(244,211,94,0.35);
+  border-color: var(--cor-acento, #C9622E);
+}
+.coleguinha-nome {
+  font-family: var(--display); font-weight: 700;
+  font-size: 16px; color: var(--tinta);
+  margin-top: 2px;
+}
+.coleguinha-papel {
+  font-size: 11px;
+  color: var(--tinta-suave);
+  font-style: italic;
+}
+/* v8.3: 5 chips de palavras alternativas no detalhe da letra */
+.letra-chips {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+  margin: 4px 8px;
+}
+.letra-chip {
+  background: var(--cor-papel);
+  border: 2px solid rgba(120,90,60,0.25);
+  border-radius: 14px;
+  padding: 6px 12px;
+  font-size: 14px; font-weight: 600;
+  color: var(--tinta);
+  cursor: pointer;
+  min-height: 36px;
+  transition: transform 0.1s, background 0.15s, border-color 0.15s;
+}
+.letra-chip:active { transform: scale(0.94); }
+.letra-chip.ativa {
+  background: var(--amarelo, #F4D35E);
+  border-color: var(--amarelo-bico, #C99A2A);
+  color: #5C4321;
 }
 
 /* ===== AVISO ===== */
@@ -3307,38 +3564,73 @@ const ROTEIRO = [
     personagens: [
       { tipo: 'nena', classe: 'nena' },
     ],
-    fala: 'O <b>SOS</b> é um <em>pedido de ajuda</em>. <b>Três curtos, três longos, três curtos.</b>',
-    falaSub: '<em>"A gente só pede SOS quando precisa de ajuda <b>de verdade</b> — pra alguém em quem confia."</em>',
+    fala: '<b>SOS</b> = <em>pedido de ajuda</em>. <b>Três curtos, três longos, três curtos.</b>',
+    falaSub: '<em>"É muito bom saber <b>pedir ajuda</b> — e <b>ajudar os amigos</b> que precisam da gente."</em>',
     acao: { tipo: 'aula-sos' },
-    proximo: '🤫 a turma tem um segredo',
+    proximo: '✉️ as letras voam pra Nena',
   },
   // E6: SEGREDO — a turma sussurra (Nena não está ali). Combinam
   // ensaiar o parabéns. Quando "Nena chegou", overlay celebra.
   {
-    id: 'segredo',
+    // v8.3: Final reformulado. Lucas: "faz mais sentido a cena em que eles
+    // trazem letra por letra para montar PARABENS, mesmo que fique longo".
+    // Cada coleguinha entrega 1-2 letras de PARABENS NENA. À medida que
+    // entregam, as letras + símbolos Morse aparecem na tela com o ritmo
+    // (compasso visível). Quando todos entregam, Nena chega e a turma
+    // canta em conjunto. Botão explícito de voltar pra landing no final.
+    id: 'letras-parabens',
     titulo: 'Parabéns, Nena!',
-    bloco: { emoji: '🎂', nome: 'festa' },
+    bloco: { emoji: '✉️', nome: 'letras voam' },
     fundo: 'celebracao',
     personagens: [],
-    fala: '🤫 — <em>Pssssiu!</em> A turma combina uma <b>surpresa</b> pra Nena…',
-    falaSub: 'Aperta "ensaiar" pra cantar parabéns junto. Depois "Nena chegou!" pra ver a surpresa.',
-    acao: { tipo: 'segredo-parabens' },
-    proximo: '🏠 voltar pra escola',
+    fala: '✉️ Cada coleguinha traz uma <b>letra</b> pra montar PARABENS NENA.',
+    falaSub: '<em>Toca em cada um, na ordem, e vê a frase aparecer com ritmo e código.</em>',
+    acao: { tipo: 'letras-parabens' },
+    proximo: '🏠 voltar pro início',
   },
 ];
 
 /* ============================================================
    PALAVRAS POR LETRA
    ============================================================ */
-const PALAVRAS_LETRA = {
-  A: 'Altinha', B: 'Bento',   C: 'Casa',    D: 'Didi',
-  E: 'Estela',  F: 'Frescobol', G: 'Galho', H: 'Homem',
-  I: 'Ipê',     J: 'Judo',    K: 'Karatê',  L: 'Lua',
-  M: 'Mama',    N: 'Nena',    O: 'Oi',      P: 'Papa',
-  Q: 'Quintal', R: 'Rio',     S: 'Sabiá',   T: 'To',
-  U: 'Uva',     V: 'Vento',   W: 'Wawe',    X: 'Xícara',
-  Y: 'Yo',      Z: 'Zebra',
+// v8.3: Lucas pediu palavras CURTAS pro alfabeto + 5 alternativas infantis
+// por letra, explorando combinações (ca/ce/ci/co/cu, etc). A 1ª palavra é
+// a âncora default mostrada no card; as 4 seguintes aparecem como chips
+// clicáveis no detalhe da letra. Critérios: curtas, do universo de 5 anos,
+// preferência por palavras concretas (objeto/animal/ação) sobre abstratas.
+const PALAVRAS_LETRA_LISTA = {
+  A: ['Asa',  'Avô',  'Anjo', 'Água', 'Amor'],
+  B: ['Bola', 'Boné', 'Bento','Bobo', 'Beijo'],
+  C: ['Casa', 'Coco', 'Cuca', 'Céu',  'Cinco'],
+  D: ['Dedo', 'Dia',  'Doce', 'Dado', 'Duda'],
+  E: ['Eu',   'Ela',  'Eva',  'Ele',  'Estela'],
+  F: ['Flor', 'Faca', 'Fé',   'Fada', 'Foca'],
+  G: ['Gato', 'Gude', 'Galho','Geleia','Gola'],
+  H: ['Hoje', 'Hora', 'Hino', 'Homem','Herói'],
+  I: ['Ipê',  'Ilha', 'Imã',  'Iate', 'Igual'],
+  J: ['Jogo', 'Joia', 'Judo', 'João', 'Janela'],
+  K: ['Kart', 'Kiwi', 'Karatê','Koala','Kombi'],
+  L: ['Lua',  'Lobo', 'Leite','Lago', 'Livro'],
+  M: ['Mama', 'Mel',  'Mola', 'Mato', 'Mão'],
+  N: ['Nena', 'Nada', 'Neve', 'Ninho','Nuvem'],
+  O: ['Oi',   'Ovo',  'Onda', 'Oito', 'Olho'],
+  P: ['Papa', 'Pé',   'Pia',  'Pó',   'Pato'],
+  Q: ['Que',  'Quina','Quiabo','Queijo','Quintal'],
+  R: ['Rio',  'Rato', 'Rua',  'Rede', 'Roda'],
+  S: ['Sol',  'Sopa', 'Sabiá','Sapo', 'Surf'],
+  T: ['To',   'Tia',  'Topo', 'Tatu', 'Touro'],
+  U: ['Uva',  'Urso', 'Unha', 'Uno',  'Útil'],
+  V: ['Vó',   'Vela', 'Voz',  'Vaca', 'Vento'],
+  W: ['Wifi', 'Wave', 'Wawe', 'Walt', 'Web'],
+  X: ['Xale', 'Xixi', 'Xô',   'Xícara','Xote'],
+  Y: ['Yo',   'Yoga', 'Yeti', 'Yuca', 'Iô-iô'],
+  Z: ['Zé',   'Zoo',  'Zero', 'Zebra','Zinco'],
 };
+// Compatibilidade: PALAVRAS_LETRA mantido como mapa simples letra→1ª palavra,
+// usado por renderizadores existentes que esperam só uma string por letra.
+const PALAVRAS_LETRA = Object.fromEntries(
+  Object.entries(PALAVRAS_LETRA_LISTA).map(([l, lista]) => [l, lista[0]])
+);
 
 /* ============================================================
    NAVEGAÇÃO
@@ -3385,6 +3677,10 @@ function renderApp() {
     btnVoltar.classList.remove('escondido');
     titulo.textContent = State.letraSelecionada;
     renderLetraDetalhe(tela, State.letraSelecionada);
+  } else if (State.modo === 'coleguinhas') {
+    btnVoltar.classList.remove('escondido');
+    titulo.textContent = 'Coleguinhas';
+    renderColeguinhas(tela);
   }
 }
 
@@ -3427,7 +3723,20 @@ function renderLanding(tela) {
     el('div', { class: 'porta-icone' }, '🔤'),
     el('div', { class: 'porta-texto' }, [
       el('div', { class: 'porta-titulo' }, 'Jogo das letras'),
-      el('div', { class: 'porta-desc' }, 'A é de Altinha, B é de Bento… ouve cada letra em canto sabiá.'),
+      el('div', { class: 'porta-desc' }, 'A é de Asa, B é de Bola… 5 palavras curtas pra cada letra.'),
+    ]),
+    el('div', { class: 'porta-seta' }, '→'),
+  ]));
+
+  // v8.3: nova porta "Coleguinhas" — exploração dos nomes da turma
+  portas.appendChild(el('button', {
+    class: 'porta',
+    onClick: () => { Audio.unlock(); navegar('coleguinhas'); }
+  }, [
+    el('div', { class: 'porta-icone' }, '👥'),
+    el('div', { class: 'porta-texto' }, [
+      el('div', { class: 'porta-titulo' }, 'Coleguinhas'),
+      el('div', { class: 'porta-desc' }, 'Explora o nome de cada um da turma — em letras, em código e cantado.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
@@ -3445,6 +3754,77 @@ function renderLanding(tela) {
   ]));
 
   wrap.appendChild(portas);
+  tela.appendChild(wrap);
+}
+
+/* ============================================================
+   COLEGUINHAS — explora o nome de cada um da turma
+   ============================================================ */
+function renderColeguinhas(tela) {
+  // v8.3: Lucas pediu "tela: explore o nome dos coleguinhas da escola".
+  // Grid 2 colunas com sabiá + nome. Click revela decomposição completa
+  // (letras + Morse + loop) reusando criarDecomposicaoNome.
+  const turma = [
+    { quem: 'nena', nome: 'Nena', papel: 'professora' },
+    { quem: 'to',   nome: 'To',   papel: 'protagonista' },
+    { quem: 'ben',  nome: 'Ben',  papel: 'amigo de To' },
+    { quem: 'tete', nome: 'Tete', papel: 'primeira amiga' },
+    { quem: 'caca', nome: 'Caca', papel: 'ping-pong' },
+    { quem: 'jo',   nome: 'Jo',   papel: 'ping-pong' },
+    { quem: 'tata', nome: 'Tata', papel: 'xadrez' },
+    { quem: 'tito', nome: 'Tito', papel: 'xadrez' },
+    { quem: 'lila', nome: 'Lila', papel: 'xadrez' },
+  ];
+
+  const wrap = el('div', { class: 'coleguinhas' });
+
+  wrap.appendChild(el('div', { class: 'coleguinhas-intro' }, [
+    el('div', { class: 'coleguinhas-titulo' }, 'A turma da Escola dos Sabiás'),
+    el('div', { class: 'coleguinhas-sub' },
+      'Toca em cada um pra ouvir o nome — letra por letra.'),
+  ]));
+
+  const grid = el('div', { class: 'coleguinhas-grid' });
+  wrap.appendChild(grid);
+
+  const painel = el('div', { class: 'decomp-painel escondido' });
+  wrap.appendChild(painel);
+
+  let decompAtual = null;
+  function escolher(item) {
+    if (decompAtual) decompAtual.parar();
+    painel.innerHTML = '';
+    painel.classList.remove('escondido');
+    painel.appendChild(el('div', { class: 'decomp-titulo' }, [
+      el('b', {}, item.nome),
+      el('span', { style: 'opacity:0.7' }, ` · ${item.papel}`),
+    ]));
+    decompAtual = criarDecomposicaoNome(item.nome.toUpperCase(), 'sabia');
+    painel.appendChild(decompAtual.wrap);
+    decompAtual.tocarTudo();
+    grid.querySelectorAll('.coleguinha-card').forEach(c => {
+      c.classList.toggle('selecionado', c.dataset.quem === item.quem);
+    });
+  }
+
+  turma.forEach(item => {
+    const card = el('button', {
+      class: 'coleguinha-card',
+      'data-quem': item.quem,
+      'aria-label': `ouvir ${item.nome}, ${item.papel}`,
+      onClick: () => escolher(item),
+    });
+    const svg = passaroSVG(item.quem);
+    if (svg) {
+      svg.style.width = '70px'; svg.style.height = '70px';
+      svg.style.transform = 'scale(1)';
+      card.appendChild(svg);
+    }
+    card.appendChild(el('div', { class: 'coleguinha-nome' }, item.nome));
+    card.appendChild(el('div', { class: 'coleguinha-papel' }, item.papel));
+    grid.appendChild(card);
+  });
+
   tela.appendChild(wrap);
 }
 
@@ -4069,6 +4449,166 @@ function renderAcaoCena(container, cena) {
       cell.appendChild(el('div', { class: 'recap-nome' }, item.nome));
       grade.appendChild(cell);
     });
+  } else if (a.tipo === 'letras-parabens') {
+    // v8.3: novo final da Temporada 1. Cada coleguinha traz 1-2 letras de
+    // PARABENS NENA. À medida que entregam, a frase aparece no topo,
+    // os símbolos Morse correspondentes preenchem embaixo, e o ritmo é
+    // mostrado pelo compasso. Quando todos entregaram, Nena chega
+    // (sem overlay fullscreen — Lucas: "final perde botão de voltar").
+    // Bolo + confete + canto da turma. Botão "voltar pro início" do
+    // renderCena fica sempre visível.
+    const FRASE = 'PARABENS NENA';   // 12 letras + 1 espaço (separa palavra)
+    // Distribuição: 8 coleguinhas entregam 1-2 letras na ordem da frase.
+    const turmaLetras = [
+      { quem: 'caca', nome: 'Caca', letras: 'PA' },   // PA
+      { quem: 'jo',   nome: 'Jo',   letras: 'RA' },   // RA
+      { quem: 'tete', nome: 'Tete', letras: 'BE' },   // BE
+      { quem: 'tata', nome: 'Tata', letras: 'NS' },   // NS
+      { quem: 'tito', nome: 'Tito', letras: 'N'  },   // N
+      { quem: 'lila', nome: 'Lila', letras: 'E'  },   // E
+      { quem: 'to',   nome: 'To',   letras: 'N'  },   // N
+      { quem: 'ben',  nome: 'Ben',  letras: 'A'  },   // A
+    ];
+
+    let entreguesIdx = 0;        // próximo da turma a entregar
+    const letrasReveladas = new Set();   // posições da frase já reveladas
+
+    // ---- Topo: frase incremental ----
+    const fraseTopo = el('div', { class: 'letras-frase' });
+    function renderFrase() {
+      fraseTopo.innerHTML = '';
+      let pos = 0;
+      for (let i = 0; i < FRASE.length; i++) {
+        const ch = FRASE[i];
+        if (ch === ' ') {
+          fraseTopo.appendChild(el('span', { class: 'letras-frase-espaco' }, ' '));
+          continue;
+        }
+        const revelada = letrasReveladas.has(pos);
+        fraseTopo.appendChild(el('span', {
+          class: 'letras-frase-letra' + (revelada ? ' revelada' : ''),
+          'data-pos': String(pos),
+        }, revelada ? ch : '_'));
+        pos++;
+      }
+    }
+    container.appendChild(fraseTopo);
+
+    // ---- Símbolos Morse alinhados embaixo ----
+    const morseTopo = el('div', { class: 'letras-morse' });
+    function renderMorseFrase() {
+      morseTopo.innerHTML = '';
+      let pos = 0;
+      for (let i = 0; i < FRASE.length; i++) {
+        const ch = FRASE[i];
+        if (ch === ' ') {
+          morseTopo.appendChild(el('span', { class: 'letras-morse-espaco' }, '/'));
+          continue;
+        }
+        const revelada = letrasReveladas.has(pos);
+        const cod = MORSE[ch] || '';
+        morseTopo.appendChild(el('span', {
+          class: 'letras-morse-letra' + (revelada ? ' revelada' : ''),
+        }, revelada ? cod : '·'.repeat(cod.length).replace(/./g, '·')));
+        pos++;
+      }
+    }
+    container.appendChild(morseTopo);
+
+    // ---- Compasso pulsando ----
+    const compasso = criarCompasso('letras-parabens');
+    container.appendChild(compasso);
+    State.cleanupAtual = ativarCompasso(compasso, calcularTiming(State.bpm).beat);
+
+    // ---- Fila da turma ----
+    const fila = el('div', { class: 'letras-fila' });
+    function renderFila() {
+      fila.innerHTML = '';
+      turmaLetras.forEach((p, i) => {
+        const ehAtivo = i === entreguesIdx;
+        const ehFeito = i < entreguesIdx;
+        const slot = el('button', {
+          class: 'letras-coleguinha' +
+            (ehAtivo ? ' ativo' : '') +
+            (ehFeito ? ' feito' : ''),
+          'aria-label': ehFeito ? `${p.nome} já entregou` :
+                        ehAtivo ? `${p.nome} entregar ${p.letras}` :
+                        `aguarde ${p.nome}`,
+          ...(!ehAtivo && !ehFeito ? { disabled: 'true' } : {}),
+          onClick: () => entregar(i),
+        });
+        const svg = passaroSVG(p.quem);
+        if (svg) {
+          svg.style.width = '52px'; svg.style.height = '52px';
+          svg.style.transform = 'scale(1)';
+          slot.appendChild(svg);
+        }
+        slot.appendChild(el('div', { class: 'letras-coleguinha-letras' },
+          ehFeito ? '✓' : p.letras));
+        slot.appendChild(el('div', { class: 'letras-coleguinha-nome' }, p.nome));
+        fila.appendChild(slot);
+      });
+    }
+    container.appendChild(fila);
+
+    // ---- Final da cena: Nena + bolo (inline, NÃO overlay fullscreen) ----
+    const final = el('div', { class: 'letras-final escondido' });
+    container.appendChild(final);
+
+    function entregar(idx) {
+      if (idx !== entreguesIdx) return;
+      const p = turmaLetras[idx];
+      Audio.unlock();
+
+      // Calcula posição inicial das letras desse personagem na FRASE
+      // (somando comprimentos dos anteriores).
+      let posInicial = 0;
+      for (let k = 0; k < idx; k++) {
+        posInicial += turmaLetras[k].letras.length;
+      }
+      // Revela as letras dessa entrega
+      for (let k = 0; k < p.letras.length; k++) {
+        letrasReveladas.add(posInicial + k);
+      }
+      entreguesIdx++;
+      renderFrase(); renderMorseFrase(); renderFila();
+
+      // Toca cada letra entregue em Morse, em sequência
+      const seqLetras = p.letras.split('').map(l => MORSE[l]).join(' ');
+      tocarSequencia(seqLetras, { voz: 'sabia', repeticoes: 1 });
+
+      if (entreguesIdx >= turmaLetras.length) {
+        // Todos entregaram! Nena chega na cena (não fullscreen).
+        setTimeout(() => mostrarFinal(), 600);
+      }
+    }
+
+    function mostrarFinal() {
+      final.classList.remove('escondido');
+      final.replaceChildren(
+        el('div', { class: 'letras-final-titulo' }, '✨ A turma cantou pra Nena! ✨'),
+        el('div', { class: 'letras-final-bolo' }, [
+          el('div', { class: 'bolo-velas' }, '🕯️ 🕯️ 🕯️ 🕯️ 🕯️'),
+          el('div', { class: 'bolo-base' }, '🎂'),
+        ]),
+        el('div', { class: 'letras-final-temporada' }, '🌟 Fim da Temporada 1 🌟'),
+        el('div', { class: 'letras-final-acoes' }, [
+          el('button', {
+            class: 'botao laranja',
+            onClick: () => {
+              Audio.unlock();
+              celebrar(50);
+              const seq = palavraParaMorse('PARABENS NENA');
+              tocarSequencia(seq, { voz: 'sabia' });
+            },
+          }, '🎵 cantar parabéns'),
+        ]),
+      );
+      celebrar(60);
+      setTimeout(() => celebrar(40), 2500);
+    }
+
+    renderFrase(); renderMorseFrase(); renderFila();
   } else if (a.tipo === 'segredo-parabens') {
     // E6: turma sussurra (sem Nena). Botão "ensaiar" toca PARABENS NENA em
     // canto sabiá baixo. Botão "Nena chegou!" mostra overlay celebrando.
@@ -4757,9 +5297,9 @@ function renderLetras(tela) {
 }
 
 function renderLetraDetalhe(tela, letra) {
-  const palavra = PALAVRAS_LETRA[letra];
+  const lista = PALAVRAS_LETRA_LISTA[letra] || [PALAVRAS_LETRA[letra]];
+  let palavraAtual = lista[0];
   const codLetra = MORSE[letra];
-  const codPalavra = palavraParaMorse(palavra);
 
   const wrap = el('div', { class: 'letra-detalhe' });
 
@@ -4786,28 +5326,54 @@ function renderLetraDetalhe(tela, letra) {
   const morseLetra = el('div', { class: 'morse-display', html: renderMorse(codLetra) });
   wrap.appendChild(morseLetra);
 
-  // "É de palavra"
-  wrap.appendChild(el('div', {
+  // "É de palavra" — atualizado dinamicamente quando troca de chip
+  const fraseE = el('div', {
     class: 'cena-fala',
     style: 'background: transparent; border:none; box-shadow:none; font-style:italic;',
-  }, [
-    el('span', {}, letra + ' é de '),
-    el('b', {}, palavra),
-  ]));
+  });
+  wrap.appendChild(fraseE);
 
-  // Palavra inteira
-  wrap.appendChild(el('div', {
+  // Palavra grande — atualizada
+  const palavraDisp = el('div', {
     class: 'palavra-display',
     style: 'font-size: clamp(24px, 6vw, 36px); margin: 4px 0;',
-  }, palavra.toUpperCase()));
+  });
+  wrap.appendChild(palavraDisp);
 
-  // Morse da palavra
+  // Morse da palavra — atualizado
   const morsePalavra = el('div', {
     class: 'morse-display',
     style: 'font-size: clamp(20px, 5vw, 28px); min-height: 36px;',
-    html: renderMorse(codPalavra)
   });
   wrap.appendChild(morsePalavra);
+
+  // 5 chips com as palavras alternativas (1ª = default ativa)
+  const chipsLista = el('div', {
+    class: 'letra-chips',
+    'aria-label': '5 palavras com a letra ' + letra,
+  });
+  wrap.appendChild(chipsLista);
+
+  function atualizarPalavra(p) {
+    palavraAtual = p;
+    fraseE.replaceChildren(
+      el('span', {}, letra + ' é de '),
+      el('b', {}, p),
+    );
+    palavraDisp.textContent = p.toUpperCase();
+    morsePalavra.innerHTML = renderMorse(palavraParaMorse(p));
+    chipsLista.querySelectorAll('.letra-chip').forEach(b => {
+      b.classList.toggle('ativa', b.dataset.palavra === p);
+    });
+  }
+  lista.forEach(p => {
+    chipsLista.appendChild(el('button', {
+      class: 'letra-chip',
+      'data-palavra': p,
+      onClick: () => atualizarPalavra(p),
+    }, p));
+  });
+  atualizarPalavra(palavraAtual);
 
   // Cabeça de compasso compartilhada por letra e palavra
   const compassoLetra = criarCompasso('pulso');
@@ -4837,8 +5403,9 @@ function renderLetraDetalhe(tela, letra) {
     class: 'botao',
     onClick: () => {
       Audio.unlock();
+      const codAtual = palavraParaMorse(palavraAtual);
       const els = morsePalavra.querySelectorAll('.ponto, .traco');
-      tocarSequencia(codPalavra, {
+      tocarSequencia(codAtual, {
         voz: 'sabia',
         compasso: compassoLetra,
         onElemento: (ch, i) => {
@@ -4852,7 +5419,7 @@ function renderLetraDetalhe(tela, letra) {
     class: 'botao secundario',
     onClick: () => {
       Audio.unlock();
-      tocarSequencia(codPalavra, { voz: 'violao' });
+      tocarSequencia(palavraParaMorse(palavraAtual), { voz: 'violao' });
     }
   }, '🎸 guitarra'));
   wrap.appendChild(botoes);
