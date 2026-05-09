@@ -261,6 +261,157 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .cena-fundo.campinho {
   background: linear-gradient(180deg, #DCE8EE 0%, #B5D9B5 40%, #7AB87A 100%);
 }
+/* v8 Temporada 1: novos fundos pra cenas de casa, padrinhos, caminho,
+   quadra (altinha) e praia (frescobol). Tons sempre quentes pra remeter
+   ao acolhimento doméstico/escolar. */
+.cena-fundo.ninho {
+  background: linear-gradient(180deg, #FFE9C8 0%, #F8C97B 50%, #C58A4B 100%);
+}
+.cena-fundo.visita {
+  background: linear-gradient(180deg, #FCE4DC 0%, #F4B8A8 50%, #D08568 100%);
+}
+.cena-fundo.caminho {
+  background: linear-gradient(180deg, #E8DDC4 0%, #C8B582 50%, #8E7A4A 100%);
+}
+.cena-fundo.quadra {
+  background: linear-gradient(180deg, #DDEBF6 0%, #A4C5E1 60%, #6FA1C6 100%);
+}
+.cena-fundo.praia {
+  background: linear-gradient(180deg, #BCE2EE 0%, #F4E4B5 60%, #DDB37A 100%);
+}
+
+/* Cabeçalho de temporada (Ep N/11 · 🏠 em casa · Título) */
+.cena-cabecalho {
+  display: flex; align-items: center; justify-content: center;
+  flex-wrap: wrap; gap: 8px;
+  font-size: 13px;
+  color: var(--tinta-suave);
+  margin: 0 4px 6px;
+  padding: 6px 10px;
+  border-bottom: 1px dashed rgba(120,90,60,0.18);
+}
+.cena-ep {
+  background: var(--cor-papel); border-radius: 8px;
+  padding: 2px 8px;
+  font-weight: 700; color: var(--tinta);
+}
+.cena-bloco {
+  background: rgba(244,211,94,0.5); border-radius: 8px;
+  padding: 2px 8px;
+  font-weight: 600;
+}
+.cena-titulo-mini {
+  font-style: italic;
+  flex-basis: 100%;
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* Família — balões de fala em grade pra Em casa / Os paios e maios */
+.familia-balcao {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  margin: 10px 0;
+}
+.familia-balao {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--cor-papel);
+  border: 2px solid var(--cor-acento);
+  border-radius: 18px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 17px; font-weight: 700; color: var(--tinta);
+  min-height: 48px;
+  transition: transform 0.1s, background 0.15s;
+}
+.familia-balao:active { transform: scale(0.94); background: rgba(244,211,94,0.4); }
+.familia-balao-emoji { font-size: 18px; opacity: 0.7; }
+.familia-balao-nome { flex: 1; text-align: center; }
+
+.familia-combos { margin: 14px 0 4px; text-align: center; }
+.familia-combos-titulo {
+  font-size: 13px; color: var(--tinta-suave);
+  font-style: italic; margin-bottom: 6px;
+}
+.familia-combos-chips {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+}
+.chip-combo {
+  background: linear-gradient(135deg, #F4D35E 0%, #E8A45C 100%);
+  border: none; border-radius: 16px;
+  padding: 8px 14px;
+  font-size: 14px; font-weight: 700; color: #5C4321;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  min-height: 44px;
+}
+.chip-combo:active { transform: scale(0.93); }
+
+/* Cena curta — pegadinhas pra caminho */
+.cena-curta-deco {
+  font-size: 26px; text-align: center;
+  letter-spacing: 8px;
+  opacity: 0.55;
+  margin: 14px 0;
+  animation: cena-curta-pegadas 1.6s linear infinite;
+}
+@keyframes cena-curta-pegadas {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.75; }
+}
+
+/* Dupla cooperativa — palco com 2 personagens + bolinha animada */
+.dupla-palco {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.55);
+  border-radius: 16px;
+  padding: 14px 10px;
+  margin: 8px 0;
+}
+.dupla-slot {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: transparent; border: 2px dashed transparent;
+  border-radius: 12px;
+  padding: 6px;
+  cursor: pointer;
+  min-height: 110px;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.dupla-slot.ativo { border-color: var(--cor-acento); }
+.dupla-slot:active { transform: scale(0.96); }
+.dupla-slot-nome { font-size: 14px; font-weight: 700; color: var(--tinta); }
+.dupla-bolinha {
+  font-size: 32px;
+  width: 50px; height: 50px;
+  display: flex; align-items: center; justify-content: center;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+}
+.dupla-bolinha.voar-esq { animation: dupla-voar-esq 0.5s ease-out; }
+.dupla-bolinha.voar-dir { animation: dupla-voar-dir 0.5s ease-out; }
+@keyframes dupla-voar-esq {
+  0% { transform: translate(40px, 0) scale(1); }
+  50% { transform: translate(0, -32px) scale(1.15); }
+  100% { transform: translate(-40px, 0) scale(1); }
+}
+@keyframes dupla-voar-dir {
+  0% { transform: translate(-40px, 0) scale(1); }
+  50% { transform: translate(0, -32px) scale(1.15); }
+  100% { transform: translate(40px, 0) scale(1); }
+}
+.dupla-placar {
+  text-align: center; font-size: 14px;
+  color: var(--tinta);
+  background: rgba(244,211,94,0.35);
+  border-radius: 12px;
+  padding: 6px 10px;
+  margin: 4px auto;
+  max-width: 320px;
+}
+.dupla-acoes {
+  display: flex; justify-content: center; gap: 8px;
+  flex-wrap: wrap;
+  margin: 6px 0 4px;
+}
 
 /* Sol/Lua decorativo no fundo da cena */
 .cena-sol {
@@ -545,6 +696,50 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   color: var(--marrom-claro);
   font-size: 14px;
 }
+.bento-overlay-temporada {
+  margin-top: 14px; padding-top: 10px;
+  border-top: 1px dashed rgba(120,90,60,0.3);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--cor-acento);
+  letter-spacing: 0.5px;
+}
+
+/* Bolo de aniversário no centro do círculo (E11) */
+.bolo-festa {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center;
+  gap: 2px;
+  animation: bolo-pop 0.6s ease-out;
+}
+.bolo-festa.escondido { display: none; }
+.bolo-velas {
+  font-size: 14px;
+  letter-spacing: -2px;
+  animation: bolo-velas-tremer 0.8s ease-in-out infinite;
+}
+.bolo-base {
+  font-size: 56px;
+  filter: drop-shadow(0 4px 6px rgba(120,60,20,0.35));
+}
+@keyframes bolo-pop {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes bolo-velas-tremer {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+  50%      { transform: translateY(-1px) scale(1.05); opacity: 0.85; }
+}
+.roda-circulo.festa { animation: festa-pulsar 1.2s ease-in-out infinite; }
+@keyframes festa-pulsar {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.15); }
+}
+
 @keyframes bentoIn {
   0%   { opacity: 0; transform: scale(0.85); }
   50%  { opacity: 1; transform: scale(1.05); }
@@ -1093,6 +1288,12 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   display: inline-flex; align-items: center;
 }
 .palavra-rapida.especial { background: var(--amarelo); border-color: var(--amarelo-bico); }
+.palavra-rapida.combo {
+  background: linear-gradient(135deg, #F4D35E 0%, #E8A45C 100%);
+  border-color: #C58A4B;
+  color: #5C4321;
+  font-weight: 700;
+}
 .palavra-rapida:active { transform: scale(0.95); }
 
 /* ===== LETRA POR LETRA ===== */
@@ -2738,12 +2939,92 @@ function renderMorse(seq) {
    E6 segredo         Turma prepara um parabéns secreto pra Nena
    ============================================================ */
 const ROTEIRO = [
-  // E1: PRIMEIRO DIA — lógica geral dos toques. Condensa amanhecer +
-  // encontro com Ben + chegada na escola num só episódio. Nena recebe
-  // os dois e ensina que tudo no Morse é um som curto (·) ou longo (–).
+  // ============================================================
+  // TEMPORADA 1 — "O primeiro dia da escola dos sabiás"
+  // 11 episódios. Casa → padrinhos → caminho → escola → cooperar
+  // → competir → time → cuidar → celebrar.
+  // ============================================================
+
+  // E1: EM CASA — família do To. Papá e Mamá no ninho, Vovô no
+  // galho de cima. 4 nomes individuais + 3 combos afetivos
+  // (PAPA-TO, MAMA-TO, VOVO-TO). Sem SVG novo: só vozes/balões.
+  {
+    id: 'em-casa',
+    titulo: 'Em casa',
+    bloco: { emoji: '🏠', nome: 'em casa' },
+    fundo: 'ninho',
+    personagens: [
+      { tipo: 'to', classe: 'protagonista' },
+    ],
+    fala: 'Bom dia, To! <b>Papá</b> e <b>Mamá</b> já levantaram. Até o <b>Vovô</b> tá no galho de cima.',
+    falaSub: '<em>"Em casa, a gente tem nome pra quem ama a gente."</em>',
+    acao: {
+      tipo: 'familia-apresentacao',
+      nomes: [
+        { palavra: 'PAPA', label: 'Papá' },
+        { palavra: 'MAMA', label: 'Mamá' },
+        { palavra: 'VOVO', label: 'Vovô' },
+        { palavra: 'TO',   label: 'To'   },
+      ],
+      combos: [
+        { texto: 'PAPA TO', label: 'PAPA-TO' },
+        { texto: 'MAMA TO', label: 'MAMA-TO' },
+        { texto: 'VOVO TO', label: 'VOVO-TO' },
+      ],
+    },
+    proximo: '💛 conhecer paios e maios',
+  },
+
+  // E2: OS PAIOS E MAIOS — padrinhos afetivos. Pessoas que escolhem
+  // amar To como se fossem pais. Mensagem central da temporada:
+  // afeto não vem só dos pais, vem de quem te escolhe.
+  {
+    id: 'paios-maios',
+    titulo: 'Os paios e maios',
+    bloco: { emoji: '💛', nome: 'paios e maios' },
+    fundo: 'visita',
+    personagens: [
+      { tipo: 'to', classe: 'protagonista' },
+    ],
+    fala: 'Hoje os <b>paios</b> e as <b>maios</b> vieram visitar To.',
+    falaSub: '<em>"Paios e maios são pessoas que escolhem te amar — como se fossem pais."</em>',
+    acao: {
+      tipo: 'familia-apresentacao',
+      nomes: [
+        { palavra: 'PAIO', label: 'Paio' },
+        { palavra: 'MAIO', label: 'Maio' },
+      ],
+      combos: [
+        { texto: 'PAIO TO', label: 'PAIO-TO' },
+        { texto: 'MAIO TO', label: 'MAIO-TO' },
+      ],
+    },
+    proximo: '🚶 ir pra escola com Ben',
+  },
+
+  // E3: CAMINHO PRA ESCOLA — cena curta de transição. Ben tá
+  // esperando To no galho do lado. Vão juntos.
+  {
+    id: 'caminho-escola',
+    titulo: 'Caminho pra escola',
+    bloco: { emoji: '🚶', nome: 'caminho' },
+    fundo: 'caminho',
+    personagens: [
+      { tipo: 'to', classe: 'protagonista' },
+      { tipo: 'ben' },
+    ],
+    fala: '<b>Ben</b> tá esperando To no galho do lado.',
+    falaSub: '<em>"Vamos juntos? A escola da Nena é logo ali."</em>',
+    acao: { tipo: 'cena-curta' },
+    proximo: '🏫 chegar na escola',
+  },
+
+  // E4: PRIMEIRO DIA — Nena recebe Ben e To. Lógica geral dos toques
+  // (curto · / longo –). Cena que era E1 antes da Temporada 1.
   {
     id: 'primeiro-dia',
     titulo: 'Primeiro dia',
+    bloco: { emoji: '🏫', nome: 'escola' },
     fundo: 'amanhecer',
     decoracao: 'sol',
     personagens: [
@@ -2754,6 +3035,55 @@ const ROTEIRO = [
     fala: 'Primeiro dia! A <b>Nena</b> recebe Ben e To na escola.',
     falaSub: '<em>"Tudo no Morse é só isso: um som <b>curto</b> · ou um som <b>longo</b> –. Vamos brincar?"</em>',
     acao: { tipo: 'aprender-toques' },
+    proximo: '🤝 jogar altinha',
+  },
+
+  // E5: ALTINHA NA QUADRA — dupla cooperativa. To e Ben jogam altinha:
+  // não pode deixar a bola cair. Conta rebatidas, sem ganhador.
+  {
+    id: 'altinha',
+    titulo: 'Altinha na quadra',
+    bloco: { emoji: '🤝', nome: 'cooperar' },
+    fundo: 'quadra',
+    personagens: [
+      { tipo: 'to', classe: 'protagonista' },
+      { tipo: 'ben' },
+    ],
+    fala: '— <b>Altinha</b> é jogar <em>junto</em>. Não deixa a bola cair!',
+    falaSub: 'Toca em quem está com a bola — ele rebate o nome em Morse.',
+    acao: {
+      tipo: 'dupla-coop',
+      esporte: 'altinha',
+      simbolo: '⚽',
+      dupla: [
+        { quem: 'to',  nome: 'To'  },
+        { quem: 'ben', nome: 'Ben' },
+      ],
+      palavra: 'ALTINHA',
+    },
+    proximo: '🏖 jogar frescobol',
+  },
+
+  // E6: FRESCOBOL NO RECREIO — Caca e Jo, raquete e bolinha de praia.
+  // Mesma lógica: cooperar, não competir. Quanto mais rebatidas, melhor.
+  {
+    id: 'frescobol',
+    titulo: 'Frescobol no recreio',
+    bloco: { emoji: '🏖', nome: 'cooperar' },
+    fundo: 'praia',
+    personagens: [],
+    fala: '— Caca rebate, Jo rebate de volta. <em>Quanto mais, melhor.</em>',
+    falaSub: '<b>Frescobol</b>: ninguém perde, todo mundo joga junto.',
+    acao: {
+      tipo: 'dupla-coop',
+      esporte: 'frescobol',
+      simbolo: '🏓',
+      dupla: [
+        { quem: 'caca', nome: 'Caca' },
+        { quem: 'jo',   nome: 'Jo'   },
+      ],
+      palavra: 'FRESCOBOL',
+    },
     proximo: '🏓 conhecer o time de ping-pong',
   },
   // E2: TIME DE PING-PONG — Caca, Jo, Tete. Rápidos, ágeis, falam
@@ -2762,6 +3092,7 @@ const ROTEIRO = [
   {
     id: 'time-pingpong',
     titulo: 'Time de ping-pong',
+    bloco: { emoji: '🏓', nome: 'ping-pong' },
     fundo: 'dia-claro',
     decoracao: 'bola-pingpong',
     personagens: [],
@@ -2783,6 +3114,7 @@ const ROTEIRO = [
   {
     id: 'time-xadrez',
     titulo: 'Time de xadrez',
+    bloco: { emoji: '♟', nome: 'xadrez' },
     fundo: 'tarde',
     decoracao: 'xadrez',
     personagens: [],
@@ -2805,6 +3137,7 @@ const ROTEIRO = [
   {
     id: 'futebol-recap',
     titulo: 'Futebol da turma',
+    bloco: { emoji: '⚽', nome: 'futebol' },
     fundo: 'campinho',
     decoracao: 'bola',
     personagens: [],
@@ -2829,6 +3162,7 @@ const ROTEIRO = [
   {
     id: 'sos-licao',
     titulo: 'SOS é pedido de ajuda',
+    bloco: { emoji: '🚨', nome: 'SOS' },
     fundo: 'escola',
     personagens: [
       { tipo: 'nena', classe: 'nena' },
@@ -2842,7 +3176,8 @@ const ROTEIRO = [
   // ensaiar o parabéns. Quando "Nena chegou", overlay celebra.
   {
     id: 'segredo',
-    titulo: 'O segredo da turma',
+    titulo: 'Parabéns, Nena!',
+    bloco: { emoji: '🎂', nome: 'festa' },
     fundo: 'celebracao',
     personagens: [],
     fala: '🤫 — <em>Pssssiu!</em> A turma combina uma <b>surpresa</b> pra Nena…',
@@ -2856,8 +3191,8 @@ const ROTEIRO = [
    PALAVRAS POR LETRA
    ============================================================ */
 const PALAVRAS_LETRA = {
-  A: 'Asa',     B: 'Bento',   C: 'Casa',    D: 'Didi',
-  E: 'Estela',  F: 'Flor',    G: 'Galho',   H: 'Homem',
+  A: 'Altinha', B: 'Bento',   C: 'Casa',    D: 'Didi',
+  E: 'Estela',  F: 'Frescobol', G: 'Galho', H: 'Homem',
   I: 'Ipê',     J: 'Judo',    K: 'Karatê',  L: 'Lua',
   M: 'Mama',    N: 'Nena',    O: 'Oi',      P: 'Papa',
   Q: 'Quintal', R: 'Rio',     S: 'Sabiá',   T: 'To',
@@ -2977,6 +3312,18 @@ function renderLanding(tela) {
    ============================================================ */
 function renderCena(tela, cena) {
   const wrap = el('div', { class: 'cena' });
+
+  // v8 (Temporada 1): cabeçalho "Ep N/11 · 🏠 em casa · Título". Bloco é
+  // opcional pra cenas legadas; cenas sem `bloco` mostram só "Ep N/N".
+  const totalCenas = ROTEIRO.length;
+  const epNum = State.cenaIdx + 1;
+  const bloco = cena.bloco;
+  const cabHTML = [
+    el('span', { class: 'cena-ep' }, `Ep ${epNum}/${totalCenas}`),
+    bloco ? el('span', { class: 'cena-bloco' }, `${bloco.emoji} ${bloco.nome}`) : null,
+    el('span', { class: 'cena-titulo-mini' }, cena.titulo),
+  ].filter(Boolean);
+  wrap.appendChild(el('div', { class: 'cena-cabecalho' }, cabHTML));
 
   // Fundo + personagens — só renderiza se houver personagens. Cenas com palco vazio
   // (ex.: roda de apresentação que monta o próprio círculo) não desperdiçam espaço.
@@ -3223,6 +3570,123 @@ function renderAcaoCena(container, cena) {
       }
     }, State.notacaoBinaria ? '1 longo · Ré' : '– longo · Ré'));
     container.appendChild(acoesEl);
+  } else if (a.tipo === 'familia-apresentacao') {
+    // v8 E1/E2: cena Em casa / Os paios e maios. N nomes (4 ou 2) + N combos
+    // afetivos (PAPA-TO etc). Cada nome individual mostra balão de fala + botão
+    // pra tocar Morse com decomposição. Combos tocam sequência das 2 palavras
+    // separadas por espaço de palavra. Reusa criarDecomposicaoNome.
+    const nomes = a.nomes || [];
+    const combos = a.combos || [];
+
+    const balcao = el('div', { class: 'familia-balcao' });
+    container.appendChild(balcao);
+
+    const painel = el('div', { class: 'decomp-painel escondido' });
+    container.appendChild(painel);
+
+    let decompAtual = null;
+    function mostrar(palavra, label) {
+      if (decompAtual) decompAtual.parar();
+      painel.innerHTML = '';
+      painel.classList.remove('escondido');
+      painel.appendChild(el('div', { class: 'decomp-titulo' }, [
+        el('b', {}, label),
+        el('span', { style: 'opacity:0.7' }, ' em código'),
+      ]));
+      decompAtual = criarDecomposicaoNome(palavra, 'sabia');
+      painel.appendChild(decompAtual.wrap);
+      decompAtual.tocarTudo();
+    }
+
+    nomes.forEach(n => {
+      const balao = el('button', {
+        class: 'familia-balao',
+        'aria-label': `tocar ${n.label}`,
+        onClick: () => mostrar(n.palavra, n.label),
+      }, [
+        el('span', { class: 'familia-balao-emoji' }, '💬'),
+        el('span', { class: 'familia-balao-nome' }, n.label),
+      ]);
+      balcao.appendChild(balao);
+    });
+
+    if (combos.length) {
+      const linha = el('div', { class: 'familia-combos' });
+      linha.appendChild(el('div', { class: 'familia-combos-titulo' }, '— juntos —'));
+      const chips = el('div', { class: 'familia-combos-chips' });
+      combos.forEach(c => {
+        chips.appendChild(el('button', {
+          class: 'chip-combo',
+          onClick: () => mostrar(c.texto, c.label),
+        }, c.label));
+      });
+      linha.appendChild(chips);
+      container.appendChild(linha);
+    }
+  } else if (a.tipo === 'cena-curta') {
+    // v8 E3: caminho pra escola. Cena de transição leve, sem componente
+    // interativo. A fala + botão "próximo" da renderCena já bastam — o
+    // renderer só adiciona um pequeno indicador visual (pegadas).
+    container.appendChild(el('div', { class: 'cena-curta-deco' }, '🐾   🐾   🐾'));
+  } else if (a.tipo === 'dupla-coop') {
+    // v8 E5/E6: dupla cooperativa (altinha/frescobol). 2 personagens lado a
+    // lado, bolinha visual entre eles. Botão "rebater" alterna o "lado ativo"
+    // e toca o nome de quem recebe. Botão "jogar junto" toca os 2 em sequência
+    // várias vezes. Contador de rebatidas como reforço positivo cooperativo.
+    const dupla = a.dupla;  // [{ quem, nome }, { quem, nome }]
+    const simbolo = a.simbolo || '⚽';
+    let lado = 0;       // 0 = primeiro recebe; 1 = segundo recebe
+    let contador = 0;
+
+    const palco = el('div', { class: 'dupla-palco ' + (a.esporte || '') });
+    const slots = dupla.map((p, i) => {
+      const slot = el('button', {
+        class: 'dupla-slot' + (i === lado ? ' ativo' : ''),
+        'aria-label': `quem recebe: ${p.nome}`,
+        onClick: () => rebater(),
+      });
+      const svg = passaroSVG(p.quem);
+      if (svg) { svg.style.width = '70px'; svg.style.height = '70px'; slot.appendChild(svg); }
+      slot.appendChild(el('div', { class: 'dupla-slot-nome' }, p.nome));
+      return slot;
+    });
+    const bolinha = el('div', { class: 'dupla-bolinha' }, simbolo);
+
+    palco.appendChild(slots[0]);
+    palco.appendChild(bolinha);
+    palco.appendChild(slots[1]);
+    container.appendChild(palco);
+
+    const placar = el('div', { class: 'dupla-placar', 'aria-live': 'polite' },
+      `rebatidas: 0 — joga junto, sem ganhador!`);
+    container.appendChild(placar);
+
+    function rebater() {
+      const recebe = dupla[lado];
+      slots.forEach((s, i) => s.classList.toggle('ativo', i === lado));
+      bolinha.classList.remove('voar-esq', 'voar-dir');
+      void bolinha.offsetWidth;  // força reflow pra reaplicar animação
+      bolinha.classList.add(lado === 0 ? 'voar-esq' : 'voar-dir');
+      tocarSequencia(palavraParaMorse(recebe.nome.toUpperCase()), { voz: 'sabia', repeticoes: 1 });
+      contador++;
+      placar.textContent = `rebatidas: ${contador} — joga junto, sem ganhador!`;
+      lado = 1 - lado;
+    }
+
+    const acoesCoop = el('div', { class: 'dupla-acoes' });
+    acoesCoop.appendChild(el('button', {
+      class: 'botao laranja',
+      onClick: rebater,
+    }, '🏐 rebater'));
+    acoesCoop.appendChild(el('button', {
+      class: 'botao secundario',
+      onClick: () => {
+        const palavra = (a.palavra || '').toUpperCase();
+        if (!palavra) return;
+        tocarSequencia(palavraParaMorse(palavra), { voz: 'sabia', repeticoes: 1 });
+      },
+    }, '📣 tocar "' + (a.palavra || '').toLowerCase() + '"'));
+    container.appendChild(acoesCoop);
   } else if (a.tipo === 'aprender-toques') {
     // E1: lógica geral dos toques. Compasso + display que acumula + botões
     // grandes · e –. Mesmo molde do antigo curto-longo, mas com falas da Nena
@@ -3439,9 +3903,19 @@ function renderAcaoCena(container, cena) {
     }
     posicionar();
 
+    // v8 (Temporada 1): bolo no centro aparece quando Nena chega. Cinco velas
+    // (idade simbólica, não a real da Gabriela). Festa mais longa: confete
+    // contínuo por ~8s, overlay marca "Fim da Temporada 1".
+    const bolo = el('div', { class: 'bolo-festa escondido' }, [
+      el('div', { class: 'bolo-velas' }, '🕯️ 🕯️ 🕯️ 🕯️ 🕯️'),
+      el('div', { class: 'bolo-base' }, '🎂'),
+    ]);
+    circulo.appendChild(bolo);
+
     const surpresa = el('div', { class: 'bento-overlay escondido' }, [
       el('div', { class: 'bento-overlay-frase', html: '🎉 <b>PARABÉNS, NENA!</b> 🎂' }),
-      el('div', { class: 'bento-overlay-sub' }, 'a turma cantou pra ela'),
+      el('div', { class: 'bento-overlay-sub' }, 'a turma toda cantou pra ela'),
+      el('div', { class: 'bento-overlay-temporada' }, '🌟 Fim da Temporada 1 🌟'),
     ]);
     container.appendChild(surpresa);
 
@@ -3464,10 +3938,14 @@ function renderAcaoCena(container, cena) {
       onClick: () => {
         Audio.unlock();
         surpresa.classList.remove('escondido');
-        celebrar(40);
+        bolo.classList.remove('escondido');
+        circulo.classList.add('festa');
+        celebrar(60);
+        // Segunda rodada de confete a 3s pra estender a festa
+        setTimeout(() => celebrar(50), 3000);
         const seq = palavraParaMorse('PARABENS NENA');
         tocarSequencia(seq, { voz: 'sabia' });
-        setTimeout(() => surpresa && surpresa.classList.add('escondido'), 4500);
+        // Overlay fica até a criança apertar pra continuar (sem auto-hide)
       }
     }, '🎂 Nena chegou!'));
     container.appendChild(acoes);
@@ -3781,7 +4259,20 @@ function renderAcaoCena(container, cena) {
 /* ============================================================
    TECLADO LIVRE
    ============================================================ */
-const PALAVRAS_RAPIDAS = ['SOS', 'BENTO', 'NENA', 'PARABENS NENA', 'TO', 'BEN', 'CACA', 'JO', 'TETE', 'TATA', 'TITO', 'LILA', 'OI', 'MAMA'];
+// v8 (Temporada 1): vocabulário cresce com família, padrinhos afetivos e jogos.
+// Combos família/padrinhos com espaço viram " / " em Morse (espaço de palavra).
+// Display com hífen (PAPA-TO) é só visual nos chips do teclado.
+const PALAVRAS_RAPIDAS = [
+  'SOS', 'BENTO', 'NENA', 'PARABENS NENA',
+  // turma
+  'TO', 'BEN', 'CACA', 'JO', 'TETE', 'TATA', 'TITO', 'LILA', 'OI',
+  // família e padrinhos
+  'PAPA', 'MAMA', 'VOVO', 'PAIO', 'MAIO',
+  // combos afetivos (mostrados como PAPA-TO / MAMA-TO / VOVO-TO / PAIO-TO / MAIO-TO)
+  'PAPA TO', 'MAMA TO', 'VOVO TO', 'PAIO TO', 'MAIO TO',
+  // jogos cooperativos
+  'ALTINHA', 'FRESCOBOL',
+];
 const ALFABETO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 // 4 velocidades nomeadas (Lucas pediu: "tartaruga, menino, coelho, guepardo").
 // O conceito de BPM contínuo via slider foi descartado — a criança escolhe entre
@@ -3974,13 +4465,19 @@ function renderTeclado(tela) {
   }, '↻ limpar'));
   wrap.appendChild(principal);
 
-  // Palavras rápidas
+  // Palavras rápidas. v8: combos afetivos (PAPA TO etc) viram chips dourados
+  // com display em hífen (PAPA-TO) — pedagogicamente lê-se "papa-to" mas em
+  // Morse vira espaço de palavra entre PAPA e TO (separador `/`).
+  const COMBOS_AFETO = new Set(['PAPA TO', 'MAMA TO', 'VOVO TO', 'PAIO TO', 'MAIO TO']);
   const palavras = el('div', { class: 'palavras-rapidas' });
   PALAVRAS_RAPIDAS.forEach(p => {
+    const ehCombo = COMBOS_AFETO.has(p);
+    const ehEspecial = (p === 'BENTO' || p === 'PARABENS NENA');
+    const display = ehCombo ? p.replace(' ', '-') : p;
     palavras.appendChild(el('button', {
-      class: 'palavra-rapida' + (p === 'BENTO' || p === 'PARABENS NENA' ? ' especial' : ''),
+      class: 'palavra-rapida' + (ehEspecial ? ' especial' : '') + (ehCombo ? ' combo' : ''),
       onClick: () => { State.texto = p.slice(0, 20); atualizaInput(); }
-    }, p));
+    }, display));
   });
   wrap.appendChild(palavras);
 
