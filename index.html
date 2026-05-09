@@ -716,11 +716,11 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-family: var(--display); font-size: 12px;
   color: var(--tinta-suave);
 }
-/* Coração: substituiu o metrônomo da v6. Lucas pediu "introduzir o pulso como
-   coração da tartaruga, menino, coelho e guepardo". A criança escolhe um chip
-   de velocidade e o coração no centro assume o ritmo cardíaco daquele animal.
-   Pedagogia direta: BPM = batidas por minuto = batimento cardíaco. A animação
-   é uma escala (sístole/diástole) sincronizada com var(--beat-dur). */
+/* Coração com ciclo de 4 tempos (v7.1). Lucas pediu: "expansão total na cabeça
+   do tema e fade out diminuindo continuamente e 4 tempos". Cada compasso 4/4
+   tem 1 expansão total no downbeat e relaxamento contínuo até o tempo 4. No
+   próximo compasso, expande total de novo. Animação dura 4× beat-dur, sempre
+   sincronizada via reset de classe quando começa/muda BPM (drift zero). */
 .compasso-coracao {
   position: relative;
   width: 64px; height: 60px;
@@ -732,13 +732,13 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   stroke: #8a2222;
   stroke-width: 2;
   transform-origin: 32px 36px;
-  animation: bater var(--beat-dur, 0.8s) ease-in-out infinite;
+  animation: bater calc(var(--beat-dur, 0.8s) * 4) cubic-bezier(0.18, 0.7, 0.45, 1) infinite;
 }
 .coracao-brilho {
   fill: #ff8a8a;
   opacity: 0.55;
   transform-origin: 32px 36px;
-  animation: bater var(--beat-dur, 0.8s) ease-in-out infinite;
+  animation: bater calc(var(--beat-dur, 0.8s) * 4) cubic-bezier(0.18, 0.7, 0.45, 1) infinite;
 }
 .compasso:not(.tocando) .coracao-corpo,
 .compasso:not(.tocando) .coracao-brilho {
@@ -746,11 +746,9 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   transform: scale(1);
 }
 @keyframes bater {
-  0%   { transform: scale(1);    }
-  18%  { transform: scale(1.18); }
-  36%  { transform: scale(0.96); }
-  54%  { transform: scale(1.08); }
-  100% { transform: scale(1);    }
+  0%   { transform: scale(1.30); }
+  6%   { transform: scale(1.30); }
+  100% { transform: scale(1.00); }
 }
 .coracao-pulso {
   fill: #ffd5d5;
@@ -1521,9 +1519,12 @@ const Audio = (() => {
   }
 
   // ===== Helpers MIDI =====
-  // Sol4 = MIDI 67, Ré4 = MIDI 62
-  const MIDI_SOL4 = 67;
-  const MIDI_RE4 = 62;
+  // Cordas soltas reais da guitarra: Sol3 = MIDI 55 (3ª corda), Ré3 = MIDI 50
+  // (4ª corda). Lucas (v7.1): "ré é mais grave que o sol" — ambas cordas
+  // soltas da afinação padrão (E2 A2 D3 G3 B3 E4). Antes usávamos Sol4/Ré4
+  // (MIDI 67/62) — soavam esganiçados em Karplus-Strong com buffer curto.
+  const MIDI_SOL3 = 55;
+  const MIDI_RE3  = 50;
   // Bird Tweet — tons úteis (testados): C5=72, E5=76, G5=79
   const MIDI_PIO_AGUDO = 79;  // G5
   const MIDI_PIO_GRAVE = 72;  // C5
@@ -1898,10 +1899,19 @@ const Audio = (() => {
     const delayLen = Math.round(sr / freq);
     const delay = new Float32Array(delayLen);
 
-    // Excitação: ruído branco com pequeno fade-in pra evitar click forte
+    // Excitação: ruído branco filtrado por moving-average 4-tap. Lucas (v7.1):
+    // "o sol sintético tá ruim". Ruído branco puro soa estático/áspero;
+    // suavizar com média móvel deixa a excitação mais "madeira/corda" e o
+    // pluck soa redondo. Fade-in de 40 amostras evita click no ataque.
+    const ruido = new Float32Array(delayLen);
+    for (let i = 0; i < delayLen; i++) ruido[i] = Math.random() * 2 - 1;
     for (let i = 0; i < delayLen; i++) {
+      const a = ruido[i];
+      const b = ruido[(i - 1 + delayLen) % delayLen];
+      const c = ruido[(i - 2 + delayLen) % delayLen];
+      const d = ruido[(i - 3 + delayLen) % delayLen];
       const fade = Math.min(1, i / 40);
-      delay[i] = (Math.random() * 2 - 1) * fade;
+      delay[i] = ((a + b + c + d) * 0.25) * fade;
     }
 
     // Loop principal: a cada amostra, output do buffer atual,
@@ -1935,17 +1945,17 @@ const Audio = (() => {
     const src = ctx.createBufferSource();
     src.buffer = audioBuf;
 
-    // v7: filter highshelf pra dar brilho de pickup elétrico. Lucas pediu
-    // "qualidade do som na guitarra". KS puro soava abafado; +6dB acima de
-    // 2.5kHz dá cintilação sem aumentar a magnitude global. Lowpass de
-    // segurança em 6kHz pra cortar harmonics agudos do KS sem alma.
+    // v7.1: cordas Sol3/Ré3 (graves). Highshelf reduzido (+3dB @ 3kHz) e
+    // lowpass mais conservador (4.5kHz) — guitarra grave não precisa de
+    // cintilação alta como uma Stratocaster aguda; aliasing/ruído fica
+    // contido. Som mais redondo, menos esganiçado.
     const shelf = ctx.createBiquadFilter();
     shelf.type = 'highshelf';
-    shelf.frequency.value = 2500;
-    shelf.gain.value = 6;
+    shelf.frequency.value = 3000;
+    shelf.gain.value = 3;
     const cut = ctx.createBiquadFilter();
     cut.type = 'lowpass';
-    cut.frequency.value = 6000;
+    cut.frequency.value = 4500;
     cut.Q.value = 0.7;
 
     // Envelope: ataque rápido (5ms), sustain proporcional, fade-out exp
@@ -1996,11 +2006,14 @@ const Audio = (() => {
     } else if (voz === 'telegrafo') {
       playTelegrafo(when, longo);
     } else if (voz === 'violao') {
-      const midi = longo ? MIDI_RE4 : MIDI_SOL4;
-      // v6: dur compacto pra notas claras (Lucas: "perde a sensação das notas
-      // alvo"). Pluck respeita o tempo do Morse: ponto curto, traço longo,
-      // sem virar firula sustenida.
+      const midi = longo ? MIDI_RE3 : MIDI_SOL3;
+      // v7.1: cordas soltas reais (Sol3=55, Ré3=50). Buffer maior do KS gera
+      // pluck natural; antes (Sol4/Ré4) o Sol soava esganiçado.
       playViolao(when, midi, Math.max(durSec * 1.6, 0.35), 0.55);
+    } else if (voz === 'coracao') {
+      // Voz "ta-tum" (v7.1): ponto = "ta" (S1 curto), traço = "tum" (S1+S2).
+      // Lucas pediu como opção no código, paralelo às outras vozes.
+      longo ? playTaTum(when) : playTa(when);
     }
   }
 
@@ -2047,15 +2060,41 @@ const Audio = (() => {
     _track(osc2, env2);
   }
 
-  // v7: corda Sol4 (ponto) ou Ré4 (traço) tocando em paralelo com a voz
+  // v7: corda Sol3 (ponto) ou Ré3 (traço) tocando em paralelo com a voz
   // principal pra Bento associar · = Sol e – = Ré. Volume baixo (0.22) pra
   // não competir com o sabiá da história — fica como referência sussurrada.
   function playReferenciaCorda(elemento /* '.' | '-' */, when, durMs) {
     when = when || now();
     durMs = durMs || (elemento === '.' ? 180 : 540);
     const durSec = durMs / 1000;
-    const midi = elemento === '-' ? MIDI_RE4 : MIDI_SOL4;
+    const midi = elemento === '-' ? MIDI_RE3 : MIDI_SOL3;
     playViolao(when, midi, Math.max(durSec * 1.6, 0.35), 0.22);
+  }
+
+  // v7.1: voz "ta-tum" como código Morse. Lucas pediu como opção paralela
+  // ao sabiá/guitarra/palma/telégrafo. "ta" (ponto) = uma batida curta;
+  // "tum" (traço) = duas batidas (lub-dub). Diferente do playBumbo (que é
+  // o som contínuo do metrônomo): aqui são pulsos de código discretos.
+  function playTa(when, vol = 0.55) {
+    if (!ctx) return;
+    const t = (typeof when === 'number') ? when : ctx.currentTime;
+    const osc = ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(110, t);
+    osc.frequency.exponentialRampToValueAtTime(70, t + 0.06);
+    const env = ctx.createGain();
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.linearRampToValueAtTime(vol, t + 0.005);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+    osc.connect(env).connect(masterGain);
+    osc.start(t); osc.stop(t + 0.15);
+    _track(osc, env);
+  }
+  function playTaTum(when, vol = 0.55) {
+    if (!ctx) return;
+    const t = (typeof when === 'number') ? when : ctx.currentTime;
+    playTa(t, vol);
+    playTa(t + 0.18, vol * 0.85);
   }
 
   return {
@@ -2067,6 +2106,7 @@ const Audio = (() => {
     playViolao,
     playReferenciaCorda,
     playBumbo,
+    playTa, playTaTum,
     pararTudo,
     estaUsandoSoundfont: () => useSoundfont,
     _activeSourcesSize: () => activeSources.size, // pra debug/teste
@@ -2110,7 +2150,7 @@ const State = {
   modo: 'landing',     // 'landing' | 'historia' | 'teclado' | 'letras' | 'letra-detalhe'
   cenaIdx: 0,
   letraSelecionada: null,
-  vozTeclado: 'sabia', // 'sabia' | 'palma' | 'telegrafo' | 'violao'
+  vozTeclado: 'sabia', // 'sabia' | 'palma' | 'telegrafo' | 'violao' | 'coracao'
   notacaoBinaria: false,
   bpm: 75, // default = menino (4-velocidades). Antes era 120 (rápido demais)
   loopInfinito: false,
@@ -2143,7 +2183,7 @@ function carregarEstado() {
     if (raw) {
       const d = JSON.parse(raw);
       if (d.cumpridas) State.cumpridas = new Set(d.cumpridas);
-      if (typeof d.vozTeclado === 'string' && ['sabia','palma','telegrafo','violao'].includes(d.vozTeclado)) {
+      if (typeof d.vozTeclado === 'string' && ['sabia','palma','telegrafo','violao','coracao'].includes(d.vozTeclado)) {
         State.vozTeclado = d.vozTeclado;
       }
       // Só aceita BPM que existe no slider atual; senão fica no default 120.
@@ -2347,15 +2387,41 @@ function criarCompasso(rotulo) {
 // dispara junto. CSS animation já bate em loop quando .tocando está ativo.
 function ativarCompasso(elementoCompasso, beatMs) {
   if (!elementoCompasso) return () => {};
-  const previa = elementoCompasso.dataset.intervalId;
+  // v7.1: Lucas pediu "pulso consistente o tempo todo". setInterval acumula
+  // drift no Chrome mobile; trocamos por setTimeout recursivo com correção
+  // baseada em performance.now() — cada tick agenda o próximo pelo tempo
+  // ALVO absoluto, não pelo intervalo relativo. Drift fica em < 1 frame.
+  const previa = elementoCompasso.dataset.timeoutId;
   if (previa) {
-    clearInterval(parseInt(previa, 10));
-    delete elementoCompasso.dataset.intervalId;
+    clearTimeout(parseInt(previa, 10));
+    delete elementoCompasso.dataset.timeoutId;
   }
   elementoCompasso.style.setProperty('--beat-dur', (beatMs / 1000) + 's');
   elementoCompasso.classList.add('tocando');
+
+  // Reset da animação CSS do coração — força reinício do compasso 4/4 no
+  // momento exato do tick 1 (sincroniza JS com CSS). Sem isso, a animação
+  // pode estar no meio do ciclo quando o pulso começa.
+  const corpo = elementoCompasso.querySelector('.coracao-corpo');
+  const brilho = elementoCompasso.querySelector('.coracao-brilho');
+  function resetAnimCoracao() {
+    [corpo, brilho].forEach(node => {
+      if (!node) return;
+      node.style.animation = 'none';
+      void node.offsetWidth;
+      node.style.animation = '';
+    });
+  }
+
   const pulso = elementoCompasso.querySelector('.coracao-pulso');
-  const pulsar = () => {
+  let beatCount = 0;
+  let cancelado = false;
+  let alvo = performance.now();
+
+  function pulsar() {
+    if (cancelado) return;
+    // Beat 1 do compasso 4/4: reset a animação pro coração expandir total
+    if (beatCount % 4 === 0) resetAnimCoracao();
     if (pulso) {
       pulso.classList.remove('ativo');
       void pulso.offsetWidth;
@@ -2364,13 +2430,22 @@ function ativarCompasso(elementoCompasso, beatMs) {
     if (State.bumboAudivel && Audio.playBumbo) {
       Audio.playBumbo();
     }
-  };
+    beatCount++;
+    alvo += beatMs;
+    const proximoMs = Math.max(0, alvo - performance.now());
+    const tid = setTimeout(pulsar, proximoMs);
+    elementoCompasso.dataset.timeoutId = String(tid);
+  }
+
   pulsar();
-  const intervalo = setInterval(pulsar, beatMs);
-  elementoCompasso.dataset.intervalId = String(intervalo);
+
   return () => {
-    clearInterval(intervalo);
-    delete elementoCompasso.dataset.intervalId;
+    cancelado = true;
+    const tid = elementoCompasso.dataset.timeoutId;
+    if (tid) {
+      clearTimeout(parseInt(tid, 10));
+      delete elementoCompasso.dataset.timeoutId;
+    }
     elementoCompasso.classList.remove('tocando');
   };
 }
@@ -3691,8 +3766,8 @@ function renderTeclado(tela) {
   // Linha 1: voz
   const linhaVoz = el('div', { class: 'config-linha' });
   linhaVoz.appendChild(el('span', { class: 'config-rotulo' }, 'Voz'));
-  ['sabia', 'palma', 'telegrafo', 'violao'].forEach(v => {
-    const labels = { sabia: ['🐦', 'sabiá'], palma: ['👏', 'palma'], telegrafo: ['⚡', 'telégrafo'], violao: ['🎸', 'guitarra'] };
+  ['sabia', 'palma', 'telegrafo', 'violao', 'coracao'].forEach(v => {
+    const labels = { sabia: ['🐦', 'sabiá'], palma: ['👏', 'palma'], telegrafo: ['⚡', 'telégrafo'], violao: ['🎸', 'guitarra'], coracao: ['🫀', 'ta-tum'] };
     const [emoji, txt] = labels[v];
     linhaVoz.appendChild(el('button', {
       class: 'chip' + (State.vozTeclado === v ? ' laranja-ativo' : ''),
