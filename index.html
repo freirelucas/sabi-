@@ -82,6 +82,64 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 }
 .cabecalho .voltar:active { transform: scale(0.92); }
 .cabecalho .voltar.escondido { visibility: hidden; }
+
+/* v8.6: controle de som no header (mute + volume) */
+.controle-som {
+  display: flex; align-items: center; gap: 6px;
+  flex-shrink: 0;
+  padding: 4px 8px 4px 4px;
+  background: rgba(244, 211, 94, 0.18);
+  border-radius: 22px;
+  border: 1.5px solid rgba(120, 90, 60, 0.18);
+}
+.som-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 18px; color: var(--marrom);
+  background: var(--papel-medio);
+  transition: transform 0.15s, background 0.2s;
+  flex-shrink: 0;
+  border: none; cursor: pointer;
+}
+.som-btn:active { transform: scale(0.92); }
+.som-btn.mudo {
+  background: rgba(120, 90, 60, 0.18);
+  color: rgba(120, 90, 60, 0.55);
+}
+.som-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 70px; height: 4px;
+  background: rgba(120, 90, 60, 0.25);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  margin: 0 2px;
+}
+.som-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--cor-acento, #C9622E);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+.som-slider::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--cor-acento, #C9622E);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  cursor: pointer;
+  border-style: solid;
+}
+.som-slider.mudo {
+  opacity: 0.4;
+  pointer-events: none;
+}
+@media (max-width: 380px) {
+  .som-slider { width: 56px; }
+  .controle-som { padding: 3px 6px 3px 3px; gap: 4px; }
+  .som-btn { width: 32px; height: 32px; font-size: 16px; }
+}
 .titulo-tela {
   font-family: var(--display); font-weight: 700;
   font-size: clamp(14px, 4vw, 18px);
@@ -1950,7 +2008,10 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   <header class="cabecalho">
     <button class="voltar" id="btn-voltar" aria-label="voltar">←</button>
     <div class="titulo-tela" id="titulo-tela">Sabiá Morse</div>
-    <div style="width:44px"></div>
+    <div class="controle-som">
+      <button class="som-btn" id="btn-mute" aria-label="ligar/desligar som" aria-pressed="false">🔊</button>
+      <input type="range" class="som-slider" id="slider-volume" min="0" max="100" value="70" aria-label="volume">
+    </div>
   </header>
   <main class="tela" id="tela"></main>
 </div>
@@ -2129,6 +2190,12 @@ const VIOLAO_D3_B64 = "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjYwLjE2LjEwMAAAAAAAAAAAA
 const Audio = (() => {
   let ctx = null;
   let masterGain = null;
+  // v8.6: volume e mute controlados externamente. masterGain.gain é a fonte
+  // de verdade do volume audível; volumeAlvo guarda o valor "destinado" pra
+  // restaurar depois de mute. Mudanças usam linearRampToValueAtTime pra
+  // evitar clicks ao deslizar o controle.
+  let volumeAlvo = 0.7;
+  let mudo = false;
   let unlocked = false;
   let useSoundfont = false;
   let sfPlayer = null;
@@ -2234,10 +2301,38 @@ const Audio = (() => {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     ctx = new AudioCtx();
     masterGain = ctx.createGain();
-    masterGain.gain.value = 0.7;
+    masterGain.gain.value = mudo ? 0 : volumeAlvo;
     masterGain.connect(ctx.destination);
     return ctx;
   }
+
+  // ===== VOLUME E MUTE (v8.6) =====
+  // Lucas reportou que a Tela Pulso "estava sem som" — investigando, o som
+  // SAÍA mas em volume baixo (masterGain.gain = 0.7 default e sintetizadores
+  // em 0.55). Adicionamos controle explícito + botão mute pra resolver tanto
+  // a percepção quanto dar UX de poder/silenciar.
+  function setVolume(v) {
+    v = Math.max(0, Math.min(1, v));
+    volumeAlvo = v;
+    if (masterGain && !mudo) {
+      const t = ctx.currentTime;
+      masterGain.gain.cancelScheduledValues(t);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, t);
+      masterGain.gain.linearRampToValueAtTime(v, t + 0.05);
+    }
+  }
+  function getVolume() { return volumeAlvo; }
+  function setMuted(b) {
+    mudo = !!b;
+    if (masterGain && ctx) {
+      const t = ctx.currentTime;
+      const alvo = mudo ? 0 : volumeAlvo;
+      masterGain.gain.cancelScheduledValues(t);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, t);
+      masterGain.gain.linearRampToValueAtTime(alvo, t + 0.04);
+    }
+  }
+  function getMuted() { return mudo; }
 
   // Decodifica o sample real do sabiá (base64 mp3 inline) em AudioBuffer.
   // Roda em background; até completar, fallback é a síntese.
@@ -2999,9 +3094,11 @@ const Audio = (() => {
     playTa, playTaTum,
     pararTudo,
     scheduleVisual, cancelVisualQueue,
+    setVolume, getVolume, setMuted, getMuted,
     estaUsandoSoundfont: () => useSoundfont,
     _activeSourcesSize: () => activeSources.size, // pra debug/teste
     _visualQueueSize: () => visualQueue.length,
+    _masterGainValue: () => masterGain ? masterGain.gain.value : -1,
   };
 })();
 
@@ -3052,6 +3149,8 @@ const State = {
   cleanupAtual: null,
   elementoTimeouts: [], // setTimeouts dos onElemento callbacks (limpos em pararLoop)
   bumboAudivel: false,  // toggle do tique do bumbo no compasso (default mudo)
+  volume: 0.7,          // v8.6: volume master (0..1) — slider no header
+  mudo: false,          // v8.6: liga/desliga global de áudio
   cumpridas: new Set(),
 };
 
@@ -3066,6 +3165,8 @@ function salvarEstado() {
       vozTeclado: State.vozTeclado,
       notacaoBinaria: State.notacaoBinaria,
       bumboAudivel: State.bumboAudivel,
+      volume: State.volume,
+      mudo: State.mudo,
     }));
   } catch(e) {}
 }
@@ -3084,6 +3185,8 @@ function carregarEstado() {
       // volta pro tempo pedagogicamente recomendado.
       if (typeof d.notacaoBinaria === 'boolean') State.notacaoBinaria = d.notacaoBinaria;
       if (typeof d.bumboAudivel === 'boolean') State.bumboAudivel = d.bumboAudivel;
+      if (typeof d.volume === 'number' && d.volume >= 0 && d.volume <= 1) State.volume = d.volume;
+      if (typeof d.mudo === 'boolean') State.mudo = d.mudo;
     }
   } catch(e) {}
 }
@@ -6002,11 +6105,51 @@ $('#btn-voltar').addEventListener('click', () => {
   else navegar('landing');
 });
 
+// v8.6: handlers do controle de som
+function atualizarControleSomUI() {
+  const btn = $('#btn-mute');
+  const slider = $('#slider-volume');
+  if (!btn || !slider) return;
+  btn.classList.toggle('mudo', State.mudo);
+  btn.textContent = State.mudo ? '🔇' : '🔊';
+  btn.setAttribute('aria-pressed', State.mudo ? 'true' : 'false');
+  btn.setAttribute('aria-label', State.mudo ? 'ligar som' : 'desligar som');
+  slider.classList.toggle('mudo', State.mudo);
+  slider.value = String(Math.round(State.volume * 100));
+  slider.setAttribute('aria-valuetext',
+    State.mudo ? 'mudo' : `volume ${Math.round(State.volume * 100)}%`);
+}
+$('#btn-mute').addEventListener('click', () => {
+  State.mudo = !State.mudo;
+  Audio.setMuted(State.mudo);
+  atualizarControleSomUI();
+  salvarEstado();
+});
+$('#slider-volume').addEventListener('input', (ev) => {
+  const v = parseFloat(ev.target.value) / 100;
+  State.volume = v;
+  // Mexer no slider sai automaticamente do mute
+  if (State.mudo) {
+    State.mudo = false;
+    Audio.setMuted(false);
+  }
+  Audio.setVolume(v);
+  atualizarControleSomUI();
+  // Salva debounced pra não martelar localStorage
+  clearTimeout(window._volumeSaveT);
+  window._volumeSaveT = setTimeout(salvarEstado, 200);
+});
+
 /* ============================================================
    INICIALIZAÇÃO
    ============================================================ */
 async function inicializar() {
   carregarEstado();
+
+  // v8.6: aplica volume/mute persistidos no Audio antes do primeiro som
+  Audio.setVolume(State.volume);
+  Audio.setMuted(State.mudo);
+  atualizarControleSomUI();
 
   const loaderEl = $('#loader');
   const loaderBarra = $('#loader-barra');
