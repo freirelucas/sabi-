@@ -216,6 +216,95 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   display: flex; flex-direction: column; gap: 10px; width: 100%;
   max-width: 360px; margin-top: 4px;
 }
+
+/* v8.5 MENU INICIAL — reformulado com hero + 3 grupos */
+.menu {
+  flex: 1; display: flex; flex-direction: column; gap: 16px;
+  padding: 8px 6px 24px;
+  background:
+    radial-gradient(ellipse 90% 50% at 50% 0%, rgba(244,211,94,0.28), transparent 70%),
+    radial-gradient(ellipse 70% 35% at 50% 100%, rgba(232,164,92,0.18), transparent 70%);
+}
+.menu-hero {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 4px; padding: 6px 8px 14px;
+  position: relative;
+}
+.menu-hero-personagens {
+  display: flex; gap: 0; align-items: flex-end; justify-content: center;
+  margin-bottom: 4px;
+  animation: landing-personagens-entra 0.6s ease-out 0.1s both;
+}
+.menu-hero-personagens .passaro-svg {
+  width: 100px; height: 100px;
+  animation: landing-passaro-flutuar 3.2s ease-in-out infinite;
+}
+.menu-hero-personagens .passaro-svg.menor {
+  width: 76px; height: 76px;
+}
+.menu-hero-personagens .passaro-svg:nth-child(1) { animation-delay: 0.1s; }
+.menu-hero-personagens .passaro-svg:nth-child(2) { animation-delay: 0.4s; }
+.menu-hero-personagens .passaro-svg:nth-child(3) { animation-delay: 0.7s; }
+
+.menu-hero-titulo {
+  font-family: var(--display); font-weight: 900;
+  font-size: clamp(36px, 11vw, 60px);
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  color: var(--marrom);
+  letter-spacing: -0.02em; line-height: 1;
+  text-align: center; margin: 0;
+  text-shadow:
+    0 1px 0 rgba(244, 211, 94, 0.7),
+    0 4px 10px rgba(120, 60, 20, 0.14);
+  animation: landing-titulo-entra 0.7s cubic-bezier(0.2, 0.7, 0.3, 1.1);
+}
+.menu-hero-tag {
+  font-family: var(--display); font-weight: 600;
+  font-style: italic;
+  font-size: clamp(13px, 3.6vw, 16px);
+  color: var(--cor-acento, #C9622E);
+  text-align: center; margin: 4px 0 0;
+  letter-spacing: 0.01em;
+  animation: landing-sub-entra 0.5s ease-out 0.25s both;
+}
+.menu-hero-sub {
+  font-family: var(--display); font-style: italic; font-weight: 500;
+  font-size: clamp(13px, 3.4vw, 15px);
+  color: var(--tinta-suave);
+  text-align: center; margin: 0;
+  animation: landing-sub-entra 0.5s ease-out 0.4s both;
+}
+
+.menu-grupo {
+  display: flex; flex-direction: column; gap: 8px;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  animation: landing-porta-entra 0.5s ease-out both;
+}
+.menu-grupo:nth-of-type(1) { animation-delay: 0.4s; }
+.menu-grupo:nth-of-type(2) { animation-delay: 0.55s; }
+.menu-grupo:nth-of-type(3) { animation-delay: 0.7s; }
+.menu-grupo-rotulo {
+  font-family: var(--display); font-weight: 700;
+  font-size: 13px;
+  color: var(--tinta-suave);
+  letter-spacing: 0.5px;
+  text-transform: lowercase;
+  padding: 0 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+.menu-grupo-rotulo::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(120, 90, 60, 0.2);
+  margin-left: 8px;
+}
+.menu-grupo .porta {
+  width: 100%;
+  margin: 0;
+}
 .porta {
   background: var(--papel-medio);
   border: 2px solid var(--marrom-claro);
@@ -1640,6 +1729,113 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   display: flex; flex-direction: column; align-items: center; gap: 12px;
 }
 
+/* v8.5: tela PULSO — explora subdivisões do tempo */
+.pulso-tela {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 0 6px 18px;
+}
+.pulso-intro { text-align: center; padding: 4px 12px; }
+.pulso-titulo {
+  font-family: var(--display); font-weight: 800;
+  font-size: 18px; color: var(--tinta);
+  margin-bottom: 4px;
+}
+.pulso-sub {
+  font-family: var(--display); font-style: italic;
+  font-size: 13px; color: var(--tinta-suave);
+  line-height: 1.4;
+}
+.pulso-camadas {
+  display: flex; flex-direction: column; gap: 10px;
+  margin: 4px 4px;
+}
+.pulso-camada {
+  background: var(--cor-papel);
+  border: 2px solid rgba(120,90,60,0.25);
+  border-radius: 14px;
+  padding: 10px 12px;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.pulso-camada.tocando {
+  border-color: var(--cor-acento, #C9622E);
+  background: rgba(244,211,94,0.18);
+}
+.pulso-camada-cabecalho {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 8px;
+}
+.pulso-camada-titulo {
+  font-family: var(--display); font-weight: 700;
+  font-size: 16px; color: var(--tinta);
+}
+.pulso-camada-sub {
+  font-size: 12px; color: var(--tinta-suave);
+  font-style: italic;
+}
+.pulso-barras {
+  display: flex; gap: 4px;
+  height: 28px;
+}
+.pulso-divisao {
+  flex: 1;
+  background: rgba(120,90,60,0.15);
+  border-radius: 4px;
+  transition: background 0.05s, transform 0.06s;
+}
+.pulso-divisao.ativo {
+  background: var(--laranja-vivo, #C9622E);
+  transform: scaleY(1.18);
+}
+.pulso-btn {
+  align-self: flex-start;
+  min-height: 44px;
+}
+/* Régua Morse — ponto vs traço como múltiplos de semicolcheia */
+.pulso-regua {
+  background: rgba(244,211,94,0.18);
+  border: 2px dashed rgba(120,90,60,0.3);
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin: 4px 4px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.pulso-regua-titulo {
+  font-family: var(--display); font-weight: 700;
+  font-size: 14px; color: var(--tinta);
+}
+.pulso-regua-linha {
+  display: grid;
+  grid-template-columns: 70px 1fr 100px;
+  align-items: center; gap: 8px;
+}
+.pulso-regua-rotulo {
+  font-family: var(--display); font-weight: 700;
+  font-size: 15px; color: var(--cor-acento, #C9622E);
+}
+.pulso-regua-grade {
+  display: flex; gap: 3px;
+  height: 22px;
+}
+.pulso-regua-celula {
+  flex: 1;
+  background: rgba(120,90,60,0.12);
+  border-radius: 3px;
+}
+.pulso-regua-celula.preenchida {
+  background: var(--laranja-vivo, #C9622E);
+}
+.pulso-regua-explica {
+  font-size: 11px; color: var(--tinta-suave);
+  font-style: italic; text-align: right;
+}
+@media (max-width: 380px) {
+  .pulso-regua-linha {
+    grid-template-columns: 60px 1fr 80px;
+    gap: 6px;
+  }
+}
+
 /* v8.3: tela COLEGUINHAS — explora o nome de cada um da turma */
 .coleguinhas {
   display: flex; flex-direction: column; gap: 14px;
@@ -1980,6 +2176,50 @@ const Audio = (() => {
       activeSources.clear();
       activeGains.clear();
     }, 25);
+    // v8.5: limpa também a fila de callbacks visuais agendados
+    cancelVisualQueue();
+  }
+
+  // ===== SCHEDULER VISUAL (v8.5) =====
+  // Sincronia elegante áudio↔imagem: o relógio ÚNICO é ctx.currentTime.
+  // Quando a UI quer disparar uma animação alinhada com uma nota, agenda
+  // via scheduleVisual(when, callback). Um loop rAF lê ctx.currentTime e
+  // dispara as callbacks que já passaram do alvo. Como tanto Audio.start
+  // quanto a callback visual leem do MESMO relógio, eles caem juntos sem
+  // drift — independente do CPU/scheduler do navegador.
+  //
+  // Antes: usávamos setTimeout(fn, ms) com performance.now() — outro
+  // relógio. Drift de ~30ms acumulava em ciclos longos e o pulso visual
+  // entrava em offset arbitrário do beat.
+  const visualQueue = [];
+  let visualLoopId = null;
+  function scheduleVisual(when, callback) {
+    if (!ctx) { try { callback(); } catch(e) {} return; }
+    visualQueue.push({ when, callback });
+    visualQueue.sort((a, b) => a.when - b.when);
+    if (visualLoopId === null) startVisualLoop();
+  }
+  function startVisualLoop() {
+    function tick() {
+      if (!ctx || visualQueue.length === 0) {
+        visualLoopId = null;
+        return;
+      }
+      const now = ctx.currentTime;
+      while (visualQueue.length && visualQueue[0].when <= now) {
+        const item = visualQueue.shift();
+        try { item.callback(); } catch(e) {}
+      }
+      visualLoopId = requestAnimationFrame(tick);
+    }
+    visualLoopId = requestAnimationFrame(tick);
+  }
+  function cancelVisualQueue() {
+    visualQueue.length = 0;
+    if (visualLoopId !== null) {
+      cancelAnimationFrame(visualLoopId);
+      visualLoopId = null;
+    }
   }
 
   // Offsets escolhidos dentro do sample pra cada papel (ver header sobre as 5 frases)
@@ -2758,8 +2998,10 @@ const Audio = (() => {
     playBumbo,
     playTa, playTaTum,
     pararTudo,
+    scheduleVisual, cancelVisualQueue,
     estaUsandoSoundfont: () => useSoundfont,
     _activeSourcesSize: () => activeSources.size, // pra debug/teste
+    _visualQueueSize: () => visualQueue.length,
   };
 })();
 
@@ -3044,11 +3286,14 @@ function criarCompasso(rotulo) {
 }
 
 // Liga o coração ao tempo. beatMs = duração de um beat em ms.
-// startDelayMs (v8.4): atraso até o primeiro pulse — usado por tocarSequencia
-// pra alinhar o tick visual com o início real do áudio (Audio.now() + 0.1).
-// Sem isso o relógio do CSS (performance.now) e o do Web Audio (currentTime)
-// ficavam descalibrados — o pulso visual entrava num offset arbitrário do beat.
-function ativarCompasso(elementoCompasso, beatMs, startDelayMs = 0) {
+//
+// startDelayMs (v8.4): atraso até o primeiro pulse em ms (modo standalone,
+// sem áudio rodando — ticks via setTimeout recursivo).
+//
+// startTimeAudio (v8.5): se passado (ctx.currentTime do início do áudio),
+// os ticks são agendados via Audio.scheduleVisual usando o MESMO relógio
+// que o áudio. Sincronia perfeita áudio↔visual. Ignora startDelayMs.
+function ativarCompasso(elementoCompasso, beatMs, startDelayMs = 0, startTimeAudio = null) {
   if (!elementoCompasso) return () => {};
   // setTimeout recursivo com correção em performance.now() — cada tick agenda
   // o próximo pelo tempo ALVO absoluto, não pelo intervalo relativo (drift < 1 frame).
@@ -3082,10 +3327,8 @@ function ativarCompasso(elementoCompasso, beatMs, startDelayMs = 0) {
 
   const pulso = elementoCompasso.querySelector('.coracao-pulso');
   let cancelado = false;
-  // alvo começa em performance.now()+startDelay (sincronia com áudio)
-  let alvo = performance.now() + startDelayMs;
 
-  function pulsar() {
+  function pulse() {
     if (cancelado) return;
     dispararBatida();
     if (pulso) {
@@ -3096,18 +3339,46 @@ function ativarCompasso(elementoCompasso, beatMs, startDelayMs = 0) {
     if (State.bumboAudivel && Audio.playBumbo) {
       Audio.playBumbo();
     }
-    alvo += beatMs;
-    const proximoMs = Math.max(0, alvo - performance.now());
-    const tid = setTimeout(pulsar, proximoMs);
-    elementoCompasso.dataset.timeoutId = String(tid);
   }
 
-  // v8.4: primeiro tick alinhado ao startDelay (não imediato)
-  const tid0 = setTimeout(pulsar, Math.max(0, startDelayMs));
-  elementoCompasso.dataset.timeoutId = String(tid0);
+  if (startTimeAudio !== null && Audio && Audio.scheduleVisual) {
+    // v8.5: modo SINCRONIZADO. Agenda N beats à frente via scheduleVisual.
+    // Quando faltarem poucos beats na fila, re-agenda o próximo lote. Isso
+    // mantém o tick dentro da janela de antecedência do AudioContext (que é
+    // uma fonte de verdade muito mais precisa que setTimeout).
+    const beatSec = beatMs / 1000;
+    const LOTE = 8; // 8 beats por lote (suficiente pra um nome longo)
+    let proximoTime = startTimeAudio;
+    function agendarLote() {
+      if (cancelado) return;
+      for (let i = 0; i < LOTE; i++) {
+        const t = proximoTime + i * beatSec;
+        Audio.scheduleVisual(t, pulse);
+      }
+      // Re-agenda mais um lote logo antes do penúltimo terminar.
+      const reAgendarTime = proximoTime + (LOTE - 1) * beatSec;
+      Audio.scheduleVisual(reAgendarTime, () => {
+        proximoTime = reAgendarTime + beatSec;
+        agendarLote();
+      });
+    }
+    agendarLote();
+  } else {
+    // Modo standalone: setTimeout recursivo com correção em performance.now()
+    let alvo = performance.now() + startDelayMs;
+    function pulsar() {
+      if (cancelado) return;
+      pulse();
+      alvo += beatMs;
+      const proximoMs = Math.max(0, alvo - performance.now());
+      const tid = setTimeout(pulsar, proximoMs);
+      elementoCompasso.dataset.timeoutId = String(tid);
+    }
+    const tid0 = setTimeout(pulsar, Math.max(0, startDelayMs));
+    elementoCompasso.dataset.timeoutId = String(tid0);
+  }
 
-  // v8.4: cleanup armazenado no DOM pra pararLoop encontrar mesmo
-  // sem ter referência guardada (corrige botão pausar)
+  // Cleanup armazenado no DOM pra pararLoop encontrar mesmo sem referência guardada
   const cleanup = () => {
     cancelado = true;
     const tid = elementoCompasso.dataset.timeoutId;
@@ -3137,14 +3408,21 @@ function tocarSequencia(seq, opts = {}) {
 
   const T = calcularTiming(State.bpm);
 
-  // v8.4: cabeça de compasso ALINHADA ao início real do áudio. tocarUmaVez
-  // agenda o primeiro elemento em Audio.now()+0.1s, então o pulso visual
-  // também começa 100ms depois. Pulso e som passam a cair juntos.
-  const START_DELAY_MS = 100;
-  const desligarCompasso = compasso ? ativarCompasso(compasso, T.beat, START_DELAY_MS) : () => {};
+  // v8.5: cabeça de compasso usa o MESMO relógio do áudio (ctx.currentTime).
+  // tocarUmaVez agenda os elementos a partir de Audio.now() + 0.1s. Passamos
+  // esse mesmo timestamp pro ativarCompasso, que agenda os ticks via
+  // Audio.scheduleVisual — pulso e som caem juntos sempre.
+  const startTime = Audio.now() + 0.1;
+  const desligarCompasso = compasso
+    ? ativarCompasso(compasso, T.beat, 0, startTime)
+    : () => {};
 
   function tocarUmaVez(callback) {
-    let t = Audio.now() + 0.1;
+    // 1ª chamada: usa o startTime original (alinhado com o compasso visual).
+    // Repetições subsequentes: Audio.now() + 0.1 (encadeia depois do silêncio).
+    // Compasso visual continua pulsando no grid fixo independente.
+    let t = (tocarUmaVez._jaTocou ? Audio.now() + 0.1 : startTime);
+    tocarUmaVez._jaTocou = true;
     let acumulado = 100;
     let idxElem = 0;
 
@@ -3155,10 +3433,12 @@ function tocarSequencia(seq, opts = {}) {
         Audio.playElemento(ch, voz, t, dur);
         const myIdx = idxElem++;
         const myCh = ch;
-        const myAcum = acumulado;
-        // Track o timeout pra cancelar limpo em pararLoop (caso mude de cena/voz)
-        const id = setTimeout(() => onElemento && onElemento(myCh, myIdx), myAcum);
-        State.elementoTimeouts.push(id);
+        // v8.5: callback visual ancorado em ctx.currentTime (mesmo relógio
+        // do áudio). Garante que a animação cai EXATAMENTE quando o som
+        // soa, sem drift entre setTimeout e Web Audio.
+        if (onElemento) {
+          Audio.scheduleVisual(t, () => onElemento(myCh, myIdx));
+        }
         t += dur / 1000;
         acumulado += dur;
         const next = seq[i + 1];
@@ -3716,79 +3996,122 @@ function renderApp() {
     btnVoltar.classList.remove('escondido');
     titulo.textContent = 'Coleguinhas';
     renderColeguinhas(tela);
+  } else if (State.modo === 'pulso') {
+    btnVoltar.classList.remove('escondido');
+    titulo.textContent = 'O pulso';
+    renderPulso(tela);
   }
 }
 
 /* ============================================================
    LANDING — três portas
    ============================================================ */
+// v8.5: menu inicial reformulado. Hero proeminente com personagens em palco
+// + título estilizado + tagline. Portas agrupadas por tipo de experiência:
+//   NARRATIVA  — a história em episódios (porta principal)
+//   EXPLORAÇÃO — pulso, letras, coleguinhas (estudo dirigido)
+//   BRINCAR    — teclado livre (uso aberto)
+// Cada grupo tem rótulo. Layout mais respirado e estruturado.
 function renderLanding(tela) {
-  const wrap = el('div', { class: 'landing' });
+  const wrap = el('div', { class: 'menu' });
 
-  // Personagens centrais
-  const pers = el('div', { class: 'landing-personagens' });
+  // ===== HERO =====
+  const hero = el('div', { class: 'menu-hero' });
+
+  const pers = el('div', { class: 'menu-hero-personagens' });
   const ben = passaroSVG('ben'); ben.classList.add('menor');
   const to = passaroSVG('to');
   const caca = passaroSVG('caca'); caca.classList.add('menor');
   pers.appendChild(ben); pers.appendChild(to); pers.appendChild(caca);
-  wrap.appendChild(pers);
+  hero.appendChild(pers);
 
-  wrap.appendChild(el('h1', { class: 'landing-titulo' }, 'Sabiá Morse'));
-  wrap.appendChild(el('p', { class: 'landing-sub' }, 'oi, Bento! a escola dos sabiás te espera.'));
+  hero.appendChild(el('h1', { class: 'menu-hero-titulo' }, 'Sabiá Morse'));
+  hero.appendChild(el('p', { class: 'menu-hero-tag' },
+    'pássaros escrevem com música'));
+  hero.appendChild(el('p', { class: 'menu-hero-sub' },
+    'oi, Bento! a escola dos sabiás te espera.'));
 
-  const portas = el('div', { class: 'landing-portas' });
+  wrap.appendChild(hero);
 
-  portas.appendChild(el('button', {
+  // ===== GRUPO 1: NARRATIVA =====
+  const grupoNarrativa = el('section', { class: 'menu-grupo' });
+  grupoNarrativa.appendChild(el('div', { class: 'menu-grupo-rotulo' }, '📖 narrativa'));
+  grupoNarrativa.appendChild(el('button', {
     class: 'porta principal',
-    onClick: () => { Audio.unlock(); navegar('historia', { cenaIdx: 0 }); }
+    onClick: () => { Audio.unlock(); navegar('historia', { cenaIdx: 0 }); },
   }, [
-    el('div', { class: 'porta-icone' }, '📖'),
+    el('div', { class: 'porta-icone' }, '🎬'),
     el('div', { class: 'porta-texto' }, [
       el('div', { class: 'porta-titulo' }, 'História'),
       el('div', { class: 'porta-badge' }, 'Temporada 1 · 12 episódios'),
-      el('div', { class: 'porta-desc' }, 'Em casa com a família, padrinhos, primeiro dia, jogos e a festa da Nena.'),
+      el('div', { class: 'porta-desc' },
+        'Em casa, padrinhos, primeiro dia, jogos e a festa da Nena.'),
+    ]),
+    el('div', { class: 'porta-seta' }, '→'),
+  ]));
+  wrap.appendChild(grupoNarrativa);
+
+  // ===== GRUPO 2: EXPLORAÇÃO =====
+  const grupoExplora = el('section', { class: 'menu-grupo' });
+  grupoExplora.appendChild(el('div', { class: 'menu-grupo-rotulo' }, '🔍 exploração'));
+
+  grupoExplora.appendChild(el('button', {
+    class: 'porta',
+    onClick: () => { Audio.unlock(); navegar('pulso'); },
+  }, [
+    el('div', { class: 'porta-icone' }, '💗'),
+    el('div', { class: 'porta-texto' }, [
+      el('div', { class: 'porta-titulo' }, 'O pulso'),
+      el('div', { class: 'porta-desc' },
+        'Sente a batida. Divide em 2, depois em 4 — a régua do Morse.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
 
-  portas.appendChild(el('button', {
+  grupoExplora.appendChild(el('button', {
     class: 'porta',
-    onClick: () => { Audio.unlock(); navegar('letras'); }
+    onClick: () => { Audio.unlock(); navegar('letras'); },
   }, [
     el('div', { class: 'porta-icone' }, '🔤'),
     el('div', { class: 'porta-texto' }, [
-      el('div', { class: 'porta-titulo' }, 'Jogo das letras'),
-      el('div', { class: 'porta-desc' }, 'A é de Asa, B é de Bola… 5 palavras curtas pra cada letra.'),
+      el('div', { class: 'porta-titulo' }, 'Letras'),
+      el('div', { class: 'porta-desc' },
+        'A é de Asa, B é de Bola… 5 palavras pra cada letra.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
 
-  // v8.3: nova porta "Coleguinhas" — exploração dos nomes da turma
-  portas.appendChild(el('button', {
+  grupoExplora.appendChild(el('button', {
     class: 'porta',
-    onClick: () => { Audio.unlock(); navegar('coleguinhas'); }
+    onClick: () => { Audio.unlock(); navegar('coleguinhas'); },
   }, [
     el('div', { class: 'porta-icone' }, '👥'),
     el('div', { class: 'porta-texto' }, [
       el('div', { class: 'porta-titulo' }, 'Coleguinhas'),
-      el('div', { class: 'porta-desc' }, 'Explora o nome de cada um da turma — em letras, em código e cantado.'),
+      el('div', { class: 'porta-desc' },
+        'O nome de cada um da turma — em letras, código e canto.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
+  wrap.appendChild(grupoExplora);
 
-  portas.appendChild(el('button', {
+  // ===== GRUPO 3: BRINCAR =====
+  const grupoBrincar = el('section', { class: 'menu-grupo' });
+  grupoBrincar.appendChild(el('div', { class: 'menu-grupo-rotulo' }, '🎮 brincar livre'));
+  grupoBrincar.appendChild(el('button', {
     class: 'porta',
-    onClick: () => { Audio.unlock(); navegar('teclado'); }
+    onClick: () => { Audio.unlock(); navegar('teclado'); },
   }, [
     el('div', { class: 'porta-icone' }, '🎹'),
     el('div', { class: 'porta-texto' }, [
       el('div', { class: 'porta-titulo' }, 'Teclado livre'),
-      el('div', { class: 'porta-desc' }, 'Escreve qualquer palavra. Sabiá, palma, telégrafo ou guitarra.'),
+      el('div', { class: 'porta-desc' },
+        'Escreve qualquer palavra. Sabiá, palma, telégrafo ou guitarra.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
+  wrap.appendChild(grupoBrincar);
 
-  wrap.appendChild(portas);
   tela.appendChild(wrap);
 }
 
@@ -3859,6 +4182,189 @@ function renderColeguinhas(tela) {
     card.appendChild(el('div', { class: 'coleguinha-papel' }, item.papel));
     grid.appendChild(card);
   });
+
+  tela.appendChild(wrap);
+}
+
+/* ============================================================
+   PULSO — exploração das subdivisões do tempo
+   ============================================================ */
+// v8.5: tela dedicada pra explorar o pulso (semínima) e suas subdivisões
+// (colcheias, semicolcheias). Demonstra que o ponto Morse é uma
+// semicolcheia (1/4 do beat) e o traço é 3 semicolcheias (3/4 do beat).
+//
+// Camadas progressivas:
+//   1 semínima  = batida inteira
+//   2 colcheias = beat dividido em 2
+//   4 semicolcheias = beat dividido em 4 (régua do Morse)
+//
+// Cada camada tem visualização de barras + botão "ouvir". Todas usam
+// o scheduler visual ancorado em ctx.currentTime — animação cai no
+// instante exato do som.
+function renderPulso(tela) {
+  const wrap = el('div', { class: 'pulso-tela' });
+
+  wrap.appendChild(el('div', { class: 'pulso-intro' }, [
+    el('div', { class: 'pulso-titulo' }, 'O pulso e suas divisões'),
+    el('div', { class: 'pulso-sub' },
+      'Um pulso é uma batida. A gente pode dividir cada pulso em pedacinhos iguais.'),
+  ]));
+
+  // Compasso central (4 pulsos visíveis = 1 compasso musical)
+  const compassoCentral = criarCompasso('pulso');
+  wrap.appendChild(compassoCentral);
+
+  // Seletor de velocidade reusável (chips menino/coelho/etc)
+  wrap.appendChild(criarSeletorVelocidade(() => {
+    // BPM mudou — re-renderiza pra refletir nas durações mostradas
+    parar();
+    redesenharCamadas();
+  }));
+
+  // Container das 3 camadas
+  const camadas = el('div', { class: 'pulso-camadas' });
+  wrap.appendChild(camadas);
+
+  // Camada extra (régua Morse): mostra ponto vs traço dentro do beat
+  const reguaMorse = el('div', { class: 'pulso-regua' });
+  wrap.appendChild(reguaMorse);
+
+  let cleanupAtual = null;
+  let camadaTocando = null;
+  function parar() {
+    if (cleanupAtual) { try { cleanupAtual(); } catch(e) {} cleanupAtual = null; }
+    Audio.cancelVisualQueue && Audio.cancelVisualQueue();
+    Audio.pararTudo && Audio.pararTudo();
+    camadas.querySelectorAll('.pulso-camada').forEach(c => c.classList.remove('tocando'));
+    camadas.querySelectorAll('.pulso-divisao').forEach(d => d.classList.remove('ativo'));
+    camadas.querySelectorAll('.pulso-btn').forEach(b => b.textContent = '▶ ouvir');
+    camadaTocando = null;
+    State.cleanupAtual = null;
+  }
+
+  function tocarCamada(camadaEl, divisao, vozFn) {
+    Audio.unlock();
+    if (camadaTocando === camadaEl) { parar(); return; }
+    parar();
+    camadaTocando = camadaEl;
+    camadaEl.classList.add('tocando');
+    const btn = camadaEl.querySelector('.pulso-btn');
+    if (btn) btn.textContent = '⏸ parar';
+
+    const divisoes = camadaEl.querySelectorAll('.pulso-divisao');
+    const T = calcularTiming(State.bpm);
+    const beatSec = T.beat / 1000;
+    const subSec = beatSec / divisao;
+
+    // 4 compassos = 16 beats = bastante material pra ouvir o pulso
+    const COMPASSOS = 4;
+    const beatsPorCompasso = 4;
+    const totalBeats = COMPASSOS * beatsPorCompasso;
+    const totalSubs = totalBeats * divisao;
+
+    const startTime = Audio.now() + 0.1;
+    let cancelado = false;
+
+    // Agenda todas as notinhas + animações ancoradas em ctx.currentTime
+    for (let i = 0; i < totalSubs; i++) {
+      const t = startTime + i * subSec;
+      vozFn(t);
+      const idxDivisao = i % divisao;
+      const beatIdx = Math.floor(i / divisao);
+      Audio.scheduleVisual(t, () => {
+        if (cancelado) return;
+        divisoes.forEach(d => d.classList.remove('ativo'));
+        if (divisoes[idxDivisao]) {
+          divisoes[idxDivisao].classList.add('ativo');
+        }
+      });
+    }
+
+    // Compasso central pulsa em sincronia (mesma fonte: ctx.currentTime)
+    const cleanupCompasso = ativarCompasso(compassoCentral, T.beat, 0, startTime);
+    State.reproduzindo = true;
+
+    cleanupAtual = () => {
+      cancelado = true;
+      try { cleanupCompasso(); } catch(e) {}
+      State.reproduzindo = false;
+    };
+    State.cleanupAtual = cleanupAtual;
+
+    // Auto-stop após total + cauda
+    const totalMs = totalBeats * T.beat + 200;
+    setTimeout(() => { if (camadaTocando === camadaEl) parar(); }, totalMs);
+  }
+
+  function fazerCamada({ titulo, subtitulo, divisao, vozFn, classe }) {
+    const camadaEl = el('div', { class: 'pulso-camada ' + classe });
+    camadaEl.appendChild(el('div', { class: 'pulso-camada-cabecalho' }, [
+      el('div', { class: 'pulso-camada-titulo' }, titulo),
+      el('div', { class: 'pulso-camada-sub' }, subtitulo),
+    ]));
+    const barras = el('div', { class: 'pulso-barras' });
+    for (let i = 0; i < divisao; i++) {
+      barras.appendChild(el('div', { class: 'pulso-divisao', 'data-idx': i }));
+    }
+    camadaEl.appendChild(barras);
+    const btn = el('button', { class: 'pulso-btn botao secundario' }, '▶ ouvir');
+    btn.addEventListener('click', () => tocarCamada(camadaEl, divisao, vozFn));
+    camadaEl.appendChild(btn);
+    camadas.appendChild(camadaEl);
+  }
+
+  function redesenharCamadas() {
+    camadas.innerHTML = '';
+    fazerCamada({
+      titulo: '1 semínima',
+      subtitulo: 'a batida inteira — o pulso',
+      divisao: 1,
+      classe: 'um',
+      vozFn: (t) => Audio.playElemento('-', 'sabia', t, calcularTiming(State.bpm).traco),
+    });
+    fazerCamada({
+      titulo: '2 colcheias',
+      subtitulo: 'cada pulso dividido em 2',
+      divisao: 2,
+      classe: 'dois',
+      vozFn: (t) => Audio.playElemento('.', 'sabia', t, calcularTiming(State.bpm).ponto * 1.6),
+    });
+    fazerCamada({
+      titulo: '4 semicolcheias',
+      subtitulo: 'cada pulso dividido em 4 — a régua do Morse',
+      divisao: 4,
+      classe: 'quatro',
+      vozFn: (t) => Audio.playElemento('.', 'sabia', t, calcularTiming(State.bpm).ponto),
+    });
+
+    // Régua Morse: visualiza ponto e traço como subdivisões do beat
+    reguaMorse.innerHTML = '';
+    reguaMorse.appendChild(el('div', { class: 'pulso-regua-titulo' },
+      'No Morse:'));
+    const linhaPonto = el('div', { class: 'pulso-regua-linha' }, [
+      el('div', { class: 'pulso-regua-rotulo' }, '· ponto'),
+      el('div', { class: 'pulso-regua-grade' }, [
+        el('div', { class: 'pulso-regua-celula preenchida' }),
+        el('div', { class: 'pulso-regua-celula' }),
+        el('div', { class: 'pulso-regua-celula' }),
+        el('div', { class: 'pulso-regua-celula' }),
+      ]),
+      el('div', { class: 'pulso-regua-explica' }, '1 semicolcheia'),
+    ]);
+    const linhaTraco = el('div', { class: 'pulso-regua-linha' }, [
+      el('div', { class: 'pulso-regua-rotulo' }, '— traço'),
+      el('div', { class: 'pulso-regua-grade' }, [
+        el('div', { class: 'pulso-regua-celula preenchida' }),
+        el('div', { class: 'pulso-regua-celula preenchida' }),
+        el('div', { class: 'pulso-regua-celula preenchida' }),
+        el('div', { class: 'pulso-regua-celula' }),
+      ]),
+      el('div', { class: 'pulso-regua-explica' }, '3 semicolcheias'),
+    ]);
+    reguaMorse.appendChild(linhaPonto);
+    reguaMorse.appendChild(linhaTraco);
+  }
+  redesenharCamadas();
 
   tela.appendChild(wrap);
 }
