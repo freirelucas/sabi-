@@ -716,39 +716,40 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-family: var(--display); font-size: 12px;
   color: var(--tinta-suave);
 }
-/* Coração com ciclo de 4 tempos (v7.1). Lucas pediu: "expansão total na cabeça
-   do tema e fade out diminuindo continuamente e 4 tempos". Cada compasso 4/4
-   tem 1 expansão total no downbeat e relaxamento contínuo até o tempo 4. No
-   próximo compasso, expande total de novo. Animação dura 4× beat-dur, sempre
-   sincronizada via reset de classe quando começa/muda BPM (drift zero). */
+/* Coração: cada beat é uma batida NÍTIDA, não decay mudo. Lucas (v7.2):
+   "batida mais forte na cabeça do tempo e 3 tempos fracos em sequência
+   durante o fade out". Compasso 4/4: beat 1 forte (scale 1.32), beats
+   2-4 fracos com magnitude decrescente (1.16 / 1.10 / 1.05). Cada batida
+   é uma animação curta de 280ms disparada pelo JS — sincronia 1:1 com o
+   tick (drift zero do setTimeout recursivo). */
 .compasso-coracao {
   position: relative;
   width: 64px; height: 60px;
   filter: drop-shadow(0 2px 1px rgba(0,0,0,0.12));
 }
 .compasso-coracao svg { width: 100%; height: 100%; overflow: visible; }
-.coracao-corpo {
+.coracao-corpo,
+.coracao-brilho {
   fill: #d94a4a;
   stroke: #8a2222;
   stroke-width: 2;
   transform-origin: 32px 36px;
-  animation: bater calc(var(--beat-dur, 0.8s) * 4) cubic-bezier(0.18, 0.7, 0.45, 1) infinite;
+  transform: scale(1);
+  --pico: 1.10;
 }
 .coracao-brilho {
   fill: #ff8a8a;
+  stroke: none;
   opacity: 0.55;
-  transform-origin: 32px 36px;
-  animation: bater calc(var(--beat-dur, 0.8s) * 4) cubic-bezier(0.18, 0.7, 0.45, 1) infinite;
 }
-.compasso:not(.tocando) .coracao-corpo,
-.compasso:not(.tocando) .coracao-brilho {
-  animation: none;
-  transform: scale(1);
+.coracao-corpo.batendo,
+.coracao-brilho.batendo {
+  animation: pulsoCoracao 280ms cubic-bezier(0.2, 0.65, 0.3, 1);
 }
-@keyframes bater {
-  0%   { transform: scale(1.30); }
-  6%   { transform: scale(1.30); }
-  100% { transform: scale(1.00); }
+@keyframes pulsoCoracao {
+  0%   { transform: scale(1); }
+  22%  { transform: scale(var(--pico, 1.10)); }
+  100% { transform: scale(1); }
 }
 .coracao-pulso {
   fill: #ffd5d5;
@@ -2399,17 +2400,22 @@ function ativarCompasso(elementoCompasso, beatMs) {
   elementoCompasso.style.setProperty('--beat-dur', (beatMs / 1000) + 's');
   elementoCompasso.classList.add('tocando');
 
-  // Reset da animação CSS do coração — força reinício do compasso 4/4 no
-  // momento exato do tick 1 (sincroniza JS com CSS). Sem isso, a animação
-  // pode estar no meio do ciclo quando o pulso começa.
+  // v7.2: cada beat dispara uma batida visual com magnitude variável.
+  // Beat 1 do compasso (downbeat): forte. Beats 2/3/4: fracos decrescentes
+  // (efeito "fade out"). Magnitudes definidas em `escalas` — sincronizadas
+  // 1:1 com o tick via reset de classe + reflow forçado.
   const corpo = elementoCompasso.querySelector('.coracao-corpo');
   const brilho = elementoCompasso.querySelector('.coracao-brilho');
-  function resetAnimCoracao() {
+  const escalas = [1.32, 1.16, 1.10, 1.05]; // beat 0=forte, 1/2/3=fracos
+
+  function dispararBatida(idx) {
+    const pico = escalas[idx % 4];
     [corpo, brilho].forEach(node => {
       if (!node) return;
-      node.style.animation = 'none';
+      node.style.setProperty('--pico', pico);
+      node.classList.remove('batendo');
       void node.offsetWidth;
-      node.style.animation = '';
+      node.classList.add('batendo');
     });
   }
 
@@ -2420,8 +2426,7 @@ function ativarCompasso(elementoCompasso, beatMs) {
 
   function pulsar() {
     if (cancelado) return;
-    // Beat 1 do compasso 4/4: reset a animação pro coração expandir total
-    if (beatCount % 4 === 0) resetAnimCoracao();
+    dispararBatida(beatCount);
     if (pulso) {
       pulso.classList.remove('ativo');
       void pulso.offsetWidth;
