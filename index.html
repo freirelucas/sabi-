@@ -215,6 +215,17 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-size: 18px;
   line-height: 1.1;
 }
+.porta-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #F4D35E 0%, #E8A45C 100%);
+  color: #5C4321;
+  font-family: var(--display); font-weight: 700;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin: 4px 0 2px;
+  letter-spacing: 0.3px;
+}
 .porta-desc {
   font-family: var(--body); font-weight: 500;
   font-size: 13px;
@@ -232,6 +243,15 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   display: flex; flex-direction: column;
   position: relative;
   padding: 4px 0 16px;
+  /* v8.1: fade-in suave ao entrar numa cena. Reduzido pra prefers-reduced-motion. */
+  animation: cena-entra 0.32s ease-out;
+}
+@keyframes cena-entra {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cena { animation: none; }
 }
 .cena-fundo {
   position: relative;
@@ -264,20 +284,67 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 /* v8 Temporada 1: novos fundos pra cenas de casa, padrinhos, caminho,
    quadra (altinha) e praia (frescobol). Tons sempre quentes pra remeter
    ao acolhimento doméstico/escolar. */
+/* v8.1 polish: cada fundo novo ganha decoração sutil via pseudo-element.
+   Não usa JS extra nem PNG — só gradient/shape simples. Mantém leveza. */
 .cena-fundo.ninho {
   background: linear-gradient(180deg, #FFE9C8 0%, #F8C97B 50%, #C58A4B 100%);
+}
+.cena-fundo.ninho::before {
+  /* tons de "casa" no canto: galhinhos + folhinhas */
+  content: '🪺'; position: absolute; bottom: 6px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px; opacity: 0.85; z-index: 1;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.18));
+}
+.cena-fundo.ninho::after {
+  content: '🍂  🍂'; position: absolute; top: 14px; left: 0; right: 0;
+  text-align: center; font-size: 14px; opacity: 0.5;
+  letter-spacing: 28px; z-index: 1;
 }
 .cena-fundo.visita {
   background: linear-gradient(180deg, #FCE4DC 0%, #F4B8A8 50%, #D08568 100%);
 }
+.cena-fundo.visita::before {
+  /* coraçõezinhos flutuantes (afeto) */
+  content: '💛  💛'; position: absolute; top: 14px; left: 0; right: 0;
+  text-align: center; font-size: 16px; opacity: 0.7;
+  letter-spacing: 18px; z-index: 1;
+  animation: visita-flutuar 3.5s ease-in-out infinite;
+}
+@keyframes visita-flutuar {
+  0%,100% { transform: translateY(0); opacity: 0.55; }
+  50%     { transform: translateY(-3px); opacity: 0.85; }
+}
 .cena-fundo.caminho {
   background: linear-gradient(180deg, #E8DDC4 0%, #C8B582 50%, #8E7A4A 100%);
+}
+.cena-fundo.caminho::before {
+  /* folhinhas dispersas */
+  content: '🍃     🍃'; position: absolute; top: 12px; left: 0; right: 0;
+  text-align: center; font-size: 14px; opacity: 0.55;
+  letter-spacing: 32px; z-index: 1;
 }
 .cena-fundo.quadra {
   background: linear-gradient(180deg, #DDEBF6 0%, #A4C5E1 60%, #6FA1C6 100%);
 }
+.cena-fundo.quadra::after {
+  /* linha central da quadra */
+  content: ''; position: absolute; bottom: 0; left: 50%; width: 2px;
+  height: 28%; background: rgba(255,255,255,0.55); z-index: 1;
+}
 .cena-fundo.praia {
   background: linear-gradient(180deg, #BCE2EE 0%, #F4E4B5 60%, #DDB37A 100%);
+}
+.cena-fundo.praia::before {
+  /* ondinhas e sol */
+  content: '☀️'; position: absolute; top: 10px; right: 18px;
+  font-size: 26px; opacity: 0.85; z-index: 1;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15));
+}
+.cena-fundo.praia::after {
+  content: '〰️ 〰️ 〰️'; position: absolute; bottom: 6px; left: 0; right: 0;
+  text-align: center; font-size: 14px; color: #4A8FAE;
+  opacity: 0.55; z-index: 1; letter-spacing: 4px;
 }
 
 /* Cabeçalho de temporada (Ep N/11 · 🏠 em casa · Título) */
@@ -345,6 +412,52 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   min-height: 44px;
 }
 .chip-combo:active { transform: scale(0.93); }
+
+/* TETE — padrão alternado – · – · (Ep 5). Lucas: "explore o fato de
+   ser a palavra mais fácil de aprender". 4 cards alternados em cores
+   já estabelecidas (Sol amarelo / Ré violeta) reforçam a estética. */
+.tete-padrao {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 14px 4px 8px;
+}
+.tete-card {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 2px;
+  border: 3px solid; border-radius: 16px;
+  padding: 12px 4px;
+  cursor: pointer;
+  font-weight: 700;
+  min-height: 78px;
+  transition: transform 0.1s;
+}
+.tete-card.traco {
+  background: rgba(168,134,212,0.18);
+  border-color: var(--re-violao, #8B6FCB);
+  color: var(--re-violao, #6B4FAB);
+}
+.tete-card.ponto {
+  background: rgba(244,211,94,0.28);
+  border-color: var(--amarelo-bico, #C99A2A);
+  color: #8B6A0F;
+}
+.tete-card:active { transform: scale(0.94); }
+.tete-card.pulsar { animation: tete-card-pulsar 0.5s ease-out; }
+@keyframes tete-card-pulsar {
+  0%   { transform: scale(1);    box-shadow: 0 0 0 rgba(0,0,0,0); }
+  40%  { transform: scale(1.15); box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 rgba(0,0,0,0); }
+}
+.tete-card-letra { font-size: 28px; line-height: 1; }
+.tete-card-simbolo { font-size: 22px; line-height: 1; opacity: 0.85; }
+.tete-legenda {
+  text-align: center;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--tinta-suave);
+  margin: 4px 0 8px;
+}
 
 /* Cena curta — pegadinhas pra caminho */
 .cena-curta-deco {
@@ -3035,10 +3148,33 @@ const ROTEIRO = [
     fala: 'Primeiro dia! A <b>Nena</b> recebe Ben e To na escola.',
     falaSub: '<em>"Tudo no Morse é só isso: um som <b>curto</b> · ou um som <b>longo</b> –. Vamos brincar?"</em>',
     acao: { tipo: 'aprender-toques' },
+    proximo: '🌸 conhecer Tete',
+  },
+
+  // E5 (v8.1): TETE — primeira amiga de Ben e To na escola nova. Pedagogia
+  // central: TETE é o nome MAIS FÁCIL DE APRENDER no Morse inteiro —
+  // só dois símbolos alternando: T(–) E(·) T(–) E(·) = – · – ·.
+  // Lucas: "explore o fato de ser a palavra mais fácil de aprender,
+  // traço ponto traço ponto". Cena dedicada com renderer próprio que
+  // destaca essa alternância visualmente.
+  {
+    id: 'tete-primeira',
+    titulo: 'Tete, a primeira amiga',
+    bloco: { emoji: '🌸', nome: 'primeira amiga' },
+    fundo: 'amanhecer',
+    decoracao: 'flor-ipe',
+    personagens: [
+      { tipo: 'to', classe: 'protagonista' },
+      { tipo: 'ben' },
+      { tipo: 'tete' },
+    ],
+    fala: '<b>Tete</b> chega correndo: — "Oi! Vou ser amiga de vocês dois!"',
+    falaSub: '<em>"E olha só — meu nome é o <b>mais fácil</b> de aprender!"</em>',
+    acao: { tipo: 'tete-padrao' },
     proximo: '🤝 jogar altinha',
   },
 
-  // E5: ALTINHA NA QUADRA — dupla cooperativa. To e Ben jogam altinha:
+  // E6: ALTINHA NA QUADRA — dupla cooperativa. To e Ben jogam altinha:
   // não pode deixar a bola cair. Conta rebatidas, sem ganhador.
   {
     id: 'altinha',
@@ -3071,7 +3207,10 @@ const ROTEIRO = [
     titulo: 'Frescobol no recreio',
     bloco: { emoji: '🏖', nome: 'cooperar' },
     fundo: 'praia',
-    personagens: [],
+    personagens: [
+      { tipo: 'caca' },
+      { tipo: 'jo' },
+    ],
     fala: '— Caca rebate, Jo rebate de volta. <em>Quanto mais, melhor.</em>',
     falaSub: '<b>Frescobol</b>: ninguém perde, todo mundo joga junto.',
     acao: {
@@ -3274,7 +3413,8 @@ function renderLanding(tela) {
     el('div', { class: 'porta-icone' }, '📖'),
     el('div', { class: 'porta-texto' }, [
       el('div', { class: 'porta-titulo' }, 'História'),
-      el('div', { class: 'porta-desc' }, 'Primeiro dia de To e Ben na escola. SOS e os nomes da turma.'),
+      el('div', { class: 'porta-badge' }, 'Temporada 1 · 12 episódios'),
+      el('div', { class: 'porta-desc' }, 'Em casa com a família, padrinhos, primeiro dia, jogos e a festa da Nena.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
@@ -3286,7 +3426,7 @@ function renderLanding(tela) {
     el('div', { class: 'porta-icone' }, '🔤'),
     el('div', { class: 'porta-texto' }, [
       el('div', { class: 'porta-titulo' }, 'Jogo das letras'),
-      el('div', { class: 'porta-desc' }, 'A é de Asa, B é de Bento… ouve cada letra em canto sabiá.'),
+      el('div', { class: 'porta-desc' }, 'A é de Altinha, B é de Bento… ouve cada letra em canto sabiá.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
@@ -3334,6 +3474,7 @@ function renderCena(tela, cena) {
     if (cena.decoracao === 'bola-pingpong') fundo.appendChild(el('div', { class: 'cena-deco-emoji' }, '🏓'));
     if (cena.decoracao === 'xadrez') fundo.appendChild(el('div', { class: 'cena-deco-emoji' }, '♟'));
     if (cena.decoracao === 'bola') fundo.appendChild(el('div', { class: 'cena-deco-emoji' }, '⚽'));
+    if (cena.decoracao === 'flor-ipe') fundo.appendChild(el('div', { class: 'cena-deco-emoji' }, '🌸'));
     fundo.appendChild(el('div', { class: 'cena-galho' }));
 
     const palco = el('div', { class: 'cena-palco' });
@@ -3623,6 +3764,67 @@ function renderAcaoCena(container, cena) {
       linha.appendChild(chips);
       container.appendChild(linha);
     }
+  } else if (a.tipo === 'tete-padrao') {
+    // v8.1 E5: TETE em padrão alternado – · – ·. Cena pedagógica que destaca
+    // que esse é o nome mais fácil do Morse: só dois símbolos básicos
+    // alternando 4 vezes. Quatro botões grandes em sequência, depois uma
+    // chamada pra tocar o nome inteiro. Cores Sol/Ré já estabelecidas
+    // (amarelo/violeta) reforçam · = curto, – = longo.
+    const elementos = [
+      { letra: 'T', simbolo: '–', cls: 'traco', tom: '-' },
+      { letra: 'E', simbolo: '·', cls: 'ponto', tom: '.' },
+      { letra: 'T', simbolo: '–', cls: 'traco', tom: '-' },
+      { letra: 'E', simbolo: '·', cls: 'ponto', tom: '.' },
+    ];
+
+    const tabuleiro = el('div', { class: 'tete-padrao' });
+    elementos.forEach((e, i) => {
+      const card = el('button', {
+        class: 'tete-card ' + e.cls,
+        'aria-label': `letra ${e.letra}, ${e.cls === 'ponto' ? 'curto' : 'longo'}`,
+        onClick: () => {
+          Audio.unlock();
+          Audio.playElemento(e.tom, 'sabia');
+          card.classList.remove('pulsar');
+          void card.offsetWidth;
+          card.classList.add('pulsar');
+        },
+      }, [
+        el('span', { class: 'tete-card-letra' }, e.letra),
+        el('span', { class: 'tete-card-simbolo' }, e.simbolo),
+      ]);
+      tabuleiro.appendChild(card);
+    });
+    container.appendChild(tabuleiro);
+
+    container.appendChild(el('div', { class: 'tete-legenda' },
+      'cada letra = um som. juntas formam — · — ·'));
+
+    const acoesTete = el('div', { class: 'dupla-acoes' });
+    acoesTete.appendChild(el('button', {
+      class: 'botao laranja grande',
+      onClick: () => {
+        Audio.unlock();
+        const cards = tabuleiro.querySelectorAll('.tete-card');
+        const seq = palavraParaMorse('TETE');
+        let i = 0;
+        tocarSequencia(seq, {
+          voz: 'sabia',
+          repeticoes: 1,
+          onElemento: (sim) => {
+            if (sim === '.' || sim === '-') {
+              const card = cards[i++];
+              if (card) {
+                card.classList.remove('pulsar');
+                void card.offsetWidth;
+                card.classList.add('pulsar');
+              }
+            }
+          },
+        });
+      },
+    }, '🎵 tocar TETE inteira'));
+    container.appendChild(acoesTete);
   } else if (a.tipo === 'cena-curta') {
     // v8 E3: caminho pra escola. Cena de transição leve, sem componente
     // interativo. A fala + botão "próximo" da renderCena já bastam — o
