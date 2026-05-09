@@ -5090,32 +5090,26 @@ function renderPulso(tela) {
     ]));
   }
 
-  // ===== Seção "Construir PA" =====
-  // PA em Morse = · −  ·   →  P=·−−·, A=·−. Pra ficar simples pra criança,
-  // mostramos só "P" e "A" como letras separadas, cada uma numa grade
-  // de semicolcheias mostrando que letra=padrão de pontos e traços.
+  // ===== Seção "Construir MA" =====
+  // v8.9: troca de PA pra MA (Lucas).
+  //   - M = − −   (2 elementos, 3+1+3 = 7 semicolcheias) cabe na grade de 8
+  //   - A = · −   (2 elementos, 1+1+3 = 5 semicolcheias) cabe na grade de 8
+  // Vantagens vs PA antigo:
+  //   - M cabe inteiro (sem truncar como acontecia com P=·−−·)
+  //   - Coerente com PALAVRAS_LETRA (M→Mama) — extensão natural pra MAMA
+  //   - "ma" é fonema mais primal pra criança que "pa"
+  //   - M é simétrico (−−) — visualmente bonito, ritmicamente regular
   function montarSecaoPA() {
     secaoPA.innerHTML = '';
     secaoPA.appendChild(el('div', { class: 'pulso-pa-cabec' }, [
-      el('div', { class: 'pulso-pa-titulo' }, 'Olha o "PA"!'),
+      el('div', { class: 'pulso-pa-titulo' }, 'Olha o "MA"!'),
       el('div', { class: 'pulso-pa-explica', style: 'font-size:11px;font-style:italic;color:var(--tinta-suave);flex:1;text-align:right' },
         '· e − feitos de pulso'),
     ]));
 
-    // P = · − − ·  (4 elementos, 1+3+3+1 semicolcheias = 8 cells)
-    // A = · −      (2 elementos, 1+3 semicolcheias = 4 cells)
-    const letras = [
-      { nome: 'P', morse: '.---.', cells: ['ponto','vazio','traco-1','traco-2','traco-3','vazio','ponto','vazio'] },
-      // Erro acima — P = .--. = ponto, traço, traço, ponto
-      // Vou reescrever
-    ];
-    // Padrão correto:
-    // P = . - - .  (1 + esp + 3 + esp + 3 + esp + 1 = 12 semicolcheias) → muito largo
-    // Pra grade de 8 cells, simplifico mostrando SÓ os elementos sem espaços:
-    //   P = [ponto] [traço × 3] [traço × 3] [ponto]   = 1+3+3+1 = 8 ✓
-    //   A = [ponto] [traço × 3]                       = 1+3     = 4 (preenchido até 8)
     function fazerLinha(letra, padrao) {
-      // padrao = array com 'ponto' (1), 'traco' (3) preenchendo 8 cells
+      // padrao = array com 'ponto' (1 cell), 'traco-N' (3 cells em sequência),
+      // 'vazio' (espaço entre elementos). Total preenche 8 cells.
       const grade = el('div', { class: 'pulso-pa-letra-grade' });
       const cells = [];
       padrao.forEach((cls) => {
@@ -5130,32 +5124,29 @@ function renderPulso(tela) {
       return { linha, cells };
     }
 
-    const p = fazerLinha('P', [
-      'ponto',                  // ·
-      'vazio',                  // espaço
-      'traco-1','traco-2','traco-3', // −
-      'vazio',                  // espaço
-      // Truncamos: a letra P inteira (·−−·) não cabe em 8 cells; mostramos
-      // só o início (·−) que já contém o ponto e o traço do exemplo.
-      'ponto',                  // visual extra: outro ponto pro padrão fechar
+    // M = − − : traço (3) + esp (1) + traço (3) + vazio (1) = 8
+    const m = fazerLinha('M', [
+      'traco-1','traco-2','traco-3',
+      'vazio',
+      'traco-1','traco-2','traco-3',
       'vazio',
     ]);
+    // A = · − : ponto (1) + esp (1) + traço (3) + vazio (3) = 8
     const a = fazerLinha('A', [
       'ponto',
       'vazio',
       'traco-1','traco-2','traco-3',
       'vazio','vazio','vazio',
     ]);
-    secaoPA.appendChild(p.linha);
+    secaoPA.appendChild(m.linha);
     secaoPA.appendChild(a.linha);
 
-    // Botão "ouvir P-A"
-    const btnPA = el('button', { class: 'pulso-acao', style: 'margin-top:6px' }, '🔊 ouvir P + A');
-    btnPA.addEventListener('click', () => tocarPA(p.cells, a.cells));
+    const btnPA = el('button', { class: 'pulso-acao', style: 'margin-top:6px' }, '🔊 ouvir M + A');
+    btnPA.addEventListener('click', () => tocarPA(m.cells, a.cells));
     secaoPA.appendChild(btnPA);
   }
 
-  function tocarPA(cellsP, cellsA) {
+  function tocarPA(cellsM, cellsA) {
     Audio.unlock();
     parar();
     const T = calcularTiming(State.bpm);
@@ -5203,11 +5194,13 @@ function renderPulso(tela) {
       });
     }
 
-    const padraoP = ['ponto','vazio','traco-1','traco-2','traco-3','vazio','ponto','vazio'];
+    // v8.9: padrões devem bater com os do montarSecaoPA (M e A)
+    const padraoM = ['traco-1','traco-2','traco-3','vazio','traco-1','traco-2','traco-3','vazio'];
     const padraoA = ['ponto','vazio','traco-1','traco-2','traco-3','vazio','vazio','vazio'];
-    agendarLetra(cellsP, padraoP);
-    // Espaço entre P e A: 4 semicolcheias
-    acumulado += 4;
+    agendarLetra(cellsM, padraoM);
+    // Espaço entre letras (M e A): 2 semicolcheias adicionais (já temos 1
+    // 'vazio' no fim do padraoM, total 3 semicolcheias = espaço de letra Morse)
+    acumulado += 2;
     agendarLetra(cellsA, padraoA);
 
     const cleanupCompasso = ativarCompasso(compassoCentral, T.beat, 0, startTime);
