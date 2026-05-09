@@ -1960,12 +1960,26 @@ const Audio = (() => {
     return src;
   }
   function pararTudo() {
-    activeSources.forEach(s => { try { s.stop(0); } catch(e) {} });
+    // v8.4: fade-out rápido (15ms) em cada gain antes de stop(0) — evita
+    // o "click" audível que aparecia ao cortar amostra abruptamente. Total
+    // imperceptível na latência mas elimina o pop. Master continua intacto.
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    const FADE = 0.015;
     activeGains.forEach(g => {
-      try { g.gain.cancelScheduledValues(0); g.gain.value = 0; } catch(e) {}
+      try {
+        g.gain.cancelScheduledValues(t);
+        const v = g.gain.value;
+        g.gain.setValueAtTime(v, t);
+        g.gain.linearRampToValueAtTime(0, t + FADE);
+      } catch(e) {}
     });
-    activeSources.clear();
-    activeGains.clear();
+    // Stops também, mas com pequeno delay (após o fade) pra silenciar sem pop.
+    setTimeout(() => {
+      activeSources.forEach(s => { try { s.stop(0); } catch(e) {} });
+      activeSources.clear();
+      activeGains.clear();
+    }, 25);
   }
 
   // Offsets escolhidos dentro do sample pra cada papel (ver header sobre as 5 frases)
@@ -2804,10 +2818,10 @@ const State = {
 const STORAGE_KEY = 'sabia-morse-bento-v3';
 function salvarEstado() {
   try {
+    // v8.4: bpm não é mais persistido — sempre começa em menino (75 BPM).
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       cumpridas: Array.from(State.cumpridas),
       vozTeclado: State.vozTeclado,
-      bpm: State.bpm,
       notacaoBinaria: State.notacaoBinaria,
       bumboAudivel: State.bumboAudivel,
     }));
@@ -2822,13 +2836,10 @@ function carregarEstado() {
       if (typeof d.vozTeclado === 'string' && ['sabia','palma','telegrafo','violao','coracao'].includes(d.vozTeclado)) {
         State.vozTeclado = d.vozTeclado;
       }
-      // Só aceita BPM que existe no slider atual; senão fica no default 120.
-      if (typeof d.bpm === 'number' && Array.isArray(window.VALORES_BPM ? VALORES_BPM : null) && VALORES_BPM.includes(d.bpm)) {
-        State.bpm = d.bpm;
-      } else if (typeof d.bpm === 'number' && d.bpm >= 60 && d.bpm <= 180) {
-        // Fallback: aceita qualquer BPM no range válido (caso VALORES_BPM ainda não carregou)
-        State.bpm = d.bpm;
-      }
+      // v8.4: Lucas pediu "default sempre o tempo do menino". Não restauramos
+      // mais BPM do localStorage — toda sessão começa em 75 (menino). Se a
+      // criança trocar a velocidade, vale durante a sessão; ao recarregar,
+      // volta pro tempo pedagogicamente recomendado.
       if (typeof d.notacaoBinaria === 'boolean') State.notacaoBinaria = d.notacaoBinaria;
       if (typeof d.bumboAudivel === 'boolean') State.bumboAudivel = d.bumboAudivel;
     }
@@ -2958,13 +2969,27 @@ function pararLoop() {
   State.reproduzindo = false;
   // Para qualquer source/oscillator ativo no engine de áudio
   try { Audio.pararTudo && Audio.pararTudo(); } catch(e) {}
-  // Limpa cabeças de compasso ativas (interval + classe)
+  // v8.4 fix do botão pausar: ativarCompasso (v7+) usa setTimeout recursivo
+  // (drift zero) e armazena o id em dataset.timeoutId — não intervalId.
+  // Antes pararLoop lia intervalId errado, ticker continuava rodando e o
+  // coração seguia pulsando. Agora cancela timeoutId E chama o cleanup
+  // armazenado em element._cleanupCompasso (seta cancelado=true no closure).
   document.querySelectorAll('.compasso.tocando').forEach(c => {
-    const id = c.dataset.intervalId;
-    if (id) clearInterval(parseInt(id, 10));
-    delete c.dataset.intervalId;
+    const tid = c.dataset.timeoutId;
+    if (tid) {
+      clearTimeout(parseInt(tid, 10));
+      delete c.dataset.timeoutId;
+    }
+    if (typeof c._cleanupCompasso === 'function') {
+      try { c._cleanupCompasso(); } catch(e) {}
+    }
     c.classList.remove('tocando');
   });
+  // Limpa também o cleanup global atual (cena/teclado registram aqui)
+  if (State.cleanupAtual) {
+    try { State.cleanupAtual(); } catch(e) {}
+    State.cleanupAtual = null;
+  }
 }
 
 // Toca uma sequência string com '.', '-', ' ' (entre letras), '/' (entre palavras)
@@ -3018,28 +3043,29 @@ function criarCompasso(rotulo) {
   return wrap;
 }
 
-// Liga o coração ao tempo. beatMs = duração de um beat em ms. A onda de pulso
-// (.coracao-pulso) anima na sístole; o som de batida cardíaca (se audível)
-// dispara junto. CSS animation já bate em loop quando .tocando está ativo.
-function ativarCompasso(elementoCompasso, beatMs) {
+// Liga o coração ao tempo. beatMs = duração de um beat em ms.
+// startDelayMs (v8.4): atraso até o primeiro pulse — usado por tocarSequencia
+// pra alinhar o tick visual com o início real do áudio (Audio.now() + 0.1).
+// Sem isso o relógio do CSS (performance.now) e o do Web Audio (currentTime)
+// ficavam descalibrados — o pulso visual entrava num offset arbitrário do beat.
+function ativarCompasso(elementoCompasso, beatMs, startDelayMs = 0) {
   if (!elementoCompasso) return () => {};
-  // v7.1: Lucas pediu "pulso consistente o tempo todo". setInterval acumula
-  // drift no Chrome mobile; trocamos por setTimeout recursivo com correção
-  // baseada em performance.now() — cada tick agenda o próximo pelo tempo
-  // ALVO absoluto, não pelo intervalo relativo. Drift fica em < 1 frame.
+  // setTimeout recursivo com correção em performance.now() — cada tick agenda
+  // o próximo pelo tempo ALVO absoluto, não pelo intervalo relativo (drift < 1 frame).
   const previa = elementoCompasso.dataset.timeoutId;
   if (previa) {
     clearTimeout(parseInt(previa, 10));
     delete elementoCompasso.dataset.timeoutId;
   }
+  // v8.4 fix: chama cleanup anterior se houver (caso ativarCompasso seja
+  // re-chamado no mesmo elemento sem passar por pararLoop)
+  if (typeof elementoCompasso._cleanupCompasso === 'function') {
+    try { elementoCompasso._cleanupCompasso(); } catch(e) {}
+  }
   elementoCompasso.style.setProperty('--beat-dur', (beatMs / 1000) + 's');
   elementoCompasso.classList.add('tocando');
 
-  // v8.2: Lucas pediu "pulso simples, coração tranquilo". Antes (v7.2) cada
-  // compasso tinha 4 escalas distintas (1.32/1.16/1.10/1.05) marcando beat
-  // forte + 3 fracos decrescentes — ficou intenso demais. Agora todo beat
-  // tem a mesma magnitude suave (1.08), sem distinção. Pulso constante,
-  // coerente com "respiração tranquila" em vez de "batida acentuada".
+  // Pulso simples (v8.2): magnitude única 1.08, todo beat igual.
   const corpo = elementoCompasso.querySelector('.coracao-corpo');
   const brilho = elementoCompasso.querySelector('.coracao-brilho');
   const PICO_TRANQUILO = 1.08;
@@ -3055,9 +3081,9 @@ function ativarCompasso(elementoCompasso, beatMs) {
   }
 
   const pulso = elementoCompasso.querySelector('.coracao-pulso');
-  let beatCount = 0;
   let cancelado = false;
-  let alvo = performance.now();
+  // alvo começa em performance.now()+startDelay (sincronia com áudio)
+  let alvo = performance.now() + startDelayMs;
 
   function pulsar() {
     if (cancelado) return;
@@ -3070,16 +3096,19 @@ function ativarCompasso(elementoCompasso, beatMs) {
     if (State.bumboAudivel && Audio.playBumbo) {
       Audio.playBumbo();
     }
-    beatCount++;
     alvo += beatMs;
     const proximoMs = Math.max(0, alvo - performance.now());
     const tid = setTimeout(pulsar, proximoMs);
     elementoCompasso.dataset.timeoutId = String(tid);
   }
 
-  pulsar();
+  // v8.4: primeiro tick alinhado ao startDelay (não imediato)
+  const tid0 = setTimeout(pulsar, Math.max(0, startDelayMs));
+  elementoCompasso.dataset.timeoutId = String(tid0);
 
-  return () => {
+  // v8.4: cleanup armazenado no DOM pra pararLoop encontrar mesmo
+  // sem ter referência guardada (corrige botão pausar)
+  const cleanup = () => {
     cancelado = true;
     const tid = elementoCompasso.dataset.timeoutId;
     if (tid) {
@@ -3087,7 +3116,10 @@ function ativarCompasso(elementoCompasso, beatMs) {
       delete elementoCompasso.dataset.timeoutId;
     }
     elementoCompasso.classList.remove('tocando');
+    delete elementoCompasso._cleanupCompasso;
   };
+  elementoCompasso._cleanupCompasso = cleanup;
+  return cleanup;
 }
 
 function tocarSequencia(seq, opts = {}) {
@@ -3105,8 +3137,11 @@ function tocarSequencia(seq, opts = {}) {
 
   const T = calcularTiming(State.bpm);
 
-  // Cabeça de compasso liga durante a reprodução
-  const desligarCompasso = compasso ? ativarCompasso(compasso, T.beat) : () => {};
+  // v8.4: cabeça de compasso ALINHADA ao início real do áudio. tocarUmaVez
+  // agenda o primeiro elemento em Audio.now()+0.1s, então o pulso visual
+  // também começa 100ms depois. Pulso e som passam a cair juntos.
+  const START_DELAY_MS = 100;
+  const desligarCompasso = compasso ? ativarCompasso(compasso, T.beat, START_DELAY_MS) : () => {};
 
   function tocarUmaVez(callback) {
     let t = Audio.now() + 0.1;
@@ -5178,6 +5213,14 @@ function renderTeclado(tela) {
     class: 'botao laranja grande',
     onClick: function() {
       Audio.unlock();
+      // v8.4 fix do botão pausar: antes o handler SEMPRE chamava
+      // tocarSequencia, então clicar em "⏸ parar" reiniciava em vez de
+      // parar. Agora se já está tocando, pausa.
+      if (State.reproduzindo) {
+        pararLoop();
+        this.textContent = '▶ tocar';
+        return;
+      }
       if (!State.texto) return;
       const seq = palavraParaMorse(State.texto);
       this.textContent = '⏸ parar';
