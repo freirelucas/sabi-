@@ -1593,6 +1593,78 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .teclado-wrap {
   display: flex; flex-direction: column; gap: 10px;
 }
+
+/* v9.1 (D1+D2): toggle modo criança/explorar */
+.teclado-modo-toggle {
+  display: flex; gap: 6px;
+  background: var(--papel-medio);
+  padding: 4px;
+  border-radius: 22px;
+  border: 1.5px solid rgba(120, 90, 60, 0.18);
+  align-self: center;
+}
+.teclado-modo {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; min-height: 40px;
+  background: transparent; border: none;
+  border-radius: 18px;
+  font-family: var(--display); font-weight: 700;
+  font-size: 14px;
+  color: var(--tinta-suave);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.teclado-modo.ativo {
+  background: var(--laranja-vivo, #C9622E);
+  color: white;
+}
+.teclado-modo-emoji { font-size: 18px; }
+
+/* Modo CRIANÇA — display gigante + botão tocar grande + chips grandes */
+.crianca-display {
+  font-family: var(--display); font-weight: 900;
+  font-size: clamp(32px, 9vw, 48px);
+  text-align: center;
+  color: var(--cor-acento, #C9622E);
+  letter-spacing: 0.04em;
+  padding: 20px 12px 8px;
+  min-height: 70px;
+}
+.crianca-display.vazio {
+  font-size: 16px; font-weight: 600; font-style: italic;
+  color: var(--tinta-suave);
+  letter-spacing: 0;
+}
+.crianca-morse {
+  text-align: center;
+  min-height: 32px;
+  font-size: clamp(22px, 5.5vw, 30px);
+  margin-bottom: 4px;
+}
+.crianca-tocar {
+  font-size: 22px;
+  padding: 16px 36px;
+  min-height: 60px;
+  border-radius: 30px;
+  font-weight: 800;
+}
+.crianca-chips {
+  display: flex; flex-wrap: wrap; justify-content: center;
+  gap: 8px;
+  padding: 8px;
+}
+.palavra-rapida.crianca {
+  font-size: 18px;
+  padding: 12px 18px;
+  min-height: 48px;
+  font-weight: 700;
+}
+.palavra-rapida.escolhida {
+  background: var(--laranja-vivo, #C9622E);
+  color: white;
+  border-color: var(--laranja-vivo, #C9622E);
+  transform: scale(1.04);
+}
 .teclado-config {
   background: var(--papel-medio);
   border-radius: 16px;
@@ -1830,6 +1902,100 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-size: 11px;
   font-weight: 900;
   box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+/* v9.1 (PR2): botão "carimbei!" + selo conquistado */
+.carimbo-wrap {
+  display: grid; place-items: center;
+  margin: 14px 0 6px;
+}
+.botao-carimbo {
+  font-family: var(--display); font-weight: 800;
+  font-size: 18px;
+  padding: 14px 28px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #F4D35E 0%, #E8A45C 100%);
+  border: 2px solid #C9622E;
+  color: #6B3A1A;
+  cursor: pointer;
+  min-height: 52px;
+  box-shadow: 0 3px 0 #B8541F, 0 6px 14px rgba(120,60,20,0.18);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.botao-carimbo:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #B8541F, 0 3px 8px rgba(120,60,20,0.18);
+}
+.botao-carimbo.disparando {
+  animation: carimbo-disparo 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+}
+@keyframes carimbo-disparo {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.4) rotate(-6deg); }
+  70%  { transform: scale(1.1) rotate(4deg); }
+  100% { transform: scale(0.4); opacity: 0; }
+}
+.carimbo-feito {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 18px;
+  background: rgba(111, 174, 92, 0.18);
+  border: 2px dashed #6FAE5C;
+  border-radius: 18px;
+  font-family: var(--display); font-weight: 700;
+  font-size: 15px;
+  color: #3D6E2C;
+  animation: carimbo-feito-aparece 0.6s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+@keyframes carimbo-feito-aparece {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.carimbo-selo {
+  font-size: 22px;
+  display: inline-block;
+  animation: carimbo-selo-balanca 2.2s ease-in-out infinite;
+}
+
+/* v9.1 (A5): Caderno do Bento — navegação como páginas */
+.caderno-nav {
+  display: grid;
+  grid-template-columns: 56px 1fr 56px;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 8px 0;
+}
+.caderno-seta {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--papel-medio);
+  border: 2px solid rgba(120, 90, 60, 0.25);
+  font-size: 22px;
+  color: var(--cor-acento, #C9622E);
+  cursor: pointer;
+  display: grid; place-items: center;
+  transition: transform 0.12s, background 0.18s;
+}
+.caderno-seta:active { transform: scale(0.92); background: rgba(244, 211, 94, 0.32); }
+.caderno-seta.invisivel { visibility: hidden; }
+.caderno-pagina {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-family: var(--display);
+}
+.caderno-letra-atual {
+  font-size: 24px; font-weight: 900;
+  color: var(--cor-acento, #C9622E);
+  line-height: 1;
+}
+.caderno-pos {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--tinta-suave);
+}
+@keyframes carimbo-selo-balanca {
+  0%, 100% { transform: rotate(-5deg); }
+  50%      { transform: rotate(5deg); }
 }
 
 /* Tela de detalhe da letra */
@@ -2289,6 +2455,67 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   transition: transform 0.1s, border-color 0.15s, background 0.15s;
 }
 .coleguinha-card:active { transform: scale(0.95); }
+/* v9.1 (C1): grupos visuais — professora / time rápido / time calmo */
+.coleguinha-grupo {
+  margin: 6px 0 14px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(120, 90, 60, 0.18);
+}
+.coleguinha-grupo-titulo {
+  font-family: var(--display); font-weight: 800;
+  font-size: 14px;
+  color: var(--tinta);
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+.grupo-professora {
+  background: rgba(244, 211, 94, 0.18);
+  border-color: rgba(232, 164, 92, 0.4);
+}
+.grupo-rapido {
+  background: rgba(232, 164, 92, 0.10);
+  border-color: rgba(201, 98, 46, 0.28);
+}
+.grupo-calmo {
+  background: rgba(122, 144, 178, 0.10);
+  border-color: rgba(90, 120, 160, 0.28);
+}
+
+/* v9.1 (C2): cabeçalho do painel de decomposição com sabiá entrando */
+.decomp-cabec-novo {
+  display: flex; align-items: center; gap: 12px;
+  padding: 8px 12px 12px;
+}
+.decomp-sabia-entra {
+  flex-shrink: 0;
+  animation: sabia-entra 0.6s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+@keyframes sabia-entra {
+  0%   { transform: scale(0.3) translateX(-40px) rotate(-12deg); opacity: 0; }
+  60%  { transform: scale(1.1) translateX(0) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.decomp-fala {
+  flex: 1;
+  display: flex; flex-direction: column; gap: 2px;
+  animation: decomp-fala-aparece 0.5s ease-out 0.3s both;
+}
+@keyframes decomp-fala-aparece {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.decomp-fala-texto {
+  font-family: var(--display); font-weight: 700;
+  font-size: 17px;
+  color: var(--cor-acento, #C9622E);
+}
+.decomp-fala-papel {
+  font-size: 12px; font-style: italic;
+  color: var(--tinta-suave);
+}
+
 .coleguinha-card.selecionado {
   background: rgba(244,211,94,0.35);
   border-color: var(--cor-acento, #C9622E);
@@ -3531,6 +3758,9 @@ const State = {
   // v8.8: estado da Tela Pulso
   vozPulso: 'sabia',    // voz da batida na Tela Pulso (sabia | palma | telegrafo)
   pulsoEstrelas: {},    // {um:true, dois:true, quatro:true} — estrelas conquistadas
+  // v9.1 (D1): teclado em 2 modos. Default 'crianca' pra Bento de 5 anos
+  // (mostra só chips grandes + tocar). 'explorar' tem alfabeto + config completa.
+  tecladoModo: 'crianca', // 'crianca' | 'explorar'
   cumpridas: new Set(),
 };
 
@@ -3549,6 +3779,7 @@ function salvarEstado() {
       mudo: State.mudo,
       vozPulso: State.vozPulso,
       pulsoEstrelas: State.pulsoEstrelas,
+      tecladoModo: State.tecladoModo,
     }));
   } catch(e) {}
 }
@@ -3571,6 +3802,7 @@ function carregarEstado() {
       if (typeof d.mudo === 'boolean') State.mudo = d.mudo;
       if (typeof d.vozPulso === 'string' && ['sabia','palma','telegrafo'].includes(d.vozPulso)) State.vozPulso = d.vozPulso;
       if (d.pulsoEstrelas && typeof d.pulsoEstrelas === 'object') State.pulsoEstrelas = d.pulsoEstrelas;
+      if (d.tecladoModo === 'crianca' || d.tecladoModo === 'explorar') State.tecladoModo = d.tecladoModo;
     }
   } catch(e) {}
 }
@@ -4334,23 +4566,29 @@ const ROTEIRO = [
   // nomes em ordem (botão "ouvir todos" toca cada um em Morse com
   // pausa entre eles). Bola passa de um pro outro visualmente.
   {
-    id: 'futebol-recap',
-    titulo: 'Futebol da turma',
-    bloco: { emoji: '⚽', nome: 'futebol' },
+    // v9.1 (B1): troca recap-nomes por roda-apresentacao — círculo é mais
+    // bonito que grade, e traz de volta o easter-egg "Ben + To = BENTO"
+    // que estava INACESSÍVEL desde a v5 (renderer existia, nenhuma cena
+    // o usava). Ben fica por ÚLTIMO da sequência pra disparar a surpresa.
+    id: 'roda-da-turma',
+    titulo: 'Roda da turma',
+    bloco: { emoji: '🤝', nome: 'roda' },
     fundo: 'campinho',
-    decoracao: 'bola',
+    decoracao: 'sol',
     personagens: [],
-    fala: '⚽ Todo mundo no <b>campinho</b>: ping-pong + xadrez = <em>turma</em>!',
-    falaSub: 'Aperta "ouvir a turma" pra recapitular cada nome em ordem.',
+    fala: '🤝 Todo mundo se apresenta na <b>roda</b>. Toca em quem a setinha aponta!',
+    falaSub: '<em>Será que tem alguma surpresa quando o Ben falar por último…?</em> 🤫',
     acao: {
-      tipo: 'recap-nomes',
-      nomes: [
+      tipo: 'roda-apresentacao',
+      sequencia: [
         { quem: 'caca', nome: 'Caca' },
         { quem: 'jo',   nome: 'Jo'   },
         { quem: 'tete', nome: 'Tete' },
         { quem: 'tata', nome: 'Tata' },
         { quem: 'tito', nome: 'Tito' },
         { quem: 'lila', nome: 'Lila' },
+        { quem: 'to',   nome: 'To'   },
+        { quem: 'ben',  nome: 'Ben'  },   // ← último: dispara BENTO=Ben+To
       ],
     },
     proximo: '🆘 aprender o SOS',
@@ -4606,70 +4844,113 @@ function renderLanding(tela) {
    COLEGUINHAS — explora o nome de cada um da turma
    ============================================================ */
 function renderColeguinhas(tela) {
-  // v8.3: Lucas pediu "tela: explore o nome dos coleguinhas da escola".
-  // Grid 2 colunas com sabiá + nome. Click revela decomposição completa
-  // (letras + Morse + loop) reusando criarDecomposicaoNome.
-  const turma = [
-    { quem: 'nena', nome: 'Nena', papel: 'professora' },
-    { quem: 'to',   nome: 'To',   papel: 'protagonista' },
-    { quem: 'ben',  nome: 'Ben',  papel: 'amigo de To' },
-    { quem: 'tete', nome: 'Tete', papel: 'primeira amiga' },
-    { quem: 'caca', nome: 'Caca', papel: 'ping-pong' },
-    { quem: 'jo',   nome: 'Jo',   papel: 'ping-pong' },
-    { quem: 'tata', nome: 'Tata', papel: 'xadrez' },
-    { quem: 'tito', nome: 'Tito', papel: 'xadrez' },
-    { quem: 'lila', nome: 'Lila', papel: 'xadrez' },
+  // v9.1 (C1+C2): organizado em 3 grupos visualmente separados:
+  //   👩‍🏫 professora    Nena
+  //   ⚡ time rápido    To, Ben, Tete, Caca, Jo (ping-pong + amigos)
+  //   ♟ time calmo      Tata, Tito, Lila (xadrez)
+  // Apresentação animada (C2): sabiá "voa" do card pro topo do painel
+  // ao ser tocado, com fala "oi, eu sou X!" antes da decomposição.
+  const grupos = [
+    {
+      id: 'professora',
+      titulo: '👩‍🏫 professora',
+      cor: 'professora',
+      itens: [
+        { quem: 'nena', nome: 'Nena', papel: 'professora dos sabiás' },
+      ],
+    },
+    {
+      id: 'rapido',
+      titulo: '⚡ time rápido',
+      cor: 'rapido',
+      itens: [
+        { quem: 'to',   nome: 'To',   papel: 'protagonista' },
+        { quem: 'ben',  nome: 'Ben',  papel: 'amigo do To' },
+        { quem: 'tete', nome: 'Tete', papel: 'primeira amiga' },
+        { quem: 'caca', nome: 'Caca', papel: 'ping-pong' },
+        { quem: 'jo',   nome: 'Jo',   papel: 'ping-pong' },
+      ],
+    },
+    {
+      id: 'calmo',
+      titulo: '♟ time calmo',
+      cor: 'calmo',
+      itens: [
+        { quem: 'tata', nome: 'Tata', papel: 'xadrez' },
+        { quem: 'tito', nome: 'Tito', papel: 'xadrez' },
+        { quem: 'lila', nome: 'Lila', papel: 'xadrez' },
+      ],
+    },
   ];
 
   const wrap = el('div', { class: 'coleguinhas' });
-
   wrap.appendChild(el('div', { class: 'coleguinhas-intro' }, [
     el('div', { class: 'coleguinhas-titulo' }, 'A turma da Escola dos Sabiás'),
     el('div', { class: 'coleguinhas-sub' },
-      'Toca em cada um pra ouvir o nome — letra por letra.'),
+      'Toca em cada um pra conhecer — eles cantam o próprio nome em Morse.'),
   ]));
 
-  const grid = el('div', { class: 'coleguinhas-grid' });
-  wrap.appendChild(grid);
-
   const painel = el('div', { class: 'decomp-painel escondido' });
-  wrap.appendChild(painel);
 
   let decompAtual = null;
   function escolher(item) {
     if (decompAtual) decompAtual.parar();
     painel.innerHTML = '';
     painel.classList.remove('escondido');
-    painel.appendChild(el('div', { class: 'decomp-titulo' }, [
-      el('b', {}, item.nome),
-      el('span', { style: 'opacity:0.7' }, ` · ${item.papel}`),
-    ]));
+
+    // C2: cabeçalho do painel com sabiá + fala "oi, eu sou X!"
+    const cabec = el('div', { class: 'decomp-cabec-novo' });
+    const svgGrande = passaroSVG(item.quem);
+    if (svgGrande) {
+      svgGrande.style.width = '78px'; svgGrande.style.height = '78px';
+      svgGrande.classList.add('decomp-sabia-entra');
+    }
+    const fala = el('div', { class: 'decomp-fala' }, [
+      el('div', { class: 'decomp-fala-texto' },
+        item.quem === 'nena' ? `oi, eu sou a ${item.nome}!` : `oi, eu sou ${item.nome === 'Tata' || item.nome === 'Tete' || item.nome === 'Caca' || item.nome === 'Jo' || item.nome === 'Lila' ? 'a ' : 'o '}${item.nome}!`),
+      el('div', { class: 'decomp-fala-papel' }, item.papel),
+    ]);
+    cabec.appendChild(svgGrande);
+    cabec.appendChild(fala);
+    painel.appendChild(cabec);
+
     decompAtual = criarDecomposicaoNome(item.nome.toUpperCase(), 'sabia');
     painel.appendChild(decompAtual.wrap);
-    decompAtual.tocarTudo();
-    grid.querySelectorAll('.coleguinha-card').forEach(c => {
+    // Pequeno delay pra criança ler "oi, eu sou X!" antes de começar
+    setTimeout(() => decompAtual && decompAtual.tocarTudo(), 350);
+
+    wrap.querySelectorAll('.coleguinha-card').forEach(c => {
       c.classList.toggle('selecionado', c.dataset.quem === item.quem);
     });
   }
 
-  turma.forEach(item => {
-    const card = el('button', {
-      class: 'coleguinha-card',
-      'data-quem': item.quem,
-      'aria-label': `ouvir ${item.nome}, ${item.papel}`,
-      onClick: () => escolher(item),
+  // Renderiza cada grupo com header + grade
+  grupos.forEach(grupo => {
+    const sec = el('section', { class: 'coleguinha-grupo grupo-' + grupo.cor });
+    sec.appendChild(el('div', { class: 'coleguinha-grupo-titulo' }, grupo.titulo));
+    const grid = el('div', { class: 'coleguinhas-grid' });
+    grupo.itens.forEach(item => {
+      const card = el('button', {
+        class: 'coleguinha-card',
+        'data-quem': item.quem,
+        'aria-label': `ouvir ${item.nome}, ${item.papel}`,
+        onClick: () => escolher(item),
+      });
+      const svg = passaroSVG(item.quem);
+      if (svg) {
+        svg.style.width = '70px'; svg.style.height = '70px';
+        svg.style.transform = 'scale(1)';
+        card.appendChild(svg);
+      }
+      card.appendChild(el('div', { class: 'coleguinha-nome' }, item.nome));
+      card.appendChild(el('div', { class: 'coleguinha-papel' }, item.papel));
+      grid.appendChild(card);
     });
-    const svg = passaroSVG(item.quem);
-    if (svg) {
-      svg.style.width = '70px'; svg.style.height = '70px';
-      svg.style.transform = 'scale(1)';
-      card.appendChild(svg);
-    }
-    card.appendChild(el('div', { class: 'coleguinha-nome' }, item.nome));
-    card.appendChild(el('div', { class: 'coleguinha-papel' }, item.papel));
-    grid.appendChild(card);
+    sec.appendChild(grid);
+    wrap.appendChild(sec);
   });
 
+  wrap.appendChild(painel);
   tela.appendChild(wrap);
 }
 
@@ -6176,8 +6457,119 @@ function criarSeletorVelocidade(onChange) {
   return wrap;
 }
 
+// v9.1 (D1+D2): modo CRIANÇA do teclado.
+// Sem alfabeto, sem config técnica. Só palavras prontas em chips grandes,
+// display da palavra escolhida, e botão "ouvir" gigante. Bento de 5 anos
+// não precisa mapear letra→Morse — escolhe palavra pronta e ouve.
+function renderTecladoCrianca(tela, wrap) {
+  // Curadoria reduzida pra criança: nomes, palavras curtas, combos afetivos.
+  const PALAVRAS_CRIANCA = [
+    'BENTO', 'NENA', 'TO', 'BEN',
+    'PAPA', 'MAMA', 'VOVO',
+    'CACA', 'JO', 'TETE', 'TATA', 'TITO', 'LILA',
+    'OI', 'SOS', 'PAPA TO', 'MAMA TO', 'VOVO TO',
+  ];
+  const COMBOS_AFETO = new Set(['PAPA TO', 'MAMA TO', 'VOVO TO']);
+  const ESPECIAIS = new Set(['BENTO', 'NENA']);
+
+  // Display da palavra escolhida
+  const display = el('div', { class: 'crianca-display vazio' }, 'escolhe uma palavra');
+  const morseDisp = el('div', { class: 'morse-display crianca-morse' });
+  const compasso = criarCompasso('crianca');
+  wrap.appendChild(display);
+  wrap.appendChild(morseDisp);
+  wrap.appendChild(compasso);
+
+  let palavraEscolhida = null;
+
+  function escolher(p) {
+    palavraEscolhida = p;
+    const txtVisivel = COMBOS_AFETO.has(p) ? p.replace(' ', '-') : p;
+    display.classList.remove('vazio');
+    display.textContent = txtVisivel;
+    morseDisp.innerHTML = renderMorse(palavraParaMorse(p));
+    wrap.querySelectorAll('.palavra-rapida').forEach(b => {
+      b.classList.toggle('escolhida', b.dataset.p === p);
+    });
+  }
+
+  // Botão tocar GRANDE
+  const btnTocar = el('button', { class: 'botao laranja crianca-tocar' }, '🔊 ouvir');
+  btnTocar.addEventListener('click', () => {
+    Audio.unlock();
+    if (!palavraEscolhida) return;
+    if (State.reproduzindo) {
+      pararLoop();
+      btnTocar.textContent = '🔊 ouvir';
+      return;
+    }
+    btnTocar.textContent = '⏸ parar';
+    const seq = palavraParaMorse(palavraEscolhida);
+    const els = morseDisp.querySelectorAll('.ponto, .traco');
+    tocarSequencia(seq, {
+      voz: State.vozTeclado,
+      compasso,
+      onElemento: (ch, i) => {
+        els.forEach(e => e.classList.remove('ativo'));
+        if (els[i]) {
+          els[i].classList.add('ativo');
+          setTimeout(() => els[i].classList.remove('ativo'), ch === '.' ? 100 : 300);
+        }
+      },
+      onFim: () => { btnTocar.textContent = '🔊 ouvir'; },
+    });
+  });
+  wrap.appendChild(el('div', { style: 'display:flex; justify-content:center; margin: 8px 0;' }, [btnTocar]));
+
+  // Chips grandes
+  const chips = el('div', { class: 'crianca-chips' });
+  PALAVRAS_CRIANCA.forEach(p => {
+    const ehCombo = COMBOS_AFETO.has(p);
+    const ehEspecial = ESPECIAIS.has(p);
+    const txt = ehCombo ? p.replace(' ', '-') : p;
+    const chip = el('button', {
+      class: 'palavra-rapida crianca' + (ehEspecial ? ' especial' : '') + (ehCombo ? ' combo' : ''),
+      'data-p': p,
+      onClick: () => escolher(p),
+    }, txt);
+    chips.appendChild(chip);
+  });
+  wrap.appendChild(chips);
+}
+
 function renderTeclado(tela) {
   const wrap = el('div', { class: 'teclado-wrap' });
+
+  // v9.1 (D1+D2): toggle modo criança/explorar no topo
+  const toggleModo = el('div', { class: 'teclado-modo-toggle' });
+  ['crianca', 'explorar'].forEach(m => {
+    const labels = { crianca: ['🧒', 'crianç'+'a'], explorar: ['🔤', 'explorar'] };
+    const [emoji, txt] = labels[m];
+    const btn = el('button', {
+      class: 'teclado-modo' + (State.tecladoModo === m ? ' ativo' : ''),
+      'aria-pressed': String(State.tecladoModo === m),
+      onClick: () => {
+        if (State.tecladoModo === m) return;
+        State.tecladoModo = m;
+        salvarEstado();
+        // Re-render sem perder texto digitado
+        tela.innerHTML = '';
+        renderTeclado(tela);
+      },
+    }, [
+      el('span', { class: 'teclado-modo-emoji' }, emoji),
+      el('span', {}, txt),
+    ]);
+    toggleModo.appendChild(btn);
+  });
+  wrap.appendChild(toggleModo);
+
+  // Modo CRIANÇA: chips grandes + display + tocar. Sem alfabeto, sem config.
+  if (State.tecladoModo === 'crianca') {
+    renderTecladoCrianca(tela, wrap);
+    tela.appendChild(wrap);
+    return;
+  }
 
   // Configuração compacta
   const config = el('div', { class: 'teclado-config' });
@@ -6447,11 +6839,10 @@ function renderLetraDetalhe(tela, letra) {
   let palavraAtual = lista[0];
   const codLetra = MORSE[letra];
 
-  // v9.0: marca como visitada ao entrar (pra grade mostrar ✓ ao voltar)
-  if (!State.cumpridas.has('letra:' + letra)) {
-    State.cumpridas.add('letra:' + letra);
-    salvarEstado();
-  }
+  // v9.1 (PR2): NÃO marca mais automaticamente. Criança aperta "🌟 carimbei!"
+  // quando se sente pronta. Auto-mark virou simulação de aprendizado;
+  // carimbar é AÇÃO da criança — pedagogicamente mais forte.
+  // (A1 do PR1 fez auto-mark; o PR2 reverte e dá agência.)
 
   const wrap = el('div', { class: 'letra-detalhe' });
 
@@ -6592,22 +6983,100 @@ function renderLetraDetalhe(tela, letra) {
   }, '🎸 guitarra'));
   wrap.appendChild(botoes);
 
-  // Navegação anterior/próxima
-  const navega = el('div', { class: 'cena-acoes', style: 'margin-top: 12px;' });
+  // v9.1 (A4): botão "🌟 CARIMBEI!" — criança decide quando marcou.
+  // Já carimbada? Mostra "✨ você carimbou esta letra" (fechado, mas pode
+  // re-abrir se quiser desmarcar — opcional, por enquanto só feedback).
+  const jaCarimbada = State.cumpridas.has('letra:' + letra);
+  const carimboWrap = el('div', { class: 'carimbo-wrap' });
+  if (jaCarimbada) {
+    carimboWrap.appendChild(el('div', { class: 'carimbo-feito' }, [
+      el('span', { class: 'carimbo-selo' }, '🌟'),
+      el('span', { class: 'carimbo-texto' }, 'você carimbou!'),
+    ]));
+  } else {
+    const btnCarimbo = el('button', { class: 'botao-carimbo' }, '🌟 carimbei!');
+    btnCarimbo.addEventListener('click', () => {
+      State.cumpridas.add('letra:' + letra);
+      salvarEstado();
+      // Animação: o botão vira o selo e cresce
+      btnCarimbo.disabled = true;
+      btnCarimbo.classList.add('disparando');
+      // Confete pequeno (10 partículas, do botão pra cima)
+      const cores = ['#C9622E', '#F4D35E', '#6FAE5C', '#5C9CE8'];
+      const overlay = el('div', { class: 'pulso-confete-overlay' });
+      for (let i = 0; i < 10; i++) {
+        const c = el('div', { class: 'pulso-confete' });
+        c.style.left = (40 + Math.random() * 20) + '%';
+        c.style.top = '60vh';
+        c.style.background = cores[i % cores.length];
+        c.style.animationDelay = (Math.random() * 0.2) + 's';
+        c.style.animationDuration = (1 + Math.random() * 0.4) + 's';
+        overlay.appendChild(c);
+      }
+      document.body.appendChild(overlay);
+      setTimeout(() => overlay.parentNode && overlay.remove(), 1800);
+      // Substitui o botão pelo "feito" após animação
+      setTimeout(() => {
+        carimboWrap.innerHTML = '';
+        carimboWrap.appendChild(el('div', { class: 'carimbo-feito' }, [
+          el('span', { class: 'carimbo-selo' }, '🌟'),
+          el('span', { class: 'carimbo-texto' }, 'você carimbou!'),
+        ]));
+      }, 600);
+    });
+    carimboWrap.appendChild(btnCarimbo);
+  }
+  wrap.appendChild(carimboWrap);
+
+  // Navegação anterior/próxima — v9.1 (A5): "Caderno do Bento"
+  // Visualmente como páginas: número da letra atual ("S · 19/26"),
+  // setões grandes nas laterais, e SWIPE horizontal pra trocar.
   const idx = ALFABETO.indexOf(letra);
+  const navega = el('div', { class: 'caderno-nav' });
+  const btnAnt = el('button', {
+    class: 'caderno-seta esq' + (idx === 0 ? ' invisivel' : ''),
+    'aria-label': idx > 0 ? 'letra anterior ' + ALFABETO[idx - 1] : 'sem anterior',
+  }, '◀');
   if (idx > 0) {
-    navega.appendChild(el('button', {
-      class: 'botao secundario pequeno',
-      onClick: () => navegar('letra-detalhe', { letra: ALFABETO[idx - 1] })
-    }, '← ' + ALFABETO[idx - 1]));
+    btnAnt.addEventListener('click', () => irParaLetra(ALFABETO[idx - 1], 'esq'));
   }
+  const pagina = el('div', { class: 'caderno-pagina' }, [
+    el('span', { class: 'caderno-letra-atual' }, letra),
+    el('span', { class: 'caderno-pos' }, `${idx + 1} / 26`),
+  ]);
+  const btnPrx = el('button', {
+    class: 'caderno-seta dir' + (idx === ALFABETO.length - 1 ? ' invisivel' : ''),
+    'aria-label': idx < ALFABETO.length - 1 ? 'próxima letra ' + ALFABETO[idx + 1] : 'sem próxima',
+  }, '▶');
   if (idx < ALFABETO.length - 1) {
-    navega.appendChild(el('button', {
-      class: 'botao secundario pequeno',
-      onClick: () => navegar('letra-detalhe', { letra: ALFABETO[idx + 1] })
-    }, ALFABETO[idx + 1] + ' →'));
+    btnPrx.addEventListener('click', () => irParaLetra(ALFABETO[idx + 1], 'dir'));
   }
+  navega.appendChild(btnAnt);
+  navega.appendChild(pagina);
+  navega.appendChild(btnPrx);
   wrap.appendChild(navega);
+
+  function irParaLetra(novaLetra, direcao) {
+    // Anima saída + nova render
+    wrap.style.transition = 'transform 0.22s ease, opacity 0.22s ease';
+    wrap.style.transform = `translateX(${direcao === 'dir' ? '-' : ''}24px)`;
+    wrap.style.opacity = '0';
+    setTimeout(() => navegar('letra-detalhe', { letra: novaLetra }), 200);
+  }
+
+  // Swipe horizontal: arrasta dedo > 60px = troca página
+  let touchStartX = null;
+  wrap.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  wrap.addEventListener('touchend', (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    touchStartX = null;
+    if (Math.abs(dx) < 60) return;
+    if (dx > 0 && idx > 0) irParaLetra(ALFABETO[idx - 1], 'esq');
+    else if (dx < 0 && idx < ALFABETO.length - 1) irParaLetra(ALFABETO[idx + 1], 'dir');
+  }, { passive: true });
 
   tela.appendChild(wrap);
 }
