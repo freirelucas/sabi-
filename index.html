@@ -191,8 +191,19 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 }
 .loader-barra {
   height: 100%; width: 0;
-  background: var(--laranja);
+  background: linear-gradient(90deg, var(--laranja-vivo, #C9622E), #F4D35E, var(--laranja-vivo, #C9622E));
+  background-size: 200% 100%;
   transition: width 0.3s ease;
+  /* v9.0: shimmer enquanto carrega — sensação de "está vivo" */
+  animation: loader-shimmer 1.4s linear infinite;
+}
+@keyframes loader-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+/* v9.0: texto rotativo do loader */
+.loader-texto {
+  transition: opacity 0.3s ease;
 }
 .loader-pular {
   margin-top: 24px;
@@ -1781,6 +1792,45 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   letter-spacing: 0.06em;
 }
 .letra-card:active .codigo { color: white; }
+
+/* v9.0: vogais e consoantes — categoria visual sem precisar ler */
+.letra-card.vogal {
+  background: rgba(244, 211, 94, 0.32); /* amarelo suave */
+  border-color: rgba(232, 164, 92, 0.55);
+}
+.letra-card.vogal .l {
+  color: #B8541F; /* laranja queimado, contraste maior no amarelo */
+}
+.letra-card.consoante {
+  /* mantém o look default */
+}
+
+/* v9.0: marca de visitada — ✓ verde no canto superior direito */
+.letra-card { position: relative; }
+.letra-card.visitada {
+  /* sutil tonalização verde pra indicar "já estive aqui" */
+  background: linear-gradient(180deg,
+    rgba(111, 174, 92, 0.10) 0%,
+    var(--papel-medio) 60%);
+  border-color: rgba(111, 174, 92, 0.5);
+}
+.letra-card.visitada.vogal {
+  background: linear-gradient(180deg,
+    rgba(111, 174, 92, 0.10) 0%,
+    rgba(244, 211, 94, 0.32) 60%);
+}
+.letra-card .visita-marca {
+  position: absolute;
+  top: 4px; right: 6px;
+  width: 18px; height: 18px;
+  display: grid; place-items: center;
+  background: #6FAE5C;
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
 
 /* Tela de detalhe da letra */
 .letra-detalhe {
@@ -3434,6 +3484,11 @@ const MORSE = {
   P: '.--.',  Q: '--.-',  R: '.-.',   S: '...',   T: '-',
   U: '..-',   V: '...-',  W: '.--',   X: '-..-',  Y: '-.--',
   Z: '--..',
+  // v9.0: dígitos 0-9 — Bento tem 5 anos! Padrão regular: cada nº n vira
+  // n pontos + (5-n) traços (1=.----, 2=..---, ...). 0=----- e 5=.....
+  // são os extremos memoráveis.
+  '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-',
+  '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.',
 };
 
 // Calcula timing musical do Morse.
@@ -5330,6 +5385,15 @@ function renderCena(tela, cena) {
     class: 'botao laranja',
     onClick: () => {
       State.cumpridas.add('cena-' + State.cenaIdx); salvarEstado();
+      // v9.0: trinado curto de transição — sensação de "página virada".
+      // Tom alto rápido (G5) seguido de tom mais alto (B5) sintetizados pelo
+      // sabiá. Não atrapalha o fluxo (~150ms), só dá o feedback de avanço.
+      Audio.unlock();
+      try {
+        const t = Audio.now();
+        Audio.playSabiaTom(t, 79, 0.08, 0.35);        // G5
+        Audio.playSabiaTom(t + 0.09, 83, 0.10, 0.35); // B5
+      } catch(e) {}
       if (State.cenaIdx < ROTEIRO.length - 1) {
         navegar('historia', { cenaIdx: State.cenaIdx + 1 });
       } else {
@@ -5352,176 +5416,7 @@ function renderCena(tela, cena) {
 function renderAcaoCena(container, cena) {
   const a = cena.acao;
   if (!a) return;
-  if (a.tipo === 'ouvir-canto') {
-    container.appendChild(el('div', { class: 'cena-acoes' }, [
-      el('button', {
-        class: 'botao amarelo',
-        onClick: () => { Audio.unlock(); Audio.playCantoSabiaFloreio(); }
-      }, '🐦 ouvir o canto'),
-    ]));
-  } else if (a.tipo === 'aprender-letras') {
-    // Mostra cada letra com botão de ouvir
-    const grid = el('div', { style: 'display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:6px 0;' });
-    a.letras.forEach(letra => {
-      const cod = MORSE[letra];
-      grid.appendChild(el('button', {
-        class: 'letra-card',
-        style: 'min-width:64px;',
-        onClick: () => {
-          Audio.unlock();
-          tocarSequencia(cod, { voz: 'sabia' });
-        }
-      }, [
-        el('span', { class: 'l' }, letra),
-        el('span', { class: 'codigo' }, cod.replaceAll('.','·').replaceAll('-','–')),
-      ]));
-    });
-    container.appendChild(grid);
-  } else if (a.tipo === 'apresentar-nomes') {
-    const grid = el('div', { style: 'display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin:6px 0;' });
-    a.nomes.forEach(nome => {
-      grid.appendChild(el('button', {
-        class: 'botao secundario pequeno',
-        style: 'flex-direction:column; padding:8px 14px; min-height:60px; line-height:1.1;',
-        onClick: () => {
-          Audio.unlock();
-          tocarSequencia(palavraParaMorse(nome), { voz: 'sabia' });
-        }
-      }, [
-        el('span', { style: 'font-size:16px; font-weight:900;' }, nome),
-        el('span', { style: 'font-size:11px; opacity:0.7; font-family:var(--body); font-weight:700; letter-spacing:0.06em;' },
-          palavraParaMorse(nome).replaceAll('.','·').replaceAll('-','–')),
-      ]));
-    });
-    container.appendChild(grid);
-  } else if (a.tipo === 'curto-longo') {
-    // Pulso visual contínuo: a cabeça de compasso pulsa no tempo do BPM, mostrando
-    // que tem uma frase rolando — os toques · e – encaixam nesse pulso.
-    const compasso = criarCompasso('pulso');
-    container.appendChild(compasso);
-    const T = calcularTiming(State.bpm);
-    const desligar = ativarCompasso(compasso, T.beat);
-    State.cleanupAtual = desligar;
-
-    const dispEl = el('div', { class: 'morse-display', style: 'font-size:48px; min-height:60px;' });
-    container.appendChild(dispEl);
-
-    // v7: botões grandes com legenda Sol/Ré + corda paralela (referência).
-    const fileira = el('div', { style: 'display:flex; gap:14px; justify-content:center; margin: 8px 0;' });
-    fileira.appendChild(el('button', {
-      class: 'botao-grande-icone amarelo com-legenda',
-      'aria-label': 'tocar um ponto curto, corda Sol',
-      onClick: () => {
-        Audio.unlock();
-        Audio.playElemento('.', 'sabia', undefined, T.ponto);
-        Audio.playReferenciaCorda('.', undefined, T.ponto);
-        const s = el('span', { class: 'ponto', html: State.notacaoBinaria ? '0' : '·' });
-        s.style.fontSize = '40px'; s.style.color = 'var(--sol-violao)';
-        dispEl.appendChild(s);
-        if (dispEl.children.length > 12) dispEl.firstChild.remove();
-      }
-    }, [
-      el('span', { class: 'sinal' }, State.notacaoBinaria ? '0' : '·'),
-      el('span', { class: 'legenda-corda' }, 'Sol'),
-    ]));
-    fileira.appendChild(el('button', {
-      class: 'botao-grande-icone com-legenda',
-      style: 'background: var(--re-violao); width:120px; border-radius:40px;',
-      'aria-label': 'tocar um traço longo, corda Ré',
-      onClick: () => {
-        Audio.unlock();
-        Audio.playElemento('-', 'sabia', undefined, T.traco);
-        Audio.playReferenciaCorda('-', undefined, T.traco);
-        const s = el('span', { class: 'traco', html: State.notacaoBinaria ? '1' : '–' });
-        s.style.fontSize = '48px'; s.style.color = 'var(--re-violao)';
-        dispEl.appendChild(s);
-        if (dispEl.children.length > 12) dispEl.firstChild.remove();
-      }
-    }, [
-      el('span', { class: 'sinal' }, State.notacaoBinaria ? '1' : '–'),
-      el('span', { class: 'legenda-corda' }, 'Ré'),
-    ]));
-    container.appendChild(fileira);
-  } else if (a.tipo === 'aula-sos') {
-    // Aula sobre SOS: três pontos / três traços / três pontos.
-    // Pulso visual contínuo + botão pra ouvir o SOS inteiro + botões · / – pra brincar.
-    const compasso = criarCompasso('pulso');
-    container.appendChild(compasso);
-    let T = calcularTiming(State.bpm);
-    State.cleanupAtual = ativarCompasso(compasso, T.beat);
-
-    container.appendChild(criarSeletorVelocidade((novoBpm) => {
-      T = calcularTiming(novoBpm);
-      State.cleanupAtual = ativarCompasso(compasso, T.beat);
-    }));
-
-    // SOS escrito em três grupos visualmente distintos
-    const sosWrap = el('div', {
-      class: 'sos-display',
-      'aria-label': 'sequência SOS em código Morse',
-    });
-    const grupos = [
-      { simb: '·', cor: 'var(--sol-violao)', n: 3, cls: 'ponto' },
-      { simb: '–', cor: 'var(--re-violao)',  n: 3, cls: 'traco' },
-      { simb: '·', cor: 'var(--sol-violao)', n: 3, cls: 'ponto' },
-    ];
-    grupos.forEach((g, i) => {
-      const grupo = el('div', { class: 'sos-grupo' });
-      for (let k = 0; k < g.n; k++) {
-        grupo.appendChild(el('span', {
-          class: g.cls,
-          style: `color: ${g.cor};`,
-        }, State.notacaoBinaria ? (g.cls === 'ponto' ? '0' : '1') : g.simb));
-      }
-      sosWrap.appendChild(grupo);
-    });
-    container.appendChild(sosWrap);
-
-    // Letra "SOS" em texto pequeno pra associação
-    container.appendChild(el('div', {
-      style: 'text-align:center; font-family: var(--display); font-weight: 800; font-size: 22px; letter-spacing: 0.18em; color: var(--marrom); margin: 4px 0 8px;'
-    }, 'S O S'));
-
-    const acoesEl = el('div', { class: 'cena-acoes', style: 'flex-wrap: wrap; gap: 8px;' });
-    acoesEl.appendChild(el('button', {
-      class: 'botao laranja',
-      onClick: () => {
-        Audio.unlock();
-        const seq = MORSE['S'] + ' ' + MORSE['O'] + ' ' + MORSE['S'];
-        const elementos = sosWrap.querySelectorAll('.ponto, .traco');
-        tocarSequencia(seq, {
-          voz: 'sabia',
-          compasso,
-          onElemento: (ch, i) => {
-            elementos.forEach(x => x.classList.remove('ativo'));
-            if (elementos[i]) {
-              elementos[i].classList.add('ativo');
-              setTimeout(() => elementos[i] && elementos[i].classList.remove('ativo'), 200);
-            }
-          },
-        });
-      }
-    }, '🆘 ouvir SOS'));
-    acoesEl.appendChild(el('button', {
-      class: 'botao secundario pequeno',
-      'aria-label': 'tocar um ponto curto, corda Sol',
-      onClick: () => {
-        Audio.unlock();
-        Audio.playElemento('.', 'sabia', undefined, T.ponto);
-        Audio.playReferenciaCorda('.', undefined, T.ponto);
-      }
-    }, State.notacaoBinaria ? '0 curto · Sol' : '· curto · Sol'));
-    acoesEl.appendChild(el('button', {
-      class: 'botao secundario pequeno',
-      'aria-label': 'tocar um traço longo, corda Ré',
-      onClick: () => {
-        Audio.unlock();
-        Audio.playElemento('-', 'sabia', undefined, T.traco);
-        Audio.playReferenciaCorda('-', undefined, T.traco);
-      }
-    }, State.notacaoBinaria ? '1 longo · Ré' : '– longo · Ré'));
-    container.appendChild(acoesEl);
-  } else if (a.tipo === 'familia-apresentacao') {
+  if (a.tipo === 'familia-apresentacao') {
     // v8 E1/E2: cena Em casa / Os paios e maios. N nomes (4 ou 2) + N combos
     // afetivos (PAPA-TO etc). Cada nome individual mostra balão de fala + botão
     // pra tocar Morse com decomposição. Combos tocam sequência das 2 palavras
@@ -6218,213 +6113,6 @@ function renderAcaoCena(container, cena) {
 
     posicionarPersonagens();
     atualizaStatus();
-  } else if (a.tipo === 'revelar-bento') {
-    container.appendChild(el('div', { class: 'palavra-display' }, 'BENTO'));
-    container.appendChild(el('div', {
-      class: 'morse-display',
-      style: 'font-size: 36px; min-height: 50px;',
-      html: renderMorse(palavraParaMorse('BENTO'))
-    }));
-    container.appendChild(el('div', { class: 'cena-acoes' }, [
-      el('button', {
-        class: 'botao laranja',
-        onClick: () => {
-          Audio.unlock();
-          tocarSequencia(palavraParaMorse('BENTO'), { voz: 'sabia' });
-        }
-      }, '🐦 ouvir BENTO'),
-      el('button', {
-        class: 'botao secundario',
-        onClick: () => {
-          Audio.unlock();
-          tocarSequencia(palavraParaMorse('BENTO'), { voz: 'violao' });
-        }
-      }, '🎸 na guitarra'),
-    ]));
-  } else if (a.tipo === 'parabens-nena') {
-    // Sequência: PARABENS NENA NENA NENA NENA — toca o nome dela 4 vezes seguidas
-    const seqMorse = palavraParaMorse('PARABENS NENA NENA NENA NENA');
-    container.appendChild(el('div', { class: 'palavra-display' }, 'PARABÉNS NENA'));
-    // Morse em duas linhas (PARABENS / NENA) pra não transbordar em telas pequenas
-    const morseWrap = el('div', { style: 'display:flex; flex-direction:column; align-items:center; gap:4px; margin: 6px 0;' });
-    morseWrap.appendChild(el('div', {
-      class: 'morse-display',
-      style: 'font-size: clamp(16px, 4vw, 22px); min-height: 28px; margin: 0;',
-      html: renderMorse(palavraParaMorse('PARABENS'))
-    }));
-    morseWrap.appendChild(el('div', {
-      class: 'morse-display',
-      style: 'font-size: clamp(16px, 4vw, 22px); min-height: 28px; margin: 0;',
-      html: renderMorse(palavraParaMorse('NENA'))
-    }));
-    container.appendChild(morseWrap);
-    container.appendChild(el('div', {
-      style: 'text-align:center; font-family: var(--display); font-style:italic; color: var(--marrom-claro); font-size: 14px; margin-top: 4px;'
-    }, 'Nena · Nena · Nena · Nena'));
-    container.appendChild(el('div', { class: 'cena-acoes', style: 'flex-wrap:wrap;' }, [
-      el('button', {
-        class: 'botao amarelo',
-        onClick: () => {
-          Audio.unlock();
-          tocarSequencia(seqMorse, { voz: 'sabia' });
-          setTimeout(() => celebrar(40), 200);
-        }
-      }, '🎂 cantar parabéns'),
-      el('button', {
-        class: 'botao secundario',
-        onClick: () => {
-          Audio.unlock();
-          tocarSequencia(seqMorse, { voz: 'violao' });
-          setTimeout(() => celebrar(30), 200);
-        }
-      }, '🎸 na guitarra'),
-    ]));
-  } else if (a.tipo === 'surpresa-letras') {
-    // Cada criança traz duas letras pra construir PARABENS NENA
-    const dist = a.distribuicao;
-    const palavraAlvo = 'PARABENS NENA';
-    const entregues = []; // [{ letra, quem }]
-    const entregueSet = new Set();
-
-    // Display da palavra com slots vazios → preenchidos
-    const palavraDisplay = el('div', {
-      class: 'palavra-display',
-      style: 'font-size: clamp(26px, 7vw, 38px); letter-spacing: 0.16em; min-height: 1.3em; margin-top: 4px;',
-      'aria-live': 'polite',
-      'aria-label': 'palavra sendo formada',
-    });
-    const renderDisplay = () => {
-      palavraDisplay.innerHTML = '';
-      let idx = 0;
-      palavraAlvo.split('').forEach((ch) => {
-        if (ch === ' ') {
-          const sp = document.createElement('span');
-          sp.style.cssText = 'display:inline-block; width:0.6em;';
-          palavraDisplay.appendChild(sp);
-        } else {
-          const filled = idx < entregues.length;
-          const span = document.createElement('span');
-          span.textContent = filled ? entregues[idx].letra : '_';
-          span.style.cssText = filled
-            ? 'color: var(--marrom); animation: letraPousa 0.35s ease;'
-            : 'color: var(--marrom-claro); opacity: 0.32;';
-          palavraDisplay.appendChild(span);
-          idx++;
-        }
-      });
-    };
-    renderDisplay();
-    container.appendChild(palavraDisplay);
-
-    // Morse em construção (pequeno, abaixo)
-    const morseDisplay = el('div', {
-      class: 'morse-display',
-      style: 'font-size: clamp(13px, 3.2vw, 17px); min-height: 22px; opacity: 0.55; margin: 4px 0 6px;',
-    });
-    const renderMorseProgresso = () => {
-      const txt = entregues.map(e => e.letra).join('');
-      if (!txt) { morseDisplay.innerHTML = ''; return; }
-      const comEspaco = txt.length > 8 ? txt.slice(0, 8) + ' ' + txt.slice(8) : txt;
-      morseDisplay.innerHTML = renderMorse(palavraParaMorse(comEspaco));
-    };
-    renderMorseProgresso();
-    container.appendChild(morseDisplay);
-
-    // Status / contador
-    const status = el('div', {
-      style: 'text-align:center; font-family: var(--display); font-style:italic; color: var(--marrom-claro); font-size: 13px; margin: 2px 0 8px;',
-      'aria-live': 'polite',
-    }, '0 de 12 letras');
-    container.appendChild(status);
-
-    // Grid 3×2 das crianças
-    const grid = el('div', {
-      style: 'display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 0 4px 4px;',
-    });
-
-    const renderGrid = () => {
-      grid.innerHTML = '';
-      dist.forEach(item => {
-        const ja = entregueSet.has(item.quem);
-        const card = el('button', {
-          style: `display:flex; flex-direction:column; align-items:center; gap:3px;
-                  padding: 8px 4px;
-                  background: ${ja ? 'var(--papel-fundo)' : 'white'};
-                  border: 2px solid ${ja ? 'var(--folha)' : 'var(--marrom-claro)'};
-                  border-radius: 14px;
-                  box-shadow: var(--sombra-suave);
-                  opacity: ${ja ? 0.6 : 1};
-                  transition: transform 0.1s, opacity 0.2s;
-                  min-height: 110px;`,
-          'aria-label': ja
-            ? `${item.nome} já entregou ${item.letras.join(' e ')}`
-            : `${item.nome} traz as letras ${item.letras.join(' e ')}`,
-          ...(ja ? { disabled: 'true' } : {}),
-          onClick: () => {
-            if (entregueSet.has(item.quem)) return;
-            entregueSet.add(item.quem);
-            item.letras.forEach(l => entregues.push({ letra: l, quem: item.quem }));
-            renderDisplay();
-            renderMorseProgresso();
-            renderGrid();
-            atualizaStatus();
-            Audio.unlock();
-            // Toca as duas letras em Morse, com espaço entre
-            const seq = item.letras.map(l => MORSE[l]).join(' ');
-            tocarSequencia(seq, { voz: 'sabia' });
-          },
-        });
-
-        // Mini SVG do passarinho
-        const svgWrap = passaroSVG(item.quem);
-        const svgEl = svgWrap.querySelector('svg');
-        if (svgEl) {
-          svgEl.style.width = '48px';
-          svgEl.style.height = '48px';
-          svgEl.style.transform = 'scale(1)';
-          svgEl.style.flexShrink = '0';
-        }
-        card.appendChild(svgWrap);
-
-        card.appendChild(el('div', {
-          style: 'font-family: var(--display); font-weight: 700; font-size: 12px; color: var(--marrom);'
-        }, item.nome));
-
-        card.appendChild(el('div', {
-          style: `font-family: var(--display); font-weight: 900; font-size: 17px;
-                  color: ${ja ? 'var(--folha)' : 'var(--laranja-vivo)'};
-                  letter-spacing: 0.12em;`
-        }, ja ? '✓ ' + item.letras.join('') : item.letras.join('')));
-
-        grid.appendChild(card);
-      });
-    };
-
-    const atualizaStatus = () => {
-      const n = entregues.length;
-      if (n === 12) {
-        status.innerHTML = '🎉 <b>pronto!</b> agora cantar pra Nena';
-        status.style.color = 'var(--laranja-vivo)';
-        status.style.fontStyle = 'normal';
-        setTimeout(() => celebrar(20), 100);
-      } else {
-        status.textContent = `${n} de 12 letras`;
-      }
-    };
-
-    renderGrid();
-    container.appendChild(grid);
-  } else if (a.tipo === 'final') {
-    container.appendChild(el('div', { class: 'cena-acoes' }, [
-      el('button', {
-        class: 'botao amarelo',
-        onClick: () => {
-          Audio.unlock();
-          Audio.playCantoSabiaFloreio();
-          setTimeout(() => celebrar(40), 200);
-        }
-      }, '🎉 cantar todos juntos'),
-    ]));
   }
 }
 
@@ -6706,16 +6394,33 @@ function renderTeclado(tela) {
    ============================================================ */
 function renderLetras(tela) {
   const wrap = el('div', {});
+
+  // v9.0: contador de letras visitadas pra dar sentido de progresso
+  const visitadas = Array.from(State.cumpridas).filter(c => c.startsWith('letra:')).length;
+  const subtitulo = visitadas === 0
+    ? '26 letras, 26 palavras. Toca pra ver e ouvir.'
+    : `${visitadas}/26 letras visitadas — continua!`;
   wrap.appendChild(el('p', {
     style: 'text-align:center; font-family: var(--display); font-style:italic; color: var(--tinta-suave); font-size: 15px; margin: 8px 0 12px;'
-  }, '26 letras, 26 palavras. Toca pra ver e ouvir.'));
+  }, subtitulo));
+
+  // v9.0: vogais com fundo amarelo, consoantes com cor padrão.
+  // Categoria visual sem precisar ler — Bento de 5 anos diferencia
+  // por cor antes de saber dizer "vogal".
+  const VOGAIS = new Set(['A', 'E', 'I', 'O', 'U']);
 
   const grade = el('div', { class: 'letras-grade' });
   for (const letra of ALFABETO) {
     const palavra = PALAVRAS_LETRA[letra];
     const cod = MORSE[letra];
-    grade.appendChild(el('button', {
-      class: 'letra-card',
+    const visitada = State.cumpridas.has('letra:' + letra);
+    const classes = [
+      'letra-card',
+      VOGAIS.has(letra) ? 'vogal' : 'consoante',
+      visitada ? 'visitada' : '',
+    ].filter(Boolean).join(' ');
+    const card = el('button', {
+      class: classes,
       onClick: () => {
         Audio.unlock();
         navegar('letra-detalhe', { letra });
@@ -6727,7 +6432,11 @@ function renderLetras(tela) {
         State.notacaoBinaria
           ? cod.replaceAll('.','0').replaceAll('-','1')
           : cod.replaceAll('.','·').replaceAll('-','–')),
-    ]));
+    ]);
+    if (visitada) {
+      card.appendChild(el('span', { class: 'visita-marca', 'aria-label': 'já visitou' }, '✓'));
+    }
+    grade.appendChild(card);
   }
   wrap.appendChild(grade);
   tela.appendChild(wrap);
@@ -6737,6 +6446,12 @@ function renderLetraDetalhe(tela, letra) {
   const lista = PALAVRAS_LETRA_LISTA[letra] || [PALAVRAS_LETRA[letra]];
   let palavraAtual = lista[0];
   const codLetra = MORSE[letra];
+
+  // v9.0: marca como visitada ao entrar (pra grade mostrar ✓ ao voltar)
+  if (!State.cumpridas.has('letra:' + letra)) {
+    State.cumpridas.add('letra:' + letra);
+    salvarEstado();
+  }
 
   const wrap = el('div', { class: 'letra-detalhe' });
 
@@ -6818,28 +6533,43 @@ function renderLetraDetalhe(tela, letra) {
 
   // Botões
   const botoes = el('div', { class: 'cena-acoes', style: 'flex-wrap:wrap;' });
-  botoes.appendChild(el('button', {
-    class: 'botao laranja',
-    onClick: () => {
-      Audio.unlock();
-      const els = morseLetra.querySelectorAll('.ponto, .traco');
-      const pulsos = tempo.querySelectorAll('.tempo-pulso');
-      tocarSequencia(codLetra, {
-        voz: 'sabia',
-        compasso: compassoLetra,
-        onElemento: (ch, i) => {
-          els.forEach(e => e.classList.remove('ativo'));
-          pulsos.forEach(p => p.classList.remove('ativo'));
-          if (els[i]) { els[i].classList.add('ativo'); setTimeout(() => els[i].classList.remove('ativo'), 250); }
-          if (pulsos[i]) { pulsos[i].classList.add('ativo'); setTimeout(() => pulsos[i].classList.remove('ativo'), 250); }
-        }
-      });
-    }
-  }, '▶ ouvir letra'));
+
+  // v9.0: "ouvir letra" virou toggle de LOOP INFINITO (como em Coleguinhas).
+  // Criança de 5 anos quer ouvir 10x sem clicar 10x. Quando tocando vira "⏸ parar".
+  const btnOuvir = el('button', { class: 'botao laranja' }, '🔁 ouvir letra');
+  let tocandoLetra = false;
+  function pararLetra() {
+    pararLoop();
+    tocandoLetra = false;
+    btnOuvir.textContent = '🔁 ouvir letra';
+    btnOuvir.classList.remove('tocando');
+  }
+  btnOuvir.addEventListener('click', () => {
+    Audio.unlock();
+    if (tocandoLetra) { pararLetra(); return; }
+    tocandoLetra = true;
+    btnOuvir.textContent = '⏸ parar';
+    btnOuvir.classList.add('tocando');
+    const els = morseLetra.querySelectorAll('.ponto, .traco');
+    const pulsos = tempo.querySelectorAll('.tempo-pulso');
+    tocarSequencia(codLetra, {
+      voz: 'sabia',
+      compasso: compassoLetra,
+      infinito: true,
+      onElemento: (ch, i) => {
+        els.forEach(e => e.classList.remove('ativo'));
+        pulsos.forEach(p => p.classList.remove('ativo'));
+        if (els[i]) { els[i].classList.add('ativo'); setTimeout(() => els[i].classList.remove('ativo'), 250); }
+        if (pulsos[i]) { pulsos[i].classList.add('ativo'); setTimeout(() => pulsos[i].classList.remove('ativo'), 250); }
+      }
+    });
+  });
+  botoes.appendChild(btnOuvir);
   botoes.appendChild(el('button', {
     class: 'botao',
     onClick: () => {
       Audio.unlock();
+      pararLetra();
       const codAtual = palavraParaMorse(palavraAtual);
       const els = morsePalavra.querySelectorAll('.ponto, .traco');
       tocarSequencia(codAtual, {
@@ -6856,6 +6586,7 @@ function renderLetraDetalhe(tela, letra) {
     class: 'botao secundario',
     onClick: () => {
       Audio.unlock();
+      pararLetra();
       tocarSequencia(palavraParaMorse(palavraAtual), { voz: 'violao' });
     }
   }, '🎸 guitarra'));
@@ -6939,15 +6670,39 @@ async function inicializar() {
   const loaderEl = $('#loader');
   const loaderBarra = $('#loader-barra');
   const loaderPular = $('#loader-pular');
+  const loaderTexto = $('#loader-texto');
 
   let appJaIniciado = false;
   function fecharLoader() {
     if (appJaIniciado) return;
     appJaIniciado = true;
+    if (rotacaoTextoId) clearInterval(rotacaoTextoId);
     loaderEl.classList.add('escondido');
     setTimeout(() => loaderEl && loaderEl.parentNode && loaderEl.remove(), 600);
     renderApp();
   }
+
+  // v9.0: frases rotativas no loader. Refresca a cada 400ms; criança
+  // não acha que travou. Ordem: tom afetivo → técnico → final.
+  const FRASES_LOADER = [
+    'preparando o sabiá…',
+    'afinando o bico…',
+    'pegando os lápis…',
+    'quase lá…',
+  ];
+  let rotacaoTextoId = null;
+  let fraseIdx = 0;
+  rotacaoTextoId = setInterval(() => {
+    if (!loaderTexto || appJaIniciado) return;
+    fraseIdx = (fraseIdx + 1) % FRASES_LOADER.length;
+    loaderTexto.style.opacity = '0';
+    setTimeout(() => {
+      if (loaderTexto) {
+        loaderTexto.textContent = FRASES_LOADER[fraseIdx];
+        loaderTexto.style.opacity = '1';
+      }
+    }, 220);
+  }, 400);
 
   // Botão "pular →" desde 0.5s — usuário sai rápido se quiser.
   setTimeout(() => loaderPular.classList.add('visivel'), 500);
