@@ -2548,6 +2548,99 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   border-color: rgba(90, 120, 160, 0.28);
 }
 
+/* v9.3: TOUR de Coleguinhas — apresentação 1 a 1 antes do grid */
+.coleguinhas-tour, .coleguinhas-grid-area {
+  width: 100%;
+  transition: opacity 0.3s ease;
+}
+.coleguinhas-tour.escondido, .coleguinhas-grid-area.escondido { display: none; }
+.coleguinhas-tour {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px;
+  padding: 8px 8px 16px;
+}
+.tour-pos {
+  font-family: var(--display); font-style: italic;
+  font-size: 13px;
+  color: var(--tinta-suave);
+}
+.tour-sabia-wrap {
+  display: flex; justify-content: center;
+  animation: tour-sabia-balanca 3s ease-in-out infinite;
+}
+@keyframes tour-sabia-balanca {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50%      { transform: translateY(-4px) rotate(1.5deg); }
+}
+.tour-fala {
+  text-align: center;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.tour-fala-texto {
+  font-family: var(--display); font-weight: 800;
+  font-size: clamp(22px, 6vw, 28px);
+  color: var(--cor-acento, #C9622E);
+}
+.tour-fala-papel {
+  font-size: 13px; font-style: italic;
+  color: var(--tinta-suave);
+}
+.tour-nav {
+  display: flex; gap: 10px; justify-content: center;
+  width: 100%; max-width: 360px;
+  margin-top: 8px;
+}
+.tour-btn-principal, .tour-btn-secundario {
+  flex: 1;
+  min-height: 50px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-family: var(--display); font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.12s, background 0.18s;
+}
+.tour-btn-principal {
+  background: var(--laranja-vivo, #C9622E);
+  color: white;
+  border-color: var(--laranja-vivo, #C9622E);
+}
+.tour-btn-principal.verde {
+  background: #6FAE5C;
+  border-color: #5C9C4D;
+}
+.tour-btn-secundario {
+  background: var(--papel-medio);
+  color: var(--tinta);
+  border-color: rgba(120, 90, 60, 0.25);
+}
+.tour-btn-secundario.invisivel { visibility: hidden; }
+.tour-btn-principal:active, .tour-btn-secundario:active { transform: scale(0.95); }
+.tour-pular {
+  background: transparent; border: none;
+  font-family: var(--display); font-style: italic;
+  font-size: 12px;
+  color: var(--tinta-suave);
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-top: 4px;
+}
+.btn-refazer-tour {
+  background: transparent;
+  border: 1.5px dashed rgba(120, 90, 60, 0.35);
+  border-radius: 12px;
+  font-family: var(--display); font-weight: 600;
+  font-size: 13px;
+  color: var(--tinta-suave);
+  cursor: pointer;
+  padding: 8px 14px;
+  margin: 12px auto 4px;
+  display: block;
+  transition: background 0.18s;
+}
+.btn-refazer-tour:active { background: rgba(244, 211, 94, 0.22); }
+
 /* v9.1 (C2): cabeçalho do painel de decomposição com sabiá entrando */
 .decomp-cabec-novo {
   display: flex; align-items: center; gap: 12px;
@@ -4385,9 +4478,13 @@ function criarDecomposicaoNome(nome, voz = 'sabia') {
   return { wrap, tocarTudo, tocarLetra, parar: pararTudoLocal };
 }
 
-// Renderiza Morse em HTML respeitando notação atual
-function renderMorse(seq) {
-  const sym = State.notacaoBinaria
+// Renderiza Morse em HTML.
+// v9.3: padrão SEMPRE · / − (Lucas: "mantenha padrão ponto e traço").
+// 0/1 é alternativa que só aparece no ALFABETO (grade de letras + teclado-
+// explorar) — chame com renderMorse(seq, { binario: true }) nesses lugares.
+function renderMorse(seq, opts = {}) {
+  const binario = opts.binario === true;
+  const sym = binario
     ? { '.': '0', '-': '1' }
     : { '.': '·', '-': '–' };
   return seq.split('').map(ch => {
@@ -4977,6 +5074,11 @@ function renderColeguinhas(tela) {
     },
   ];
 
+  // v9.3: lista plana (Nena + 8 amigos) pra modo TOUR — uma apresentação
+  // por vez, antes do grid coletivo. Lucas: "apresentar os personagens
+  // individuais antes da tela coletiva".
+  const todos = grupos.flatMap(g => g.itens);
+
   const wrap = el('div', { class: 'coleguinhas' });
   wrap.appendChild(el('div', { class: 'coleguinhas-intro' }, [
     el('div', { class: 'coleguinhas-titulo' }, 'A turma da Escola dos Sabiás'),
@@ -4984,6 +5086,14 @@ function renderColeguinhas(tela) {
       'Toca em cada um pra conhecer — eles cantam o próprio nome em Morse.'),
   ]));
 
+  // ===== Modo TOUR: 1 coleguinha por vez =====
+  // Default: tour ativo. Botão "ver todos" alterna pra grid completo.
+  const tourCumprido = State.cumpridas.has('coleguinhas-tour');
+  let modoView = tourCumprido ? 'grid' : 'tour';
+  let tourIdx = 0;
+
+  const tourArea = el('div', { class: 'coleguinhas-tour' });
+  const gridArea = el('div', { class: 'coleguinhas-grid-area' });
   const painel = el('div', { class: 'decomp-painel escondido' });
 
   let decompAtual = null;
@@ -5011,7 +5121,7 @@ function renderColeguinhas(tela) {
     decompAtual = criarDecomposicaoNome(item.nome.toUpperCase(), 'sabia');
     painel.appendChild(decompAtual.wrap);
     // v9.2: seletor 3-velocidades (sem guepardo)
-    painel.appendChild(criarSeletorVelocidadeReduzido(() => {
+    painel.appendChild(criarSeletorVelocidade(() => {
       // BPM mudou — re-render decomp
       const it = item;
       decompAtual.parar();
@@ -5027,7 +5137,7 @@ function renderColeguinhas(tela) {
     });
   }
 
-  // Renderiza cada grupo com header + grade
+  // Renderiza cada grupo com header + grade — vai DENTRO de gridArea
   grupos.forEach(grupo => {
     const sec = el('section', { class: 'coleguinha-grupo grupo-' + grupo.cor });
     sec.appendChild(el('div', { class: 'coleguinha-grupo-titulo' }, grupo.titulo));
@@ -5050,8 +5160,121 @@ function renderColeguinhas(tela) {
       grid.appendChild(card);
     });
     sec.appendChild(grid);
-    wrap.appendChild(sec);
+    gridArea.appendChild(sec);
   });
+
+  // ===== Função do TOUR =====
+  function renderTour() {
+    tourArea.innerHTML = '';
+    const item = todos[tourIdx];
+    const eh_a = item.quem === 'nena' || ['Tata','Tete','Caca','Jo','Lila'].includes(item.nome);
+
+    // Header com posição
+    tourArea.appendChild(el('div', { class: 'tour-pos' },
+      `${tourIdx + 1} / ${todos.length}`));
+
+    // Sabiá grande
+    const svgWrap = el('div', { class: 'tour-sabia-wrap' });
+    const svg = passaroSVG(item.quem);
+    if (svg) {
+      svg.style.width = '110px'; svg.style.height = '110px';
+      svg.style.transform = 'scale(1)';
+      svg.classList.add('tour-sabia-svg');
+      svgWrap.appendChild(svg);
+    }
+    tourArea.appendChild(svgWrap);
+
+    // Fala "oi, eu sou X!"
+    tourArea.appendChild(el('div', { class: 'tour-fala' }, [
+      el('div', { class: 'tour-fala-texto' },
+        `oi, eu sou ${eh_a ? 'a ' : 'o '}${item.nome}!`),
+      el('div', { class: 'tour-fala-papel' }, item.papel),
+    ]));
+
+    // Decomposição em loop
+    const decomp = criarDecomposicaoNome(item.nome.toUpperCase(), 'sabia');
+    tourArea.appendChild(decomp.wrap);
+    setTimeout(() => decomp && decomp.tocarTudo(), 350);
+
+    // Seletor velocidade (4 chips, com guepardo)
+    tourArea.appendChild(criarSeletorVelocidade(() => decomp.parar()));
+
+    // Navegação
+    const nav = el('div', { class: 'tour-nav' });
+    nav.appendChild(el('button', {
+      class: 'tour-btn-secundario' + (tourIdx === 0 ? ' invisivel' : ''),
+      onClick: () => {
+        decomp.parar();
+        tourIdx = Math.max(0, tourIdx - 1);
+        renderTour();
+      },
+    }, '← anterior'));
+
+    if (tourIdx < todos.length - 1) {
+      nav.appendChild(el('button', {
+        class: 'tour-btn-principal',
+        onClick: () => {
+          decomp.parar();
+          tourIdx++;
+          renderTour();
+        },
+      }, '→ próximo'));
+    } else {
+      // Último: botão "ver a turma toda"
+      nav.appendChild(el('button', {
+        class: 'tour-btn-principal verde',
+        onClick: () => {
+          decomp.parar();
+          State.cumpridas.add('coleguinhas-tour');
+          salvarEstado();
+          modoView = 'grid';
+          alternarView();
+        },
+      }, '🌟 ver a turma toda'));
+    }
+    tourArea.appendChild(nav);
+
+    // Botão "pular tour" (sempre visível, exceto no último)
+    if (tourIdx < todos.length - 1) {
+      tourArea.appendChild(el('button', {
+        class: 'tour-pular',
+        onClick: () => {
+          decomp.parar();
+          State.cumpridas.add('coleguinhas-tour');
+          salvarEstado();
+          modoView = 'grid';
+          alternarView();
+        },
+      }, 'pular tour →'));
+    }
+  }
+
+  function alternarView() {
+    if (modoView === 'tour') {
+      tourArea.classList.remove('escondido');
+      gridArea.classList.add('escondido');
+      renderTour();
+    } else {
+      tourArea.classList.add('escondido');
+      gridArea.classList.remove('escondido');
+    }
+  }
+
+  wrap.appendChild(tourArea);
+  wrap.appendChild(gridArea);
+
+  // Botão pequeno pra refazer tour (sempre disponível no modo grid)
+  const btnRefazerTour = el('button', {
+    class: 'btn-refazer-tour',
+    onClick: () => {
+      tourIdx = 0;
+      modoView = 'tour';
+      alternarView();
+    },
+  }, '↺ refazer tour individual');
+  wrap.appendChild(btnRefazerTour);
+
+  alternarView();
 
   wrap.appendChild(painel);
   tela.appendChild(wrap);
@@ -5950,7 +6173,7 @@ function renderAcaoCena(container, cena) {
     wrapSolo.appendChild(compassoSolo);
 
     // Seletor 3-velocidades
-    wrapSolo.appendChild(criarSeletorVelocidadeReduzido());
+    wrapSolo.appendChild(criarSeletorVelocidade());
 
     // Botão grande TOGGLE (pause sempre funciona)
     const btnSolo = el('button', { class: 'botao laranja grande' }, '🔁 ouvir ' + item.nome);
@@ -6098,13 +6321,13 @@ function renderAcaoCena(container, cena) {
         Audio.unlock();
         Audio.playElemento('.', 'sabia', undefined, T.ponto);
         Audio.playReferenciaCorda('.', undefined, T.ponto);
-        const s = el('span', { class: 'ponto', html: State.notacaoBinaria ? '0' : '·' });
+        const s = el('span', { class: 'ponto', html: '·' });
         s.style.fontSize = '40px'; s.style.color = 'var(--sol-violao)';
         dispEl.appendChild(s);
         if (dispEl.children.length > 12) dispEl.firstChild.remove();
       }
     }, [
-      el('span', { class: 'sinal' }, State.notacaoBinaria ? '0' : '·'),
+      el('span', { class: 'sinal' }, '·'),
       el('span', { class: 'legenda-corda' }, 'Sol'),
     ]));
     fileira.appendChild(el('button', {
@@ -6115,13 +6338,13 @@ function renderAcaoCena(container, cena) {
         Audio.unlock();
         Audio.playElemento('-', 'sabia', undefined, T.traco);
         Audio.playReferenciaCorda('-', undefined, T.traco);
-        const s = el('span', { class: 'traco', html: State.notacaoBinaria ? '1' : '–' });
+        const s = el('span', { class: 'traco', html: '–' });
         s.style.fontSize = '48px'; s.style.color = 'var(--re-violao)';
         dispEl.appendChild(s);
         if (dispEl.children.length > 12) dispEl.firstChild.remove();
       }
     }, [
-      el('span', { class: 'sinal' }, State.notacaoBinaria ? '1' : '–'),
+      el('span', { class: 'sinal' }, '–'),
       el('span', { class: 'legenda-corda' }, 'Ré'),
     ]));
     container.appendChild(fileira);
@@ -6276,7 +6499,7 @@ function renderAcaoCena(container, cena) {
     sosWrap.appendChild(compassoSOS);
 
     // Seletor de velocidade (3 níveis pra cenas com áudio)
-    sosWrap.appendChild(criarSeletorVelocidadeReduzido(() => {
+    sosWrap.appendChild(criarSeletorVelocidade(() => {
       // re-render seria caro; só atualiza no próximo play
     }));
 
@@ -6461,9 +6684,11 @@ function renderAcaoCena(container, cena) {
       entreguesIdx++;
       renderFrase(); renderMorseFrase(); renderFila();
 
-      // Toca cada letra entregue em Morse, em sequência
+      // v9.3: passa o compasso pra tocarSequencia → áudio + coração
+      // pulsam JUNTOS (antes o compasso rodava solto via setTimeout, sem
+      // alinhar com o áudio).
       const seqLetras = p.letras.split('').map(l => MORSE[l]).join(' ');
-      tocarSequencia(seqLetras, { voz: 'sabia', repeticoes: 1 });
+      tocarSequencia(seqLetras, { voz: 'sabia', repeticoes: 1, compasso });
 
       if (entreguesIdx >= turmaLetras.length) {
         // Todos entregaram! Nena chega na cena (não fullscreen).
@@ -6713,15 +6938,12 @@ const VELOCIDADES = [
 const VELOCIDADES_REDUZIDAS = VELOCIDADES.slice(0, 3); // sem guepardo
 const VALORES_BPM = VELOCIDADES.map(v => v.bpm);
 
-// Cria seletor de velocidade reusável (4 chips: tartaruga..guepardo).
-// Usado na Tela Pulso, Teclado-explorar e cenas que têm o pulso destacado.
+// v9.3: SEMPRE 4 chips (tartaruga..guepardo) em todas as telas (Lucas:
+// "mantem o guepardo como seletor sempre"). Antes a v9.2 tinha variante
+// "Reduzida" sem guepardo — removida. VELOCIDADES_REDUZIDAS mantida só
+// como referência caso queiramos voltar.
 function criarSeletorVelocidade(onChange) {
   return _criarSeletorVelocidadeBase(VELOCIDADES, onChange);
-}
-// v9.2: variante 3-níveis (sem guepardo) pra cenas com áudio + outras telas
-// onde "guepardo" seria rápido demais pra criança de 5 anos.
-function criarSeletorVelocidadeReduzido(onChange) {
-  return _criarSeletorVelocidadeBase(VELOCIDADES_REDUZIDAS, onChange);
 }
 function _criarSeletorVelocidadeBase(lista, onChange) {
   const wrap = el('div', { class: 'velocidade-seletor', 'aria-label': 'velocidade' });
@@ -6781,7 +7003,7 @@ function renderTecladoCrianca(tela, wrap) {
   wrap.appendChild(compasso);
 
   // v9.2: seletor 3-velocidades (sem guepardo) — Lucas
-  wrap.appendChild(criarSeletorVelocidadeReduzido());
+  wrap.appendChild(criarSeletorVelocidade());
 
   let palavraEscolhida = null;
 
@@ -6980,7 +7202,9 @@ function renderTeclado(tela) {
     } else {
       display.classList.remove('vazio');
       display.textContent = State.texto;
-      morseDisp.innerHTML = renderMorse(palavraParaMorse(State.texto));
+      // v9.3: teclado modo EXPLORAR é "alfabeto" — respeita toggle 0/1
+      morseDisp.innerHTML = renderMorse(palavraParaMorse(State.texto),
+        { binario: State.notacaoBinaria });
     }
   }
 
@@ -7310,7 +7534,7 @@ function renderLetraDetalhe(tela, letra) {
 
   // v9.2: seletor 3-velocidades (sem guepardo) — Lucas pediu em todas as
   // telas com áudio. Reage a mudança de BPM atualizando o som ao próximo play.
-  wrap.appendChild(criarSeletorVelocidadeReduzido(() => pararLetra()));
+  wrap.appendChild(criarSeletorVelocidade(() => pararLetra()));
 
   // v9.1 (A4): botão "🌟 CARIMBEI!" — criança decide quando marcou.
   // Já carimbada? Mostra "✨ você carimbou esta letra" (fechado, mas pode
