@@ -961,6 +961,71 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   color: var(--laranja-vivo) !important;
 }
 
+/* v9.2: containers extras pro SOS recriado */
+.sos-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px; padding: 8px 0 12px;
+}
+.sos-brincar {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.sos-brincar-rotulo {
+  font-family: var(--display); font-style: italic;
+  font-size: 13px; color: var(--tinta-suave);
+}
+.sos-brincar-botoes {
+  display: flex; gap: 12px;
+}
+.botao-tom-ponto, .botao-tom-traco {
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  border: 3px solid var(--cor-acento, #C9622E);
+  background: var(--papel-medio);
+  color: var(--cor-acento, #C9622E);
+  font-family: var(--display); font-weight: 900;
+  font-size: 32px;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.18s;
+  display: grid; place-items: center;
+}
+.botao-tom-traco {
+  width: 110px;
+  border-radius: 35px;
+}
+.botao-tom-ponto:active, .botao-tom-traco:active {
+  transform: scale(0.92);
+  background: var(--cor-acento, #C9622E);
+  color: white;
+}
+
+/* v9.2: apresentação SOLO de coleguinha */
+.solo-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px;
+  padding: 4px 0 12px;
+}
+.solo-sabia-wrap {
+  animation: solo-sabia-balanca 3s ease-in-out infinite;
+}
+@keyframes solo-sabia-balanca {
+  0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+  50%      { transform: translateY(-4px) rotate(1.5deg); }
+}
+.solo-nome {
+  font-family: var(--display); font-weight: 900;
+  font-size: clamp(32px, 8vw, 44px);
+  color: var(--cor-acento, #C9622E);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.solo-morse {
+  font-size: clamp(22px, 5.5vw, 30px);
+  text-align: center;
+  margin: 4px 0;
+}
+
 /* ===== RODA DE APRESENTAÇÃO — círculo de personagens ===== */
 .roda-circulo {
   position: relative;
@@ -3745,7 +3810,7 @@ const State = {
   letraSelecionada: null,
   vozTeclado: 'sabia', // 'sabia' | 'palma' | 'telegrafo' | 'violao' | 'coracao'
   notacaoBinaria: false,
-  bpm: 75, // default = menino (4-velocidades). Antes era 120 (rápido demais)
+  bpm: 38, // v9.2: default = menino (BPMs ÷ 2 pra criança de 5 anos)
   loopInfinito: false,
   loopId: null,        // id do timeout do loop
   texto: '',           // input do teclado
@@ -4377,35 +4442,9 @@ const ROTEIRO = [
         { texto: 'VOVO TO', label: 'VOVO-TO' },
       ],
     },
-    proximo: '💛 conhecer paios e maios',
-  },
-
-  // E2: OS PAIOS E MAIOS — padrinhos afetivos. Pessoas que escolhem
-  // amar To como se fossem pais. Mensagem central da temporada:
-  // afeto não vem só dos pais, vem de quem te escolhe.
-  {
-    id: 'paios-maios',
-    titulo: 'Os paios e maios',
-    bloco: { emoji: '💛', nome: 'paios e maios' },
-    fundo: 'visita',
-    personagens: [
-      { tipo: 'to', classe: 'protagonista' },
-    ],
-    fala: 'Hoje os <b>paios</b> e as <b>maios</b> vieram visitar To.',
-    falaSub: '<em>"Paios e maios são pessoas que escolhem te amar — como se fossem pais."</em>',
-    acao: {
-      tipo: 'familia-apresentacao',
-      nomes: [
-        { palavra: 'PAIO', label: 'Paio' },
-        { palavra: 'MAIO', label: 'Maio' },
-      ],
-      combos: [
-        { texto: 'PAIO TO', label: 'PAIO-TO' },
-        { texto: 'MAIO TO', label: 'MAIO-TO' },
-      ],
-    },
     proximo: '🚶 ir pra escola com Ben',
   },
+  // v9.2: cena E2 "paios e maios" REMOVIDA (Lucas).
 
   // E3: CAMINHO PRA ESCOLA — cena curta de transição. Ben tá
   // esperando To no galho do lado. Vão juntos.
@@ -4515,11 +4554,34 @@ const ROTEIRO = [
       ],
       palavra: 'FRESCOBOL',
     },
-    proximo: '🏓 conhecer o time de ping-pong',
+    proximo: '🐤 conhecer a Caca',
   },
-  // E2: TIME DE PING-PONG — Caca, Jo, Tete. Rápidos, ágeis, falam
-  // primeiro. Cada um se apresenta com nome em Morse + uma "rebatida"
-  // (palmadinha curta) entre os toques.
+  // v9.2: cenas individuais antes dos times — Lucas pediu "lembra de
+  // apresentar cada coleguinha antes de passar para os grupos".
+  // Tete já tem cena solo (E4 tete-padrao); Caca/Jo/Tata/Tito/Lila
+  // ganham apresentação solo aqui.
+  {
+    id: 'chega-caca',
+    titulo: 'Chega a Caca',
+    bloco: { emoji: '🐤', nome: 'Caca' },
+    fundo: 'dia-claro',
+    personagens: [],
+    fala: '— Oi! Eu sou a <b>Caca</b>. Sou um canarinho amarelo!',
+    falaSub: '<em>Toca pra ouvir o nome dela em Morse — pode tocar várias vezes.</em>',
+    acao: { tipo: 'coleguinha-solo', coleguinha: { quem: 'caca', nome: 'Caca' } },
+    proximo: '🐦 conhecer o Jo',
+  },
+  {
+    id: 'chega-jo',
+    titulo: 'Chega o Jo',
+    bloco: { emoji: '🐦', nome: 'Jo' },
+    fundo: 'dia-claro',
+    personagens: [],
+    fala: '— Oi! Sou o <b>Jo</b>. Sou um sabiá de peito mais escuro.',
+    falaSub: '<em>Nome curtinho — só dois sons.</em>',
+    acao: { tipo: 'coleguinha-solo', coleguinha: { quem: 'jo', nome: 'Jo' } },
+    proximo: '🏓 ver o time de ping-pong junto',
+  },
   {
     id: 'time-pingpong',
     titulo: 'Time de ping-pong',
@@ -4538,10 +4600,42 @@ const ROTEIRO = [
         { quem: 'tete', nome: 'Tete' },
       ],
     },
-    proximo: '♟ conhecer o time de xadrez',
+    proximo: '🎀 conhecer a Tata',
   },
-  // E3: TIME DE XADREZ — Tata, Tito, Lila. Calmos, pensativos. Nomes
-  // tocam mais devagar (BPM reduzido durante o episódio).
+  // v9.2: apresentações individuais antes do time de xadrez
+  {
+    id: 'chega-tata',
+    titulo: 'Chega a Tata',
+    bloco: { emoji: '🎀', nome: 'Tata' },
+    fundo: 'tarde',
+    personagens: [],
+    fala: '— Oi! Eu sou a <b>Tata</b>. Tenho uma fitinha na cabeça.',
+    falaSub: '<em>Vamos com calma — esse time é o calmo.</em>',
+    acao: { tipo: 'coleguinha-solo', coleguinha: { quem: 'tata', nome: 'Tata' } },
+    proximo: '🌿 conhecer o Tito',
+  },
+  {
+    id: 'chega-tito',
+    titulo: 'Chega o Tito',
+    bloco: { emoji: '🌿', nome: 'Tito' },
+    fundo: 'tarde',
+    personagens: [],
+    fala: '— Oi! Sou o <b>Tito</b>. Sou um sabiá cinza-oliveira.',
+    falaSub: '<em>Toca quantas vezes quiser pra decorar o som.</em>',
+    acao: { tipo: 'coleguinha-solo', coleguinha: { quem: 'tito', nome: 'Tito' } },
+    proximo: '🌸 conhecer a Lila',
+  },
+  {
+    id: 'chega-lila',
+    titulo: 'Chega a Lila',
+    bloco: { emoji: '🌸', nome: 'Lila' },
+    fundo: 'tarde',
+    personagens: [],
+    fala: '— Oi! Sou a <b>Lila</b>. Tenho a flor e a penagem rosa-violeta.',
+    falaSub: '<em>Junto com a Tata e o Tito a gente forma o time calmo.</em>',
+    acao: { tipo: 'coleguinha-solo', coleguinha: { quem: 'lila', nome: 'Lila' } },
+    proximo: '♟ ver o time de xadrez junto',
+  },
   {
     id: 'time-xadrez',
     titulo: 'Time de xadrez',
@@ -4916,6 +5010,15 @@ function renderColeguinhas(tela) {
 
     decompAtual = criarDecomposicaoNome(item.nome.toUpperCase(), 'sabia');
     painel.appendChild(decompAtual.wrap);
+    // v9.2: seletor 3-velocidades (sem guepardo)
+    painel.appendChild(criarSeletorVelocidadeReduzido(() => {
+      // BPM mudou — re-render decomp
+      const it = item;
+      decompAtual.parar();
+      decompAtual.wrap.remove();
+      decompAtual = criarDecomposicaoNome(it.nome.toUpperCase(), 'sabia');
+      painel.appendChild(decompAtual.wrap);
+    }));
     // Pequeno delay pra criança ler "oi, eu sou X!" antes de começar
     setTimeout(() => decompAtual && decompAtual.tocarTudo(), 350);
 
@@ -5816,6 +5919,93 @@ function renderAcaoCena(container, cena) {
     // interativo. A fala + botão "próximo" da renderCena já bastam — o
     // renderer só adiciona um pequeno indicador visual (pegadas).
     container.appendChild(el('div', { class: 'cena-curta-deco' }, '🐾   🐾   🐾'));
+  } else if (a.tipo === 'coleguinha-solo') {
+    // v9.2: apresentação INDIVIDUAL de um coleguinha — antes do time.
+    // Sabiá grande + nome + Morse animado. Botão ouvir (loop, com pause).
+    // Botões · / − pra brincar. Seletor 3-velocidades.
+    const item = a.coleguinha;  // { quem, nome }
+    const morseNome = palavraParaMorse(item.nome.toUpperCase());
+
+    const wrapSolo = el('div', { class: 'solo-wrap' });
+
+    // Sabiá grande
+    const sabiaGrande = el('div', { class: 'solo-sabia-wrap' });
+    const svg = passaroSVG(item.quem);
+    if (svg) {
+      svg.style.width = '120px'; svg.style.height = '120px';
+      svg.style.transform = 'scale(1)';
+      sabiaGrande.appendChild(svg);
+    }
+    wrapSolo.appendChild(sabiaGrande);
+
+    // Nome grande
+    wrapSolo.appendChild(el('div', { class: 'solo-nome' }, item.nome.toUpperCase()));
+
+    // Morse animado
+    const morseBox = el('div', { class: 'morse-display solo-morse', html: renderMorse(morseNome) });
+    wrapSolo.appendChild(morseBox);
+
+    // Compasso
+    const compassoSolo = criarCompasso('solo');
+    wrapSolo.appendChild(compassoSolo);
+
+    // Seletor 3-velocidades
+    wrapSolo.appendChild(criarSeletorVelocidadeReduzido());
+
+    // Botão grande TOGGLE (pause sempre funciona)
+    const btnSolo = el('button', { class: 'botao laranja grande' }, '🔁 ouvir ' + item.nome);
+    let tocandoSolo = false;
+    function pararSolo() {
+      pararLoop();
+      tocandoSolo = false;
+      btnSolo.textContent = '🔁 ouvir ' + item.nome;
+      morseBox.querySelectorAll('.ponto, .traco').forEach(e => e.classList.remove('ativo'));
+    }
+    btnSolo.addEventListener('click', () => {
+      Audio.unlock();
+      if (tocandoSolo) { pararSolo(); return; }
+      tocandoSolo = true;
+      btnSolo.textContent = '⏸ parar';
+      const els = morseBox.querySelectorAll('.ponto, .traco');
+      tocarSequencia(morseNome, {
+        voz: 'sabia',
+        compasso: compassoSolo,
+        infinito: true,
+        onElemento: (ch, i) => {
+          els.forEach(e => e.classList.remove('ativo'));
+          if (els[i]) {
+            els[i].classList.add('ativo');
+            setTimeout(() => els[i] && els[i].classList.remove('ativo'),
+              ch === '.' ? 120 : 320);
+          }
+        },
+      });
+    });
+    wrapSolo.appendChild(btnSolo);
+
+    // Mini-teclado · / − pra brincar
+    const par = el('div', { class: 'sos-brincar-botoes' });
+    par.appendChild(el('button', {
+      class: 'botao-tom-ponto',
+      'aria-label': 'tocar ponto',
+      onClick: () => {
+        Audio.unlock();
+        Audio.playElemento('.', 'sabia', Audio.now() + 0.02,
+          calcularTiming(State.bpm).ponto);
+      },
+    }, ['·']));
+    par.appendChild(el('button', {
+      class: 'botao-tom-traco',
+      'aria-label': 'tocar traço',
+      onClick: () => {
+        Audio.unlock();
+        Audio.playElemento('-', 'sabia', Audio.now() + 0.02,
+          calcularTiming(State.bpm).traco);
+      },
+    }, ['–']));
+    wrapSolo.appendChild(par);
+
+    container.appendChild(wrapSolo);
   } else if (a.tipo === 'dupla-coop') {
     // v8 E5/E6: dupla cooperativa (altinha/frescobol). 2 personagens lado a
     // lado, bolinha visual entre eles. Botão "rebater" alterna o "lado ativo"
@@ -6054,6 +6244,99 @@ function renderAcaoCena(container, cena) {
       cell.appendChild(el('div', { class: 'recap-nome' }, item.nome));
       grade.appendChild(cell);
     });
+  } else if (a.tipo === 'aula-sos') {
+    // v9.2: renderer SOS recriado (foi deletado por engano em v9.0 F1).
+    // 3 grupos visuais (· · · / − − − / · · ·), botão "ouvir SOS" toggle,
+    // e mini-teclado · / − pra criança brincar livremente.
+    const sosWrap = el('div', { class: 'sos-wrap' });
+
+    // 3 grupos
+    const seqSOS = '... --- ...';
+    const grupos = [
+      { letra: 'S', morse: '...' },
+      { letra: 'O', morse: '---' },
+      { letra: 'S', morse: '...' },
+    ];
+    const display = el('div', { class: 'sos-display' });
+    const allEls = [];   // lista plana de spans dos elementos pra animar
+    grupos.forEach(g => {
+      const grupo = el('div', { class: 'sos-grupo', 'aria-label': g.letra }, []);
+      g.morse.split('').forEach(ch => {
+        const sp = el('span', { class: ch === '.' ? 'ponto' : 'traco' },
+          ch === '.' ? '·' : '–');
+        grupo.appendChild(sp);
+        allEls.push(sp);
+      });
+      display.appendChild(grupo);
+    });
+    sosWrap.appendChild(display);
+
+    // Compasso pulsando
+    const compassoSOS = criarCompasso('aula-sos');
+    sosWrap.appendChild(compassoSOS);
+
+    // Seletor de velocidade (3 níveis pra cenas com áudio)
+    sosWrap.appendChild(criarSeletorVelocidadeReduzido(() => {
+      // re-render seria caro; só atualiza no próximo play
+    }));
+
+    // Botão grande TOGGLE pra ouvir SOS — pause sempre funciona
+    const btnSOS = el('button', { class: 'botao laranja grande', 'aria-label': 'ouvir SOS' }, '🔊 ouvir SOS');
+    let tocandoSOS = false;
+    function pararSOS() {
+      pararLoop();
+      tocandoSOS = false;
+      btnSOS.textContent = '🔊 ouvir SOS';
+      allEls.forEach(e => e.classList.remove('ativo'));
+    }
+    btnSOS.addEventListener('click', () => {
+      Audio.unlock();
+      if (tocandoSOS) { pararSOS(); return; }
+      tocandoSOS = true;
+      btnSOS.textContent = '⏸ parar';
+      tocarSequencia(seqSOS, {
+        voz: 'sabia',
+        compasso: compassoSOS,
+        onElemento: (ch, i) => {
+          allEls.forEach(e => e.classList.remove('ativo'));
+          if (allEls[i]) {
+            allEls[i].classList.add('ativo');
+            setTimeout(() => allEls[i] && allEls[i].classList.remove('ativo'),
+              ch === '.' ? 120 : 320);
+          }
+        },
+        onFim: () => { tocandoSOS = false; btnSOS.textContent = '🔊 ouvir SOS'; },
+      });
+    });
+    sosWrap.appendChild(btnSOS);
+
+    // Mini-teclado · / − pra brincar (dinâmicas de ponto e traço)
+    const brincar = el('div', { class: 'sos-brincar' });
+    brincar.appendChild(el('div', { class: 'sos-brincar-rotulo' },
+      'ou brinca: aperta os botões livremente'));
+    const par = el('div', { class: 'sos-brincar-botoes' });
+    par.appendChild(el('button', {
+      class: 'botao-tom-ponto',
+      'aria-label': 'tocar ponto',
+      onClick: () => {
+        Audio.unlock();
+        Audio.playElemento('.', 'sabia', Audio.now() + 0.02,
+          calcularTiming(State.bpm).ponto);
+      },
+    }, ['·']));
+    par.appendChild(el('button', {
+      class: 'botao-tom-traco',
+      'aria-label': 'tocar traço',
+      onClick: () => {
+        Audio.unlock();
+        Audio.playElemento('-', 'sabia', Audio.now() + 0.02,
+          calcularTiming(State.bpm).traco);
+      },
+    }, ['–']));
+    brincar.appendChild(par);
+    sosWrap.appendChild(brincar);
+
+    container.appendChild(sosWrap);
   } else if (a.tipo === 'letras-parabens') {
     // v8.3: novo final da Temporada 1. Cada coleguinha traz 1-2 letras de
     // PARABENS NENA. À medida que entregam, a frase aparece no topo,
@@ -6419,20 +6702,37 @@ const ALFABETO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 // O conceito de BPM contínuo via slider foi descartado — a criança escolhe entre
 // 4 níveis claros. Os BPMs aqui são o "BPM real" que vai pra calcularTiming.
 // Default: menino (75 BPM). Antes era 120, que Lucas reportou rápido demais.
+// v9.2: 4 velocidades. As 3 primeiras (sem guepardo) são usadas em telas
+// com áudio infantil. Velocidades pela METADE pras crianças (Lucas v9.2).
 const VELOCIDADES = [
-  { id: 'tartaruga', emoji: '🐢', nome: 'tartaruga', bpm: 50  },
-  { id: 'menino',    emoji: '🚶', nome: 'menino',    bpm: 75  },
-  { id: 'coelho',    emoji: '🐰', nome: 'coelho',    bpm: 110 },
-  { id: 'guepardo',  emoji: '🐆', nome: 'guepardo',  bpm: 160 },
+  { id: 'tartaruga', emoji: '🐢', nome: 'tartaruga', bpm: 25 },
+  { id: 'menino',    emoji: '🚶', nome: 'menino',    bpm: 38 },
+  { id: 'coelho',    emoji: '🐰', nome: 'coelho',    bpm: 55 },
+  { id: 'guepardo',  emoji: '🐆', nome: 'guepardo',  bpm: 80 },
 ];
+const VELOCIDADES_REDUZIDAS = VELOCIDADES.slice(0, 3); // sem guepardo
 const VALORES_BPM = VELOCIDADES.map(v => v.bpm);
 
-// Cria seletor de velocidade reusável (4 chips). Usado no teclado e nas
-// cenas com pulso. Quando troca, atualiza State.bpm e chama onChange.
+// Cria seletor de velocidade reusável (4 chips: tartaruga..guepardo).
+// Usado na Tela Pulso, Teclado-explorar e cenas que têm o pulso destacado.
 function criarSeletorVelocidade(onChange) {
+  return _criarSeletorVelocidadeBase(VELOCIDADES, onChange);
+}
+// v9.2: variante 3-níveis (sem guepardo) pra cenas com áudio + outras telas
+// onde "guepardo" seria rápido demais pra criança de 5 anos.
+function criarSeletorVelocidadeReduzido(onChange) {
+  return _criarSeletorVelocidadeBase(VELOCIDADES_REDUZIDAS, onChange);
+}
+function _criarSeletorVelocidadeBase(lista, onChange) {
   const wrap = el('div', { class: 'velocidade-seletor', 'aria-label': 'velocidade' });
-  VELOCIDADES.forEach(v => {
-    const ativo = State.bpm === v.bpm;
+  // Se BPM atual NÃO está na lista (por ex usuário tinha guepardo e a tela
+  // só mostra 3 níveis), seleciona o mais próximo abaixo.
+  const bpmAtual = State.bpm;
+  const ativoBpm = lista.find(v => v.bpm === bpmAtual)
+    ? bpmAtual
+    : lista[lista.length - 1].bpm;
+  lista.forEach(v => {
+    const ativo = ativoBpm === v.bpm;
     const chip = el('button', {
       class: 'chip-velocidade' + (ativo ? ' ativo' : ''),
       'aria-label': `velocidade ${v.nome}`,
@@ -6479,6 +6779,9 @@ function renderTecladoCrianca(tela, wrap) {
   wrap.appendChild(display);
   wrap.appendChild(morseDisp);
   wrap.appendChild(compasso);
+
+  // v9.2: seletor 3-velocidades (sem guepardo) — Lucas
+  wrap.appendChild(criarSeletorVelocidadeReduzido());
 
   let palavraEscolhida = null;
 
@@ -6956,32 +7259,58 @@ function renderLetraDetalhe(tela, letra) {
     });
   });
   botoes.appendChild(btnOuvir);
-  botoes.appendChild(el('button', {
-    class: 'botao',
-    onClick: () => {
-      Audio.unlock();
-      pararLetra();
-      const codAtual = palavraParaMorse(palavraAtual);
-      const els = morsePalavra.querySelectorAll('.ponto, .traco');
-      tocarSequencia(codAtual, {
-        voz: 'sabia',
-        compasso: compassoLetra,
-        onElemento: (ch, i) => {
-          els.forEach(e => e.classList.remove('ativo'));
-          if (els[i]) { els[i].classList.add('ativo'); setTimeout(() => els[i].classList.remove('ativo'), 250); }
-        }
-      });
-    }
-  }, '🐦 ouvir palavra'));
-  botoes.appendChild(el('button', {
-    class: 'botao secundario',
-    onClick: () => {
-      Audio.unlock();
-      pararLetra();
-      tocarSequencia(palavraParaMorse(palavraAtual), { voz: 'violao' });
-    }
-  }, '🎸 guitarra'));
+  // v9.2: "ouvir palavra" e "guitarra" agora são toggles (pause funciona).
+  const btnPalavra = el('button', { class: 'botao' }, '🐦 ouvir palavra');
+  let tocandoPalavra = false;
+  function pararPalavra() {
+    pararLoop();
+    tocandoPalavra = false;
+    btnPalavra.textContent = '🐦 ouvir palavra';
+  }
+  btnPalavra.addEventListener('click', () => {
+    Audio.unlock();
+    pararLetra();
+    if (tocandoPalavra) { pararPalavra(); return; }
+    tocandoPalavra = true;
+    btnPalavra.textContent = '⏸ parar';
+    const codAtual = palavraParaMorse(palavraAtual);
+    const els = morsePalavra.querySelectorAll('.ponto, .traco');
+    tocarSequencia(codAtual, {
+      voz: 'sabia',
+      compasso: compassoLetra,
+      onElemento: (ch, i) => {
+        els.forEach(e => e.classList.remove('ativo'));
+        if (els[i]) { els[i].classList.add('ativo'); setTimeout(() => els[i].classList.remove('ativo'), 250); }
+      },
+      onFim: () => { tocandoPalavra = false; btnPalavra.textContent = '🐦 ouvir palavra'; },
+    });
+  });
+  botoes.appendChild(btnPalavra);
+
+  const btnGuitarra = el('button', { class: 'botao secundario' }, '🎸 guitarra');
+  let tocandoGuitarra = false;
+  function pararGuitarra() {
+    pararLoop();
+    tocandoGuitarra = false;
+    btnGuitarra.textContent = '🎸 guitarra';
+  }
+  btnGuitarra.addEventListener('click', () => {
+    Audio.unlock();
+    pararLetra(); pararPalavra();
+    if (tocandoGuitarra) { pararGuitarra(); return; }
+    tocandoGuitarra = true;
+    btnGuitarra.textContent = '⏸ parar';
+    tocarSequencia(palavraParaMorse(palavraAtual), {
+      voz: 'violao',
+      onFim: () => { tocandoGuitarra = false; btnGuitarra.textContent = '🎸 guitarra'; },
+    });
+  });
+  botoes.appendChild(btnGuitarra);
   wrap.appendChild(botoes);
+
+  // v9.2: seletor 3-velocidades (sem guepardo) — Lucas pediu em todas as
+  // telas com áudio. Reage a mudança de BPM atualizando o som ao próximo play.
+  wrap.appendChild(criarSeletorVelocidadeReduzido(() => pararLetra()));
 
   // v9.1 (A4): botão "🌟 CARIMBEI!" — criança decide quando marcou.
   // Já carimbada? Mostra "✨ você carimbou esta letra" (fechado, mas pode
