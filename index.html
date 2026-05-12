@@ -3810,7 +3810,7 @@ const State = {
   letraSelecionada: null,
   vozTeclado: 'sabia', // 'sabia' | 'palma' | 'telegrafo' | 'violao' | 'coracao'
   notacaoBinaria: false,
-  bpm: 38, // v9.2: default = menino (BPMs ÷ 2 pra criança de 5 anos)
+  bpm: 25, // v9.3: default = tartaruga. Pulso é o DNA do app — começa devagar e parado.
   loopInfinito: false,
   loopId: null,        // id do timeout do loop
   texto: '',           // input do teclado
@@ -5019,8 +5019,7 @@ function renderColeguinhas(tela) {
       decompAtual = criarDecomposicaoNome(it.nome.toUpperCase(), 'sabia');
       painel.appendChild(decompAtual.wrap);
     }));
-    // Pequeno delay pra criança ler "oi, eu sou X!" antes de começar
-    setTimeout(() => decompAtual && decompAtual.tocarTudo(), 350);
+    // v9.3: sem autoplay. Painel abre parado — criança aciona via botão "ouvir" da decomp.
 
     wrap.querySelectorAll('.coleguinha-card').forEach(c => {
       c.classList.toggle('selecionado', c.dataset.quem === item.quem);
@@ -5825,7 +5824,7 @@ function renderAcaoCena(container, cena) {
       ]));
       decompAtual = criarDecomposicaoNome(palavra, 'sabia');
       painel.appendChild(decompAtual.wrap);
-      decompAtual.tocarTudo();
+      // v9.3: sem autoplay — criança aperta "ouvir" no painel decomp.
     }
 
     nomes.forEach(n => {
@@ -6193,7 +6192,7 @@ function renderAcaoCena(container, cena) {
 
       decompAtual = criarDecomposicaoNome(item.nome, 'sabia');
       painel.appendChild(decompAtual.wrap);
-      decompAtual.tocarTudo(); // já começa em loop (Lucas: "loop ativo por default")
+      // v9.3: sem autoplay — criança escolhe quando ouvir.
 
       atualizaStatus();
       render();
@@ -6230,7 +6229,7 @@ function renderAcaoCena(container, cena) {
 
       decompAtual = criarDecomposicaoNome(item.nome, 'sabia');
       painel.appendChild(decompAtual.wrap);
-      decompAtual.tocarTudo(); // loop ativo
+      // v9.3: sem autoplay.
     }
 
     lista.forEach((item) => {
