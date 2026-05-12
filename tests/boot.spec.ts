@@ -8,10 +8,10 @@ test.describe('boot', () => {
     // 1. Loader some em < 12s (waitLoaderGone já valida) e fica escondido
     await expect(page.locator('.loader-tela')).toHaveClass(/escondido/);
 
-    // 2. Landing tem 3 grupos + 5 portas (História, Pulso, Letras,
-    //    Coleguinhas, Teclado) + hero
-    await expect(page.locator('.menu-grupo')).toHaveCount(3);
-    await expect(page.locator('.porta')).toHaveCount(5);
+    // 2. Landing tem 4 grupos + 6 portas (História, Pulso, Letras,
+    //    Coleguinhas, Teclado, Conquistas) + hero
+    await expect(page.locator('.menu-grupo')).toHaveCount(4);
+    await expect(page.locator('.porta')).toHaveCount(6);
     await expect(page.locator('.porta.principal')).toHaveCount(1);
     await expect(page.locator('.menu-hero-titulo')).toHaveText('Sabiá Morse');
 

@@ -2485,6 +2485,65 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   100% { transform: translateX(-50%) scale(0.85); opacity: 0; }
 }
 
+/* v9.3: tela CONQUISTAS — painel global de estrelas */
+.conquistas-wrap {
+  display: flex; flex-direction: column; gap: 18px; padding: 8px 4px 24px;
+}
+.conquistas-resumo {
+  background: var(--papel);
+  border: 2px dashed var(--laranja);
+  border-radius: 18px;
+  padding: 18px 14px;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+.conquistas-resumo-num {
+  font-size: clamp(28px, 8vw, 38px);
+  font-weight: 800;
+  color: var(--laranja);
+  letter-spacing: 0.5px;
+}
+.conquistas-resumo-tag {
+  font-size: 14px; opacity: 0.8; margin-top: 2px;
+}
+.conquista-cat {
+  background: var(--papel);
+  border-radius: 14px;
+  padding: 12px 12px 14px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+}
+.conquista-cat-cab {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+}
+.conquista-cat-emoji { font-size: 20px; }
+.conquista-cat-titulo { font-weight: 700; flex: 1; }
+.conquista-cat-contagem {
+  font-size: 13px; opacity: 0.7; font-variant-numeric: tabular-nums;
+}
+.conquista-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px;
+}
+.conquista-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  background: rgba(0,0,0,0.03);
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.conquista-item.ganha {
+  opacity: 1;
+  background: rgba(255, 196, 0, 0.15);
+}
+.conquista-estrela { font-size: 22px; line-height: 1; }
+.conquista-nome {
+  font-size: 11px; text-align: center;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 100%;
+}
+
 /* v8.3: tela COLEGUINHAS — explora o nome de cada um da turma */
 .coleguinhas {
   display: flex; flex-direction: column; gap: 14px;
@@ -3866,7 +3925,13 @@ function carregarEstado() {
       if (typeof d.volume === 'number' && d.volume >= 0 && d.volume <= 1) State.volume = d.volume;
       if (typeof d.mudo === 'boolean') State.mudo = d.mudo;
       if (typeof d.vozPulso === 'string' && ['sabia','palma','telegrafo'].includes(d.vozPulso)) State.vozPulso = d.vozPulso;
-      if (d.pulsoEstrelas && typeof d.pulsoEstrelas === 'object') State.pulsoEstrelas = d.pulsoEstrelas;
+      if (d.pulsoEstrelas && typeof d.pulsoEstrelas === 'object') {
+        // v9.3: migração — pulsoEstrelas vira chaves 'pulso:um/dois/quatro' em cumpridas.
+        State.pulsoEstrelas = d.pulsoEstrelas;
+        ['um','dois','quatro'].forEach(k => {
+          if (d.pulsoEstrelas[k]) State.cumpridas.add('pulso:' + k);
+        });
+      }
       if (d.tecladoModo === 'crianca' || d.tecladoModo === 'explorar') State.tecladoModo = d.tecladoModo;
     }
   } catch(e) {}
@@ -4831,6 +4896,10 @@ function renderApp() {
     btnVoltar.classList.remove('escondido');
     titulo.textContent = 'O pulso';
     renderPulso(tela);
+  } else if (State.modo === 'conquistas') {
+    btnVoltar.classList.remove('escondido');
+    titulo.textContent = 'Minhas conquistas';
+    renderConquistas(tela);
   }
 }
 
@@ -4943,6 +5012,100 @@ function renderLanding(tela) {
   ]));
   wrap.appendChild(grupoBrincar);
 
+  // v9.3: porta "minhas conquistas" — sistema unificado de estrelas
+  const totalConq = totalConquistas();
+  const grupoConq = el('section', { class: 'menu-grupo' });
+  grupoConq.appendChild(el('div', { class: 'menu-grupo-rotulo' }, '🏆 progresso'));
+  grupoConq.appendChild(el('button', {
+    class: 'porta',
+    onClick: () => navegar('conquistas'),
+  }, [
+    el('div', { class: 'porta-icone' }, '⭐'),
+    el('div', { class: 'porta-texto' }, [
+      el('div', { class: 'porta-titulo' }, 'Minhas conquistas'),
+      el('div', { class: 'porta-badge' }, totalConq.ganhas + '/' + totalConq.total + ' estrelas'),
+      el('div', { class: 'porta-desc' },
+        'Episódios, letras, coleguinhas e camadas do pulso.'),
+    ]),
+    el('div', { class: 'porta-seta' }, '→'),
+  ]));
+  wrap.appendChild(grupoConq);
+
+  tela.appendChild(wrap);
+}
+
+/* ============================================================
+   CONQUISTAS (v9.3) — painel global de estrelas
+   Fonte única: State.cumpridas. Categorias:
+   - cena:N          16 episódios
+   - letra:X         26 letras
+   - coleguinha:X     9 turma
+   - pulso:um/dois/quatro  3 camadas
+   ============================================================ */
+const COLEGUINHAS_IDS = ['nena','to','ben','tete','caca','jo','tata','tito','lila'];
+const PULSO_CAMADAS = ['um','dois','quatro'];
+
+function totalConquistas() {
+  const c = State.cumpridas;
+  const cenas = ROTEIRO.filter((_, i) => c.has('cena-' + i)).length;
+  const letras = Array.from(c).filter(k => k.startsWith('letra:')).length;
+  const coleguinhas = COLEGUINHAS_IDS.filter(q => c.has('coleguinha:' + q)).length;
+  const pulso = PULSO_CAMADAS.filter(p => c.has('pulso:' + p)).length;
+  const ganhas = cenas + letras + coleguinhas + pulso;
+  const total = ROTEIRO.length + 26 + COLEGUINHAS_IDS.length + PULSO_CAMADAS.length;
+  return { cenas, letras, coleguinhas, pulso, ganhas, total };
+}
+
+function renderConquistas(tela) {
+  const t = totalConquistas();
+  const wrap = el('div', { class: 'conquistas-wrap' });
+
+  wrap.appendChild(el('div', { class: 'conquistas-resumo' }, [
+    el('div', { class: 'conquistas-resumo-num' }, t.ganhas + ' / ' + t.total),
+    el('div', { class: 'conquistas-resumo-tag' }, '⭐ estrelas conquistadas'),
+  ]));
+
+  const categorias = [
+    { id: 'cenas', emoji: '🎬', titulo: 'Episódios', ganhas: t.cenas, total: ROTEIRO.length,
+      itens: ROTEIRO.map((ep, i) => ({
+        nome: ep.titulo || ep.id, ganha: State.cumpridas.has('cena-' + i)
+      })) },
+    { id: 'letras', emoji: '🔤', titulo: 'Letras', ganhas: t.letras, total: 26,
+      itens: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(L => ({
+        nome: L, ganha: State.cumpridas.has('letra:' + L)
+      })) },
+    { id: 'coleguinhas', emoji: '👥', titulo: 'Coleguinhas', ganhas: t.coleguinhas, total: COLEGUINHAS_IDS.length,
+      itens: COLEGUINHAS_IDS.map(q => ({
+        nome: q.charAt(0).toUpperCase() + q.slice(1), ganha: State.cumpridas.has('coleguinha:' + q)
+      })) },
+    { id: 'pulso', emoji: '💗', titulo: 'Camadas do pulso', ganhas: t.pulso, total: PULSO_CAMADAS.length,
+      itens: PULSO_CAMADAS.map(p => ({
+        nome: { um: '1 batida', dois: '2 batidinhas', quatro: '4 batidinhas' }[p],
+        ganha: State.cumpridas.has('pulso:' + p)
+      })) },
+  ];
+
+  categorias.forEach(cat => {
+    const sec = el('section', { class: 'conquista-cat' });
+    sec.appendChild(el('div', { class: 'conquista-cat-cab' }, [
+      el('span', { class: 'conquista-cat-emoji' }, cat.emoji),
+      el('span', { class: 'conquista-cat-titulo' }, cat.titulo),
+      el('span', { class: 'conquista-cat-contagem' }, cat.ganhas + '/' + cat.total),
+    ]));
+    const grid = el('div', { class: 'conquista-grid' });
+    cat.itens.forEach(it => {
+      grid.appendChild(el('div', {
+        class: 'conquista-item' + (it.ganha ? ' ganha' : ''),
+        title: it.nome,
+      }, [
+        el('span', { class: 'conquista-estrela' }, it.ganha ? '⭐' : '☆'),
+        el('span', { class: 'conquista-nome' }, it.nome),
+      ]));
+    });
+    sec.appendChild(grid);
+    wrap.appendChild(sec);
+  });
+
   tela.appendChild(wrap);
 }
 
@@ -5003,6 +5166,10 @@ function renderColeguinhas(tela) {
     if (decompAtual) decompAtual.parar();
     painel.innerHTML = '';
     painel.classList.remove('escondido');
+
+    // v9.3: marca conquista de ter conhecido este coleguinha.
+    State.cumpridas.add('coleguinha:' + item.quem);
+    salvarEstado();
 
     // C2: cabeçalho do painel com sabiá + fala "oi, eu sou X!"
     const cabec = el('div', { class: 'decomp-cabec-novo' });
@@ -5367,6 +5534,7 @@ function renderPulso(tela) {
     const id = camadaEl.dataset.camadaId;
     if (!id) return;
     State.pulsoEstrelas[id] = true;
+    State.cumpridas.add('pulso:' + id);
     salvarEstado();
     const estrelaEl = camadaEl.querySelector('.pulso-camada-estrela');
     if (estrelaEl) {
