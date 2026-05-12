@@ -4287,6 +4287,12 @@ function criarDecomposicaoNome(nome, voz = 'sabia') {
   const letras = nome.toUpperCase().replace(/[^A-Z]/g, '').split('');
   const wrap = el('div', { class: 'decomp-wrap' });
 
+  // v9.3: cabeça de compasso embutida — toda tela com decomp pulsa no BPM.
+  // Liga em tocarTudo/tocarLetra e desliga em pararTudoLocal.
+  const compasso = criarCompasso('decomp');
+  wrap.appendChild(compasso);
+  let cleanupCompassoLocal = null;
+
   // Linha de cards (uma letra por card, com padrão Morse abaixo)
   const linha = el('div', { class: 'decomp-letras' });
   const cards = letras.map((letra, idx) => {
@@ -4326,6 +4332,7 @@ function criarDecomposicaoNome(nome, voz = 'sabia') {
     tocando = false;
     if (proximoTimeout) { clearTimeout(proximoTimeout); proximoTimeout = null; }
     pararLoop();
+    if (cleanupCompassoLocal) { cleanupCompassoLocal(); cleanupCompassoLocal = null; }
     cards.forEach(c => c.classList.remove('ativo'));
     btnPlay.innerHTML = '▶ tocar em loop';
   }
@@ -4338,10 +4345,13 @@ function criarDecomposicaoNome(nome, voz = 'sabia') {
     if (!cod) return;
     cards.forEach(c => c.classList.remove('ativo'));
     cards[idx].classList.add('ativo');
+    if (cleanupCompassoLocal) cleanupCompassoLocal();
+    cleanupCompassoLocal = ativarCompasso(compasso, calcularTiming(State.bpm).beat);
     tocarSequencia(cod, {
       voz,
       onFim: () => {
         if (cards[idx]) cards[idx].classList.remove('ativo');
+        if (cleanupCompassoLocal) { cleanupCompassoLocal(); cleanupCompassoLocal = null; }
       }
     });
   }
@@ -4351,6 +4361,8 @@ function criarDecomposicaoNome(nome, voz = 'sabia') {
     Audio.unlock();
     tocando = true;
     btnPlay.innerHTML = '⏸ parar';
+    if (cleanupCompassoLocal) cleanupCompassoLocal();
+    cleanupCompassoLocal = ativarCompasso(compasso, calcularTiming(State.bpm).beat);
 
     let i = 0;
     const proxima = () => {
