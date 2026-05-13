@@ -489,7 +489,7 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .cena-fundo.campinho {
   background: linear-gradient(180deg, #DCE8EE 0%, #B5D9B5 40%, #7AB87A 100%);
 }
-/* v8 Temporada 1: novos fundos pra cenas de casa, padrinhos, caminho,
+/* v8 Temporada 1: novos fundos pra cenas de casa, caminho,
    quadra (altinha) e praia (frescobol). Tons sempre quentes pra remeter
    ao acolhimento doméstico/escolar. */
 /* v8.1 polish: cada fundo novo ganha decoração sutil via pseudo-element.
@@ -1496,6 +1496,25 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   background: #d94a4a;
   color: white;
   border-color: #8a2222;
+}
+
+/* v9.4: toggle de pulsação visual (▶/⏸) — pisca independente do áudio. */
+.compasso-toggle-visual {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  border: 1px solid var(--marrom-claro);
+  border-radius: 50%;
+  background: white;
+  font-size: 13px;
+  cursor: pointer;
+  margin-right: 4px;
+  transition: background 0.15s, transform 0.1s;
+}
+.compasso-toggle-visual:active { transform: scale(0.92); }
+.compasso-toggle-visual.ativo {
+  background: var(--laranja);
+  color: white;
+  border-color: #a36430;
 }
 
 /* ===== DECOMPOSIÇÃO DE NOMES — letras visíveis + loop + highlight ===== */
@@ -4116,7 +4135,36 @@ function criarCompasso(rotulo) {
   `;
   wrap.appendChild(cor);
 
-  // Toggle 🫀 (era 🥁): toca o som de batida cardíaca audível. Default mudo.
+  // v9.4: toggle ▶/⏸ pulsação visual manual. Default desligado.
+  // Aceita liga/desliga independente do áudio — criança vê o pulso
+  // mesmo sem ninguém tocar. Quando áudio dispara via ativarCompasso,
+  // continua animando junto (auto-anima ignora esse toggle).
+  let cleanupVisualManual = null;
+  const btnVisual = el('button', {
+    class: 'compasso-toggle-visual',
+    'aria-label': 'ligar pulsação visual',
+    'aria-pressed': 'false',
+    title: 'ver o pulso',
+    onClick: () => {
+      if (cleanupVisualManual) {
+        cleanupVisualManual();
+        cleanupVisualManual = null;
+        btnVisual.classList.remove('ativo');
+        btnVisual.textContent = '▶';
+        btnVisual.setAttribute('aria-pressed', 'false');
+        btnVisual.setAttribute('aria-label', 'ligar pulsação visual');
+      } else {
+        cleanupVisualManual = ativarCompasso(wrap, calcularTiming(State.bpm).beat);
+        btnVisual.classList.add('ativo');
+        btnVisual.textContent = '⏸';
+        btnVisual.setAttribute('aria-pressed', 'true');
+        btnVisual.setAttribute('aria-label', 'parar pulsação visual');
+      }
+    }
+  }, '▶');
+  wrap.appendChild(btnVisual);
+
+  // Toggle 🫀: toca o som de batida cardíaca audível. Default mudo.
   const btn = el('button', {
     class: 'compasso-toggle',
     'aria-label': 'ouvir as batidas do coração',
@@ -4488,7 +4536,7 @@ function renderMorse(seq) {
 const ROTEIRO = [
   // ============================================================
   // TEMPORADA 1 — "O primeiro dia da escola dos sabiás"
-  // 11 episódios. Casa → padrinhos → caminho → escola → cooperar
+  // 16 episódios. Casa → caminho → escola → apresentações → times → festa
   // → competir → time → cuidar → celebrar.
   // ============================================================
 
@@ -4579,6 +4627,31 @@ const ROTEIRO = [
     fala: '<b>Tete</b> chega correndo: — "Oi! Vou ser amiga de vocês dois!"',
     falaSub: '<em>"E olha só — meu nome é o <b>mais fácil</b> de aprender!"</em>',
     acao: { tipo: 'tete-padrao' },
+    proximo: '🐤 conhecer a Caca',
+  },
+
+  // v9.4: apresentações individuais antes de qualquer jogo coletivo.
+  // Caca e Jo aparecem agora ANTES de altinha/frescobol (onde eles atuam).
+  {
+    id: 'chega-caca',
+    titulo: 'Chega a Caca',
+    bloco: { emoji: '🐤', nome: 'Caca' },
+    fundo: 'dia-claro',
+    personagens: [],
+    fala: '— Oi! Eu sou a <b>Caca</b>. Sou um canarinho amarelo!',
+    falaSub: '<em>Toca pra ouvir o nome dela em Morse — pode tocar várias vezes.</em>',
+    acao: { tipo: 'coleguinha-solo', coleguinha: { quem: 'caca', nome: 'Caca' } },
+    proximo: '🐦 conhecer o Jo',
+  },
+  {
+    id: 'chega-jo',
+    titulo: 'Chega o Jo',
+    bloco: { emoji: '🐦', nome: 'Jo' },
+    fundo: 'dia-claro',
+    personagens: [],
+    fala: '— Oi! Sou o <b>Jo</b>. Sou um sabiá de peito mais escuro.',
+    falaSub: '<em>Nome curtinho — só dois sons.</em>',
+    acao: { tipo: 'coleguinha-solo', coleguinha: { quem: 'jo', nome: 'Jo' } },
     proximo: '🤝 jogar altinha',
   },
 
@@ -4631,32 +4704,6 @@ const ROTEIRO = [
       ],
       palavra: 'FRESCOBOL',
     },
-    proximo: '🐤 conhecer a Caca',
-  },
-  // v9.2: cenas individuais antes dos times — Lucas pediu "lembra de
-  // apresentar cada coleguinha antes de passar para os grupos".
-  // Tete já tem cena solo (E4 tete-padrao); Caca/Jo/Tata/Tito/Lila
-  // ganham apresentação solo aqui.
-  {
-    id: 'chega-caca',
-    titulo: 'Chega a Caca',
-    bloco: { emoji: '🐤', nome: 'Caca' },
-    fundo: 'dia-claro',
-    personagens: [],
-    fala: '— Oi! Eu sou a <b>Caca</b>. Sou um canarinho amarelo!',
-    falaSub: '<em>Toca pra ouvir o nome dela em Morse — pode tocar várias vezes.</em>',
-    acao: { tipo: 'coleguinha-solo', coleguinha: { quem: 'caca', nome: 'Caca' } },
-    proximo: '🐦 conhecer o Jo',
-  },
-  {
-    id: 'chega-jo',
-    titulo: 'Chega o Jo',
-    bloco: { emoji: '🐦', nome: 'Jo' },
-    fundo: 'dia-claro',
-    personagens: [],
-    fala: '— Oi! Sou o <b>Jo</b>. Sou um sabiá de peito mais escuro.',
-    falaSub: '<em>Nome curtinho — só dois sons.</em>',
-    acao: { tipo: 'coleguinha-solo', coleguinha: { quem: 'jo', nome: 'Jo' } },
     proximo: '🏓 ver o time de ping-pong junto',
   },
   {
@@ -4945,7 +4992,7 @@ function renderLanding(tela) {
       el('div', { class: 'porta-titulo' }, 'História'),
       el('div', { class: 'porta-badge' }, 'Temporada 1 · 12 episódios'),
       el('div', { class: 'porta-desc' },
-        'Em casa, padrinhos, primeiro dia, jogos e a festa da Nena.'),
+        'Em casa, caminho, primeiro dia, jogos e a festa da Nena.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
@@ -6862,17 +6909,17 @@ function renderAcaoCena(container, cena) {
 /* ============================================================
    TECLADO LIVRE
    ============================================================ */
-// v8 (Temporada 1): vocabulário cresce com família, padrinhos afetivos e jogos.
-// Combos família/padrinhos com espaço viram " / " em Morse (espaço de palavra).
+// v9.4: vocabulário com família e jogos (padrinhos saíram do app).
+// Combos família com espaço viram " / " em Morse (espaço de palavra).
 // Display com hífen (PAPA-TO) é só visual nos chips do teclado.
 const PALAVRAS_RAPIDAS = [
   'SOS', 'BENTO', 'NENA', 'PARABENS NENA',
   // turma
   'TO', 'BEN', 'CACA', 'JO', 'TETE', 'TATA', 'TITO', 'LILA', 'OI',
-  // família e padrinhos
-  'PAPA', 'MAMA', 'VOVO', 'PAIO', 'MAIO',
-  // combos afetivos (mostrados como PAPA-TO / MAMA-TO / VOVO-TO / PAIO-TO / MAIO-TO)
-  'PAPA TO', 'MAMA TO', 'VOVO TO', 'PAIO TO', 'MAIO TO',
+  // família
+  'PAPA', 'MAMA', 'VOVO',
+  // combos afetivos (mostrados como PAPA-TO / MAMA-TO / VOVO-TO)
+  'PAPA TO', 'MAMA TO', 'VOVO TO',
   // jogos cooperativos
   'ALTINHA', 'FRESCOBOL',
 ];
@@ -7210,7 +7257,7 @@ function renderTeclado(tela) {
   // Palavras rápidas. v8: combos afetivos (PAPA TO etc) viram chips dourados
   // com display em hífen (PAPA-TO) — pedagogicamente lê-se "papa-to" mas em
   // Morse vira espaço de palavra entre PAPA e TO (separador `/`).
-  const COMBOS_AFETO = new Set(['PAPA TO', 'MAMA TO', 'VOVO TO', 'PAIO TO', 'MAIO TO']);
+  const COMBOS_AFETO = new Set(['PAPA TO', 'MAMA TO', 'VOVO TO']);
   const palavras = el('div', { class: 'palavras-rapidas' });
   PALAVRAS_RAPIDAS.forEach(p => {
     const ehCombo = COMBOS_AFETO.has(p);
