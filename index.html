@@ -70,7 +70,10 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 /* ===== CABEÇALHO ===== */
 .cabecalho {
   display: flex; align-items: center; gap: 8px;
-  padding: 12px 16px; flex-shrink: 0; min-height: 56px;
+  /* v9.4 (iOS): safe-area no topo evita que o conteúdo passe sob o notch
+     em iPhones com Dynamic Island/recorte. */
+  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 12px max(16px, env(safe-area-inset-left));
+  flex-shrink: 0; min-height: 56px;
 }
 .cabecalho .voltar {
   width: 44px; height: 44px; border-radius: 50%;
@@ -151,7 +154,11 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 /* ===== TELA / VIEW ===== */
 .tela {
   flex: 1; display: flex; flex-direction: column;
-  padding: 8px 16px 20px; overflow-y: auto; overflow-x: hidden;
+  /* v9.4 (iOS): env(safe-area-inset-*) cobre o home indicator. Antes os CTAs
+     finais ficavam cortados em iPhone com gesture bar. Android sem notch
+     vê o mínimo (16/20px). */
+  padding: 8px max(16px, env(safe-area-inset-left)) max(20px, calc(20px + env(safe-area-inset-bottom))) max(16px, env(safe-area-inset-right));
+  overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 .tela.fade-in { animation: fadeIn 0.5s ease; }
@@ -898,23 +905,26 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   padding-bottom: 18px;
   width: 100%;
 }
-.cena-palco .passaro-svg { width: 90px; height: 90px; flex-shrink: 0; }
-.cena-palco .passaro-svg.protagonista { width: 110px; height: 110px; }
-.cena-palco .passaro-svg.menor { width: 64px; height: 64px; }
-.cena-palco .passaro-svg.nena { width: 120px; height: 120px; }
+/* v9.4: ilustrações ~25% maiores — o palco era uma faixa e os pássaros
+   ocupavam só ~20% da área. Agora preenchem mais o quadro. Media queries
+   abaixo escalam pra telas pequenas. */
+.cena-palco .passaro-svg { width: 112px; height: 112px; flex-shrink: 0; }
+.cena-palco .passaro-svg.protagonista { width: 138px; height: 138px; }
+.cena-palco .passaro-svg.menor { width: 80px; height: 80px; }
+.cena-palco .passaro-svg.nena { width: 150px; height: 150px; }
 
 @media (max-width: 480px) {
   .cena-palco { gap: 2px; padding-bottom: 14px; min-height: 100px; }
-  .cena-palco .passaro-svg { width: 72px; height: 72px; }
-  .cena-palco .passaro-svg.protagonista { width: 90px; height: 90px; }
-  .cena-palco .passaro-svg.menor { width: 54px; height: 54px; }
-  .cena-palco .passaro-svg.nena { width: 96px; height: 96px; }
+  .cena-palco .passaro-svg { width: 90px; height: 90px; }
+  .cena-palco .passaro-svg.protagonista { width: 112px; height: 112px; }
+  .cena-palco .passaro-svg.menor { width: 68px; height: 68px; }
+  .cena-palco .passaro-svg.nena { width: 120px; height: 120px; }
 }
 @media (max-width: 380px) {
-  .cena-palco .passaro-svg { width: 60px; height: 60px; }
-  .cena-palco .passaro-svg.protagonista { width: 76px; height: 76px; }
-  .cena-palco .passaro-svg.menor { width: 46px; height: 46px; }
-  .cena-palco .passaro-svg.nena { width: 80px; height: 80px; }
+  .cena-palco .passaro-svg { width: 75px; height: 75px; }
+  .cena-palco .passaro-svg.protagonista { width: 95px; height: 95px; }
+  .cena-palco .passaro-svg.menor { width: 58px; height: 58px; }
+  .cena-palco .passaro-svg.nena { width: 100px; height: 100px; }
 }
 .cena-palco .passaro-svg.feliz { animation: pulinho 0.8s ease infinite; }
 .cena-palco .passaro-svg.pulando { animation: pulinhoUma 0.6s ease; }
@@ -1597,11 +1607,16 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 }
 .chip-velocidade:active { transform: scale(0.93); }
 .chip-velocidade.ativo {
-  background: var(--laranja);
+  /* v9.4: estado ativo mais óbvio. Antes a diferença era sutil em criança
+     de 5 anos identificar "qual eu escolhi". Agora: laranja-vivo + ring
+     amarelo + scale up + emoji maior. */
+  background: var(--laranja-vivo);
   border-color: var(--laranja-vivo);
   color: white;
-  box-shadow: 0 0 0 3px rgba(232,164,92,0.25), var(--sombra-media);
+  transform: scale(1.08);
+  box-shadow: 0 0 0 4px var(--amarelo), 0 4px 10px rgba(216, 136, 65, 0.4);
 }
+.chip-velocidade.ativo .chip-vel-emoji { font-size: 26px; }
 .chip-vel-emoji { font-size: 22px; line-height: 1; }
 .chip-vel-nome  { font-size: 11px; margin-top: 2px; letter-spacing: 0.02em; }
 @media (max-width: 380px) {
@@ -1717,6 +1732,13 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   display: flex; flex-wrap: wrap; justify-content: center;
   gap: 8px;
   padding: 8px;
+}
+.crianca-chips-divisor {
+  flex-basis: 100%;
+  text-align: center;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--tinta-suave);
+  margin: 8px 0 0;
 }
 .palavra-rapida.crianca {
   font-size: 18px;
@@ -1867,8 +1889,23 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   .tecla .nome { font-size: 14px; }
 }
 
+/* v9.4: grid 3 colunas fixas elimina linha-solo ("TO" sozinho) e o ritmo
+   irregular do flex-wrap. Chips ocupam largura igual; encadeados (PAPA-TO)
+   ficam num grupo separado abaixo (via .palavras-rapidas-divisor). */
 .palavras-rapidas {
-  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+  justify-items: stretch;
+}
+.palavras-rapidas .palavra-rapida { justify-content: center; width: 100%; }
+.palavras-rapidas-divisor {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--tinta-suave);
+  margin: 6px 0 2px;
+}
+@media (max-width: 380px) {
+  .palavras-rapidas { grid-template-columns: repeat(2, 1fr); }
 }
 .palavra-rapida {
   background: var(--ceu);
@@ -2725,10 +2762,10 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 /* ===== RESPONSIVO ===== */
 @media (max-height: 640px) {
   .cena-fundo { min-height: 220px; padding: 12px 8px 8px; }
-  .cena-palco { min-height: 110px; padding-bottom: 16px; }
-  .cena-palco .passaro-svg { width: 84px; height: 84px; }
-  .cena-palco .passaro-svg.protagonista { width: 100px; height: 100px; }
-  .cena-palco .passaro-svg.nena { width: 110px; height: 110px; }
+  .cena-palco { min-height: 130px; padding-bottom: 16px; }
+  .cena-palco .passaro-svg { width: 105px; height: 105px; }
+  .cena-palco .passaro-svg.protagonista { width: 125px; height: 125px; }
+  .cena-palco .passaro-svg.nena { width: 138px; height: 138px; }
   .cena-fala { padding: 10px 14px; }
   .landing-personagens .passaro-svg { width: 80px; height: 80px; }
 }
@@ -2952,6 +2989,34 @@ const Audio = (() => {
   let violaoG3Buffer = null;  // Sol3 = ponto
   let violaoD3Buffer = null;  // Ré3  = traço
 
+  // v9.1: hardening pra Safari iOS. Lucas reportou que Android funciona mas
+  // Apple não. Três armadilhas conhecidas do iOS Safari:
+  //   (1) AudioContext criado fora de um gesto fica em estado 'suspended' e
+  //       o primeiro resume() às vezes falha silenciosamente.
+  //   (2) Após Siri/ligação/outra mídia, o ctx entra em 'interrupted' — o
+  //       código antigo só tratava 'suspended'.
+  //   (3) Voltar do background deixa o ctx num desses estados sem nenhum
+  //       evento de UI que dispare o unlock antigo.
+  // Solução: unlock() resume sempre que state ≠ 'running', um <audio> HTML5
+  // silencioso "kicka" a sessão no primeiro toque, visibilitychange força
+  // re-unlock ao voltar do background, e statechange loga em modo debug.
+  let _kickAudioEl = null;
+  // 0.05s de silêncio em WAV PCM mono 44.1kHz — Data URL pequena.
+  const _SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=';
+  function _kickAudioSession() {
+    try {
+      if (!_kickAudioEl) {
+        _kickAudioEl = new window.Audio(_SILENT_WAV);
+        _kickAudioEl.setAttribute('playsinline', '');
+        _kickAudioEl.setAttribute('webkit-playsinline', '');
+        _kickAudioEl.muted = true;
+        _kickAudioEl.loop = false;
+      }
+      const p = _kickAudioEl.play();
+      if (p && p.catch) p.catch(() => {});
+    } catch (e) { /* silent */ }
+  }
+
   // ----- Tracking de fontes ativas -----
   // Toda BufferSourceNode/OscillatorNode entra aqui ao ser criada e sai automaticamente
   // no .onended. pararTudo() força .stop(0) em tudo que sobrou — resolve a sobreposição
@@ -3126,11 +3191,24 @@ const Audio = (() => {
 
   async function unlock() {
     init();
-    if (ctx.state === 'suspended') { try { await ctx.resume(); } catch(e){} }
+    // v9.1 (iOS): resume cobre 'suspended' (não-gesto) e 'interrupted'
+    // (Siri, outra mídia, ligação). Antes só tratava 'suspended'.
+    if (ctx.state !== 'running') {
+      try { await ctx.resume(); } catch(e){}
+    }
     if (!unlocked) {
       const buf = ctx.createBuffer(1, 1, 22050);
       const s = ctx.createBufferSource();
       s.buffer = buf; s.connect(ctx.destination); s.start(0);
+      // v9.1: <audio> HTML5 silencioso ajuda a kickar a sessão de áudio
+      // do iOS em alguns cases (não anula o switch físico de mudo).
+      _kickAudioSession();
+      // v9.1: log de mudanças de estado pra debug em iOS.
+      if (ctx.onstatechange === null) {
+        ctx.onstatechange = () => {
+          if (window.__debugAudio) console.debug('AudioContext state →', ctx.state);
+        };
+      }
       unlocked = true;
       // Decodifica o sample real em background — não bloqueia
       carregarSabiaSample();
@@ -4887,7 +4965,8 @@ function renderApp() {
 
   if (State.modo === 'landing') {
     btnVoltar.classList.add('escondido');
-    titulo.textContent = 'Sabiá Morse';
+    // v9.4: hero da landing já tem "Sabiá Morse" como h1 — não duplica no header.
+    titulo.textContent = '';
     renderLanding(tela);
   } else if (State.modo === 'historia') {
     btnVoltar.classList.remove('escondido');
@@ -5925,17 +6004,16 @@ function renderPulso(tela) {
 function renderCena(tela, cena) {
   const wrap = el('div', { class: 'cena' });
 
-  // v8 (Temporada 1): cabeçalho "Ep N/11 · 🏠 em casa · Título". Bloco é
-  // opcional pra cenas legadas; cenas sem `bloco` mostram só "Ep N/N".
-  const totalCenas = ROTEIRO.length;
-  const epNum = State.cenaIdx + 1;
+  // v9.4: cabeçalho da cena ficava "Ep N/N · 🏠 em casa · Em casa" — três
+  // vezes a mesma info (header da app já mostra "Ep N/N · Título"). Agora
+  // só o chip do bloco (com emoji do local) aparece aqui — o resto é
+  // breadcrumb no header. Cenas sem bloco renderizam sem cabeçalho extra.
   const bloco = cena.bloco;
-  const cabHTML = [
-    el('span', { class: 'cena-ep' }, `Ep ${epNum}/${totalCenas}`),
-    bloco ? el('span', { class: 'cena-bloco' }, `${bloco.emoji} ${bloco.nome}`) : null,
-    el('span', { class: 'cena-titulo-mini' }, cena.titulo),
-  ].filter(Boolean);
-  wrap.appendChild(el('div', { class: 'cena-cabecalho' }, cabHTML));
+  if (bloco) {
+    wrap.appendChild(el('div', { class: 'cena-cabecalho' }, [
+      el('span', { class: 'cena-bloco' }, `${bloco.emoji} ${bloco.nome}`),
+    ]));
+  }
 
   // Fundo + personagens — só renderiza se houver personagens. Cenas com palco vazio
   // (ex.: roda de apresentação que monta o próprio círculo) não desperdiçam espaço.
@@ -5968,9 +6046,13 @@ function renderCena(tela, cena) {
   wrap.appendChild(fala);
 
   if (cena.falaSub) {
+    // v9.4: contraste subiu — antes era `--tinta-suave` em fundo creme, sumia
+    // em luz ambiente no iPhone. Agora usa `--marrom` (mesmo tom da fala
+    // principal) com weight 500 e fundo levemente tingido pra destacar a
+    // citação sem competir com a fala em si.
     wrap.appendChild(el('div', {
       class: 'cena-fala',
-      style: 'font-style:italic; color: var(--tinta-suave); background: transparent; border: none; box-shadow: none; padding: 4px 12px;',
+      style: 'font-style:italic; font-weight:500; color: var(--marrom); background: rgba(244,211,94,0.18); border: none; box-shadow: none; padding: 8px 14px; font-size: clamp(14px, 4vw, 17px);',
       html: cena.falaSub,
     }));
   }
@@ -7046,19 +7128,28 @@ function renderTecladoCrianca(tela, wrap) {
   });
   wrap.appendChild(el('div', { style: 'display:flex; justify-content:center; margin: 8px 0;' }, [btnTocar]));
 
-  // Chips grandes
+  // Chips grandes — v9.4: combos afetivos com divisor visual.
   const chips = el('div', { class: 'crianca-chips' });
-  PALAVRAS_CRIANCA.forEach(p => {
-    const ehCombo = COMBOS_AFETO.has(p);
+  const simples = PALAVRAS_CRIANCA.filter(p => !COMBOS_AFETO.has(p));
+  const combos = PALAVRAS_CRIANCA.filter(p => COMBOS_AFETO.has(p));
+  simples.forEach(p => {
     const ehEspecial = ESPECIAIS.has(p);
-    const txt = ehCombo ? p.replace(' ', '-') : p;
-    const chip = el('button', {
-      class: 'palavra-rapida crianca' + (ehEspecial ? ' especial' : '') + (ehCombo ? ' combo' : ''),
+    chips.appendChild(el('button', {
+      class: 'palavra-rapida crianca' + (ehEspecial ? ' especial' : ''),
       'data-p': p,
       onClick: () => escolher(p),
-    }, txt);
-    chips.appendChild(chip);
+    }, p));
   });
+  if (combos.length) {
+    chips.appendChild(el('div', { class: 'crianca-chips-divisor' }, '↓ encadeados ↓'));
+    combos.forEach(p => {
+      chips.appendChild(el('button', {
+        class: 'palavra-rapida crianca combo',
+        'data-p': p,
+        onClick: () => escolher(p),
+      }, p.replace(' ', '-')));
+    });
+  }
   wrap.appendChild(chips);
 }
 
@@ -7257,15 +7348,26 @@ function renderTeclado(tela) {
   // Morse vira espaço de palavra entre PAPA e TO (separador `/`).
   const COMBOS_AFETO = new Set(['PAPA TO', 'MAMA TO', 'VOVO TO', 'PAIO TO', 'MAIO TO']);
   const palavras = el('div', { class: 'palavras-rapidas' });
-  PALAVRAS_RAPIDAS.forEach(p => {
-    const ehCombo = COMBOS_AFETO.has(p);
+  // v9.4: combos afetivos (PAPA-TO etc) ganham divisor visual — antes
+  // misturavam com nomes simples e quebravam o ritmo do grid.
+  const simples = PALAVRAS_RAPIDAS.filter(p => !COMBOS_AFETO.has(p));
+  const combos = PALAVRAS_RAPIDAS.filter(p => COMBOS_AFETO.has(p));
+  simples.forEach(p => {
     const ehEspecial = (p === 'BENTO' || p === 'PARABENS NENA');
-    const display = ehCombo ? p.replace(' ', '-') : p;
     palavras.appendChild(el('button', {
-      class: 'palavra-rapida' + (ehEspecial ? ' especial' : '') + (ehCombo ? ' combo' : ''),
+      class: 'palavra-rapida' + (ehEspecial ? ' especial' : ''),
       onClick: () => { State.texto = p.slice(0, 20); atualizaInput(); }
-    }, display));
+    }, p));
   });
+  if (combos.length) {
+    palavras.appendChild(el('div', { class: 'palavras-rapidas-divisor' }, '↓ encadeados ↓'));
+    combos.forEach(p => {
+      palavras.appendChild(el('button', {
+        class: 'palavra-rapida combo',
+        onClick: () => { State.texto = p.slice(0, 20); atualizaInput(); }
+      }, p.replace(' ', '-')));
+    });
+  }
   wrap.appendChild(palavras);
 
   // Grade alfabeto
@@ -7396,13 +7498,9 @@ function renderLetraDetalhe(tela, letra) {
   const morseLetra = el('div', { class: 'morse-display', html: renderMorse(codLetra) });
   wrap.appendChild(morseLetra);
 
-  // "É de palavra" — atualizado dinamicamente quando troca de chip
-  const fraseE = el('div', {
-    class: 'cena-fala',
-    style: 'background: transparent; border:none; box-shadow:none; font-style:italic;',
-  });
-  wrap.appendChild(fraseE);
-
+  // v9.4: a frase "S é de Sol" foi removida — era a quinta menção de "Sol"
+  // na mesma tela (S grande, ...,morse, frase, palavra-display, morse-palavra,
+  // chip). Big SOL + chip ativo já comunicam a relação letra→palavra.
   // Palavra grande — atualizada
   const palavraDisp = el('div', {
     class: 'palavra-display',
@@ -7426,10 +7524,6 @@ function renderLetraDetalhe(tela, letra) {
 
   function atualizarPalavra(p) {
     palavraAtual = p;
-    fraseE.replaceChildren(
-      el('span', {}, letra + ' é de '),
-      el('b', {}, p),
-    );
     palavraDisp.textContent = p.toUpperCase();
     morsePalavra.innerHTML = renderMorse(palavraParaMorse(p));
     chipsLista.querySelectorAll('.letra-chip').forEach(b => {
@@ -7740,9 +7834,21 @@ async function inicializar() {
   setTimeout(fecharLoader, 1200);
 
   // Desbloqueio: cada gesto reabre o AudioContext (iOS suspende após inatividade).
+  // v9.1: touchstart e pointerdown são MAIS cedo que touchend/click — no iOS,
+  // o "user gesture context" começa no início do toque, então resume() tem
+  // mais chance de ter sucesso. Mantidos touchend/click pra cobrir mouse e
+  // navegadores que não disparam touch/pointer.
   const unlockHandler = () => Audio.unlock();
-  document.body.addEventListener('touchend', unlockHandler);
+  document.body.addEventListener('touchstart', unlockHandler, { passive: true });
+  document.body.addEventListener('touchend', unlockHandler, { passive: true });
+  document.body.addEventListener('pointerdown', unlockHandler, { passive: true });
   document.body.addEventListener('click', unlockHandler);
+  // v9.1: voltar do background no iOS pode deixar o ctx em 'interrupted'
+  // sem nenhum gesto pra dispará-lo. Re-tenta unlock na próxima vez que
+  // a aba ficar visível.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) Audio.unlock();
+  });
 }
 
 window.addEventListener('load', inicializar);
