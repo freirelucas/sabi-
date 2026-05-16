@@ -2952,6 +2952,34 @@ const Audio = (() => {
   let violaoG3Buffer = null;  // Sol3 = ponto
   let violaoD3Buffer = null;  // Ré3  = traço
 
+  // v9.1: hardening pra Safari iOS. Lucas reportou que Android funciona mas
+  // Apple não. Três armadilhas conhecidas do iOS Safari:
+  //   (1) AudioContext criado fora de um gesto fica em estado 'suspended' e
+  //       o primeiro resume() às vezes falha silenciosamente.
+  //   (2) Após Siri/ligação/outra mídia, o ctx entra em 'interrupted' — o
+  //       código antigo só tratava 'suspended'.
+  //   (3) Voltar do background deixa o ctx num desses estados sem nenhum
+  //       evento de UI que dispare o unlock antigo.
+  // Solução: unlock() resume sempre que state ≠ 'running', um <audio> HTML5
+  // silencioso "kicka" a sessão no primeiro toque, visibilitychange força
+  // re-unlock ao voltar do background, e statechange loga em modo debug.
+  let _kickAudioEl = null;
+  // 0.05s de silêncio em WAV PCM mono 44.1kHz — Data URL pequena.
+  const _SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=';
+  function _kickAudioSession() {
+    try {
+      if (!_kickAudioEl) {
+        _kickAudioEl = new window.Audio(_SILENT_WAV);
+        _kickAudioEl.setAttribute('playsinline', '');
+        _kickAudioEl.setAttribute('webkit-playsinline', '');
+        _kickAudioEl.muted = true;
+        _kickAudioEl.loop = false;
+      }
+      const p = _kickAudioEl.play();
+      if (p && p.catch) p.catch(() => {});
+    } catch (e) { /* silent */ }
+  }
+
   // ----- Tracking de fontes ativas -----
   // Toda BufferSourceNode/OscillatorNode entra aqui ao ser criada e sai automaticamente
   // no .onended. pararTudo() força .stop(0) em tudo que sobrou — resolve a sobreposição
@@ -3126,11 +3154,24 @@ const Audio = (() => {
 
   async function unlock() {
     init();
-    if (ctx.state === 'suspended') { try { await ctx.resume(); } catch(e){} }
+    // v9.1 (iOS): resume cobre 'suspended' (não-gesto) e 'interrupted'
+    // (Siri, outra mídia, ligação). Antes só tratava 'suspended'.
+    if (ctx.state !== 'running') {
+      try { await ctx.resume(); } catch(e){}
+    }
     if (!unlocked) {
       const buf = ctx.createBuffer(1, 1, 22050);
       const s = ctx.createBufferSource();
       s.buffer = buf; s.connect(ctx.destination); s.start(0);
+      // v9.1: <audio> HTML5 silencioso ajuda a kickar a sessão de áudio
+      // do iOS em alguns cases (não anula o switch físico de mudo).
+      _kickAudioSession();
+      // v9.1: log de mudanças de estado pra debug em iOS.
+      if (ctx.onstatechange === null) {
+        ctx.onstatechange = () => {
+          if (window.__debugAudio) console.debug('AudioContext state →', ctx.state);
+        };
+      }
       unlocked = true;
       // Decodifica o sample real em background — não bloqueia
       carregarSabiaSample();
@@ -7740,9 +7781,21 @@ async function inicializar() {
   setTimeout(fecharLoader, 1200);
 
   // Desbloqueio: cada gesto reabre o AudioContext (iOS suspende após inatividade).
+  // v9.1: touchstart e pointerdown são MAIS cedo que touchend/click — no iOS,
+  // o "user gesture context" começa no início do toque, então resume() tem
+  // mais chance de ter sucesso. Mantidos touchend/click pra cobrir mouse e
+  // navegadores que não disparam touch/pointer.
   const unlockHandler = () => Audio.unlock();
-  document.body.addEventListener('touchend', unlockHandler);
+  document.body.addEventListener('touchstart', unlockHandler, { passive: true });
+  document.body.addEventListener('touchend', unlockHandler, { passive: true });
+  document.body.addEventListener('pointerdown', unlockHandler, { passive: true });
   document.body.addEventListener('click', unlockHandler);
+  // v9.1: voltar do background no iOS pode deixar o ctx em 'interrupted'
+  // sem nenhum gesto pra dispará-lo. Re-tenta unlock na próxima vez que
+  // a aba ficar visível.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) Audio.unlock();
+  });
 }
 
 window.addEventListener('load', inicializar);
