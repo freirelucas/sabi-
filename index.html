@@ -4838,23 +4838,26 @@ const ROTEIRO = [
 // a âncora default mostrada no card; as 4 seguintes aparecem como chips
 // clicáveis no detalhe da letra. Critérios: curtas, do universo de 5 anos,
 // preferência por palavras concretas (objeto/animal/ação) sobre abstratas.
+// v9.7: amigos do Bento (Ana, Bruno, Gabriel, Luca, Pedro) entram como
+// 6ª opção em cada letra correspondente. Preserva as palavras-âncora
+// que Lucas escolheu (1ª posição = a que feed PALAVRAS_LETRA).
 const PALAVRAS_LETRA_LISTA = {
-  A: ['Asa',  'Avô',  'Anjo', 'Água', 'Amor'],
-  B: ['Bola', 'Boné', 'Bento','Bobo', 'Beijo'],
+  A: ['Asa',  'Avô',  'Anjo', 'Água', 'Amor', 'Ana'],
+  B: ['Bola', 'Boné', 'Bento','Bobo', 'Beijo','Bruno'],
   C: ['Casa', 'Coco', 'Cuca', 'Céu',  'Cinco'],
   D: ['Dedo', 'Dia',  'Doce', 'Dado', 'Duda'],
   E: ['Eu',   'Ela',  'Eva',  'Ele',  'Estela'],
   F: ['Flor', 'Faca', 'Fé',   'Fada', 'Foca'],
-  G: ['Gato', 'Gude', 'Galho','Geleia','Gola'],
+  G: ['Gato', 'Gude', 'Galho','Geleia','Gola', 'Gabriel'],
   H: ['Hoje', 'Hora', 'Hino', 'Homem','Herói'],
   I: ['Ipê',  'Ilha', 'Imã',  'Iate', 'Igual'],
   J: ['Jogo', 'Joia', 'Judo', 'João', 'Janela'],
   K: ['Kart', 'Kiwi', 'Karatê','Koala','Kombi'],
-  L: ['Lua',  'Lobo', 'Leite','Lago', 'Livro'],
+  L: ['Lua',  'Lobo', 'Leite','Lago', 'Livro','Luca'],
   M: ['Mama', 'Mel',  'Mola', 'Mato', 'Mão'],
   N: ['Nena', 'Nada', 'Neve', 'Ninho','Nuvem'],
   O: ['Oi',   'Ovo',  'Onda', 'Oito', 'Olho'],
-  P: ['Papa', 'Pé',   'Pia',  'Pó',   'Pato'],
+  P: ['Papa', 'Pé',   'Pia',  'Pó',   'Pato', 'Pedro'],
   Q: ['Que',  'Quina','Quiabo','Queijo','Quintal'],
   R: ['Rio',  'Rato', 'Rua',  'Rede', 'Roda'],
   S: ['Sol',  'Sopa', 'Sabiá','Sapo', 'Surf'],
