@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#E8A45C">
-<title>Sabiá Morse — Escola do To e do Ben</title>
+<title>Sábia Sabiá — Escola do To e do Ben</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500;9..144,700;9..144,900&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
@@ -96,9 +96,10 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   border: 1.5px solid rgba(120, 90, 60, 0.18);
 }
 .som-btn {
-  width: 36px; height: 36px; border-radius: 50%;
+  /* v9.6: 36 → 44 pra atingir min-touch Apple HIG. */
+  width: 44px; height: 44px; border-radius: 50%;
   display: grid; place-items: center;
-  font-size: 18px; color: var(--marrom);
+  font-size: 20px; color: var(--marrom);
   background: var(--papel-medio);
   transition: transform 0.15s, background 0.2s;
   flex-shrink: 0;
@@ -141,7 +142,8 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 @media (max-width: 380px) {
   .som-slider { width: 56px; }
   .controle-som { padding: 3px 6px 3px 3px; gap: 4px; }
-  .som-btn { width: 32px; height: 32px; font-size: 16px; }
+  /* v9.6: mantém 40+ mesmo em tela pequena pra continuar atingindo min-touch. */
+  .som-btn { width: 40px; height: 40px; font-size: 18px; }
 }
 .titulo-tela {
   font-family: var(--display); font-weight: 700;
@@ -1492,12 +1494,13 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 }
 .compasso-rotulo { font-weight: 700; opacity: 0.7; }
 .compasso-toggle {
+  /* v9.6: 32 → 44 pra min-touch Apple HIG. */
   display: inline-flex; align-items: center; justify-content: center;
-  width: 32px; height: 32px;
+  width: 44px; height: 44px;
   border: 1px solid var(--marrom-claro);
   border-radius: 50%;
   background: white;
-  font-size: 14px;
+  font-size: 18px;
   cursor: pointer;
   transition: background 0.15s, transform 0.1s;
 }
@@ -1684,8 +1687,9 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   align-self: center;
 }
 .teclado-modo {
+  /* v9.6: min-height 40 → 44 pra min-touch Apple HIG. */
   display: flex; align-items: center; gap: 6px;
-  padding: 8px 16px; min-height: 40px;
+  padding: 10px 16px; min-height: 44px;
   background: transparent; border: none;
   border-radius: 18px;
   font-family: var(--display); font-weight: 700;
@@ -1769,15 +1773,16 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   min-width: 56px;
 }
 .chip {
+  /* v9.6: 36 → 44 (Apple HIG). Padding interno acompanha pra manter respiro. */
   background: white;
   border: 2px solid var(--marrom-claro);
   border-radius: 18px;
-  padding: 6px 12px;
+  padding: 10px 14px;
   font-family: var(--display); font-weight: 700;
   font-size: 13px;
   color: var(--marrom);
   display: inline-flex; align-items: center; gap: 4px;
-  min-height: 36px;
+  min-height: 44px;
   transition: all 0.1s;
 }
 .chip.ativo {
@@ -1908,14 +1913,15 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   .palavras-rapidas { grid-template-columns: repeat(2, 1fr); }
 }
 .palavra-rapida {
+  /* v9.6: 40 → 44 (Apple HIG). */
   background: var(--ceu);
   border: 2px solid #B8C9D2;
   border-radius: 20px;
-  padding: 9px 14px;
+  padding: 11px 14px;
   font-family: var(--display); font-weight: 700;
   font-size: 13px;
   color: var(--tinta);
-  min-height: 40px;
+  min-height: 44px;
   display: inline-flex; align-items: center;
 }
 .palavra-rapida.especial { background: var(--amarelo); border-color: var(--amarelo-bico); }
@@ -2366,12 +2372,15 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .pulso-explora-mini-vis > span.pulsando { background: var(--laranja-vivo) !important; transform: scaleY(1.3); }
 
 .pulso-rever-wizard {
+  /* v9.6: padding maior pra atingir min-touch 44px (Apple HIG) sem
+     deixar o link textual visualmente grande. */
   text-align: center;
   font-size: 12px; color: var(--tinta-suave);
   margin-top: 6px;
   cursor: pointer;
   text-decoration: underline;
-  padding: 8px;
+  padding: 14px 16px;
+  min-height: 44px;
   background: transparent;
   border: none;
   font-family: var(--display);
@@ -2563,15 +2572,19 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .tour-btn-secundario.invisivel { visibility: hidden; }
 .tour-btn-principal:active, .tour-btn-secundario:active { transform: scale(0.95); }
 .tour-pular {
+  /* v9.6: padding maior pra atingir min-touch 44 (Apple HIG) sem
+     deixar o link textual visualmente grande. */
   background: transparent; border: none;
   font-family: var(--display); font-style: italic;
   font-size: 12px;
   color: var(--tinta-suave);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 14px 16px;
+  min-height: 44px;
   margin-top: 4px;
 }
 .btn-refazer-tour {
+  /* v9.6: padding + min-height pra Apple HIG. */
   background: transparent;
   border: 1.5px dashed rgba(120, 90, 60, 0.35);
   border-radius: 12px;
@@ -2579,7 +2592,8 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   font-size: 13px;
   color: var(--tinta-suave);
   cursor: pointer;
-  padding: 8px 14px;
+  padding: 12px 16px;
+  min-height: 44px;
   margin: 12px auto 4px;
   display: block;
   transition: background 0.18s;
@@ -2639,14 +2653,15 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   margin: 4px 8px;
 }
 .letra-chip {
+  /* v9.6: 36 → 44 (Apple HIG). */
   background: var(--cor-papel);
   border: 2px solid rgba(120,90,60,0.25);
   border-radius: 14px;
-  padding: 6px 12px;
+  padding: 10px 14px;
   font-size: 14px; font-weight: 600;
   color: var(--tinta);
   cursor: pointer;
-  min-height: 36px;
+  min-height: 44px;
   transition: transform 0.1s, background 0.15s, border-color 0.15s;
 }
 .letra-chip:active { transform: scale(0.94); }
@@ -2697,7 +2712,7 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 <div id="app">
   <header class="cabecalho">
     <button class="voltar" id="btn-voltar" aria-label="voltar">←</button>
-    <div class="titulo-tela" id="titulo-tela">Sabiá Morse</div>
+    <div class="titulo-tela" id="titulo-tela">Sábia Sabiá</div>
     <div class="controle-som">
       <button class="som-btn" id="btn-mute" aria-label="ligar/desligar som" aria-pressed="false">🔊</button>
       <input type="range" class="som-slider" id="slider-volume" min="0" max="100" value="70" aria-label="volume">
@@ -4881,7 +4896,7 @@ function renderApp() {
 
   if (State.modo === 'landing') {
     btnVoltar.classList.add('escondido');
-    // v9.4: hero da landing já tem "Sabiá Morse" como h1 — não duplica no header.
+    // v9.4: hero da landing já tem "Sábia Sabiá" como h1 — não duplica no header.
     titulo.textContent = '';
     renderLanding(tela);
   } else if (State.modo === 'historia') {
@@ -4936,7 +4951,7 @@ function renderLanding(tela) {
   pers.appendChild(ben); pers.appendChild(to); pers.appendChild(caca);
   hero.appendChild(pers);
 
-  hero.appendChild(el('h1', { class: 'menu-hero-titulo' }, 'Sabiá Morse'));
+  hero.appendChild(el('h1', { class: 'menu-hero-titulo' }, 'Sábia Sabiá'));
   hero.appendChild(el('p', { class: 'menu-hero-tag' },
     'pássaros escrevem com música'));
   hero.appendChild(el('p', { class: 'menu-hero-sub' },
@@ -6877,8 +6892,10 @@ function renderAcaoCena(container, cena) {
 // Display com hífen (PAPA-TO) é só visual nos chips do teclado.
 const PALAVRAS_RAPIDAS = [
   'SOS', 'BENTO', 'NENA', 'PARABENS NENA',
-  // turma
+  // turma da história
   'TO', 'BEN', 'CACA', 'JO', 'TETE', 'TATA', 'TITO', 'LILA', 'OI',
+  // amigos do Bento (v9.6 — Lucas pediu)
+  'ANA', 'BRUNO', 'PEDRO', 'GABRIEL', 'LUCA',
   // família e padrinhos
   'PAPA', 'MAMA', 'VOVO', 'PAIO', 'MAIO',
   // combos afetivos (mostrados como PAPA-TO / MAMA-TO / VOVO-TO / PAIO-TO / MAIO-TO)
@@ -6949,8 +6966,10 @@ function _criarSeletorVelocidadeBase(lista, onChange) {
 // não precisa mapear letra→Morse — escolhe palavra pronta e ouve.
 function renderTecladoCrianca(tela, wrap) {
   // Curadoria reduzida pra criança: nomes, palavras curtas, combos afetivos.
+  // v9.6: amigos do Bento (Ana, Bruno, Pedro, Gabriel, Luca) entram aqui.
   const PALAVRAS_CRIANCA = [
     'BENTO', 'NENA', 'TO', 'BEN',
+    'ANA', 'BRUNO', 'PEDRO', 'GABRIEL', 'LUCA',
     'PAPA', 'MAMA', 'VOVO',
     'CACA', 'JO', 'TETE', 'TATA', 'TITO', 'LILA',
     'OI', 'SOS', 'PAPA TO', 'MAMA TO', 'VOVO TO',

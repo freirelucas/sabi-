@@ -1,4 +1,4 @@
-# Sabiá Morse
+# Sábia Sabiá
 
 App standalone (1 HTML) que ensina Morse pro Bento (5 anos) via uma história na escola dos sabiás.
 
