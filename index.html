@@ -2682,6 +2682,136 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
   margin: 8px 0;
 }
 
+/* ============================================================
+   v10 — HUB DE TEMPORADAS · MAPA · TEMPORADA 2 (silêncio) · passo 6
+   ============================================================ */
+/* --- Hub de temporadas --- */
+.temporadas-hub {
+  flex: 1; display: flex; flex-direction: column; gap: 12px;
+  max-width: 440px; width: 100%; margin: 0 auto; padding: 4px 2px 16px;
+}
+.hub-intro { display: flex; align-items: center; gap: 12px; padding: 4px 6px 6px; }
+.hub-intro-emoji { font-size: 34px; }
+.hub-intro-titulo { font-family: var(--display); font-weight: 900; font-size: 26px; color: var(--marrom); line-height: 1; }
+.hub-intro-sub { font-family: var(--display); font-style: italic; font-weight: 500; font-size: 14px; color: var(--tinta-suave); }
+.temporada-card {
+  display: flex; align-items: center; gap: 12px; text-align: left; width: 100%;
+  background: var(--papel-medio);
+  border: 2px solid var(--temp-cor, var(--marrom-claro));
+  border-radius: 20px; padding: 14px 16px 14px 20px;
+  box-shadow: var(--sombra-suave);
+  transition: transform 0.15s, box-shadow 0.15s;
+  animation: landing-porta-entra 0.5s ease-out both;
+  position: relative; overflow: hidden;
+}
+.temporada-card::before { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 6px; background: var(--temp-cor, var(--laranja)); }
+.temporada-card:active { transform: scale(0.97); box-shadow: var(--sombra-media); }
+.temporada-card.completa { background: linear-gradient(135deg, #FFF8E6, var(--papel-medio)); }
+.temporada-card-emoji {
+  font-size: 32px; width: 52px; height: 52px; flex-shrink: 0; display: grid; place-items: center;
+  background: var(--papel); border-radius: 14px; box-shadow: inset 0 0 0 2px rgba(125,90,60,0.12);
+}
+.temporada-card-corpo { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.temporada-card-num { font-family: var(--display); font-weight: 700; font-size: 11.5px; letter-spacing: 0.4px; color: var(--temp-cor, var(--laranja-vivo)); text-transform: uppercase; }
+.temporada-card-titulo { font-family: var(--display); font-weight: 800; font-size: 19px; color: var(--marrom); line-height: 1.05; }
+.temporada-card-resumo { font-size: 12.5px; color: var(--tinta-suave); line-height: 1.25; }
+.temporada-card-prog { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+.temporada-card-prog-barra { flex: 1; height: 7px; border-radius: 4px; background: rgba(125,90,60,0.15); overflow: hidden; }
+.temporada-card-prog-fill { display: block; height: 100%; border-radius: 4px; background: var(--temp-cor, var(--laranja)); transition: width 0.4s ease; }
+.temporada-card-prog-num { font-family: var(--display); font-weight: 700; font-size: 12px; color: var(--marrom-claro); white-space: nowrap; }
+.temporada-card-seta { font-size: 20px; color: var(--temp-cor, var(--marrom-claro)); opacity: 0.85; flex-shrink: 0; }
+
+/* --- Mapa de episódios --- */
+.mapa-tela { flex: 1; display: flex; flex-direction: column; gap: 10px; max-width: 440px; width: 100%; margin: 0 auto; padding: 4px 2px 16px; }
+.mapa-cabecalho { display: flex; align-items: center; gap: 12px; padding: 4px 4px 2px; }
+.mapa-cab-emoji { font-size: 28px; width: 50px; height: 50px; flex-shrink: 0; display: grid; place-items: center; background: var(--temp-cor, var(--laranja)); border-radius: 14px; box-shadow: var(--sombra-suave); }
+.mapa-cab-num { font-family: var(--display); font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--temp-cor, var(--laranja-vivo)); }
+.mapa-cab-titulo { font-family: var(--display); font-weight: 900; font-size: 22px; color: var(--marrom); line-height: 1; }
+.mapa-comecar { align-self: stretch; font-family: var(--display); font-weight: 800; font-size: 17px; color: #fff; background: var(--temp-cor, var(--laranja)); border-radius: 16px; padding: 12px; min-height: 52px; box-shadow: var(--sombra-media); transition: transform 0.15s; }
+.mapa-comecar:active { transform: scale(0.97); }
+.mapa-trilha { display: flex; flex-direction: column; gap: 8px; }
+.mapa-ep { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; background: var(--papel-medio); border: 2px solid rgba(125,90,60,0.18); border-radius: 16px; padding: 10px 14px; min-height: 56px; transition: transform 0.12s, border-color 0.15s, background 0.15s; }
+.mapa-ep:active { transform: scale(0.98); }
+.mapa-ep.visto { border-color: var(--temp-cor, var(--laranja)); background: linear-gradient(135deg, #FFFCF2, var(--papel-medio)); }
+.mapa-ep-num { width: 36px; height: 36px; flex-shrink: 0; display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 16px; border-radius: 50%; background: var(--papel); color: var(--marrom-claro); box-shadow: inset 0 0 0 2px rgba(125,90,60,0.15); }
+.mapa-ep.visto .mapa-ep-num { background: var(--temp-cor, var(--laranja)); color: #fff; box-shadow: none; font-size: 18px; }
+.mapa-ep-corpo { flex: 1; min-width: 0; }
+.mapa-ep-titulo { font-family: var(--display); font-weight: 700; font-size: 15px; color: var(--marrom); line-height: 1.1; }
+.mapa-ep-bloco { font-size: 11.5px; color: var(--tinta-suave); margin-top: 1px; }
+.mapa-ep-seta { font-size: 17px; color: var(--marrom-claro); opacity: 0.55; flex-shrink: 0; }
+
+/* --- Par mágico (Temporada 2): o silêncio é a única diferença --- */
+.pm-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 6px 0; }
+.pm-leitura { display: flex; gap: 14px; min-height: 56px; align-items: center; }
+.pm-letra-res { font-family: var(--display); font-weight: 900; font-size: 44px; color: var(--marrom); background: var(--papel-medio); border-radius: 14px; padding: 2px 16px; box-shadow: var(--sombra-suave); animation: pm-pop 0.3s ease-out; }
+@keyframes pm-pop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.pm-morse { min-height: 58px; display: flex; align-items: center; justify-content: center; }
+.pm-grupo { display: flex; align-items: center; gap: 6px; }
+.pm-sinal { font-size: 44px; line-height: 1; color: var(--re-violao); transition: transform 0.1s, color 0.1s; }
+.pm-sinal.ponto { color: var(--sol-violao); }
+.pm-sinal.ativo { transform: scale(1.5) translateY(-4px); color: var(--laranja-vivo); }
+.pm-respiro { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 0 4px; padding: 0 10px; animation: pm-pop 0.3s ease-out; }
+.pm-respiro-puff { font-size: 26px; animation: pm-flutua 1.6s ease-in-out infinite; }
+.pm-respiro-rot { font-family: var(--display); font-style: italic; font-size: 11px; color: var(--re-violao); font-weight: 700; }
+@keyframes pm-flutua { 0%,100% { transform: translateY(0); opacity: 0.85; } 50% { transform: translateY(-4px); opacity: 1; } }
+.pm-conta { font-family: var(--display); font-style: italic; font-size: 14px; color: var(--tinta-suave); }
+.pm-switch { display: inline-flex; align-items: center; gap: 6px; background: var(--papel-medio); border: 2px solid var(--marrom-claro); border-radius: 30px; padding: 5px 8px; }
+.pm-switch-lado { font-family: var(--display); font-weight: 700; font-size: 13px; color: var(--tinta-suave); padding: 0 4px; transition: color 0.2s; }
+.pm-switch.on .pm-switch-lado.on { color: var(--re-violao); }
+.pm-switch:not(.on) .pm-switch-lado.off { color: var(--marrom); }
+.pm-switch-trilho { width: 50px; height: 28px; border-radius: 16px; background: rgba(125,90,60,0.2); position: relative; transition: background 0.2s; flex-shrink: 0; }
+.pm-switch.on .pm-switch-trilho { background: rgba(184,134,159,0.5); }
+.pm-switch-knob { position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 13px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: transform 0.2s; }
+.pm-switch.on .pm-switch-knob { transform: translateX(22px); }
+.pm-ouvir { min-width: 140px; }
+
+/* --- Silêncio respira (Temporada 2): respiros entre letras/palavras --- */
+.sr-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 6px 0; }
+.sr-dica { font-family: var(--display); font-style: italic; font-size: 14px; color: var(--marrom); text-align: center; max-width: 340px; line-height: 1.3; }
+.sr-linha { display: flex; align-items: flex-end; justify-content: center; flex-wrap: wrap; gap: 4px; }
+.sr-letra { display: flex; flex-direction: column; align-items: center; gap: 4px; background: var(--papel-medio); border-radius: 12px; padding: 6px 10px; box-shadow: var(--sombra-suave); }
+.sr-letra-nome { font-family: var(--display); font-weight: 900; font-size: 20px; color: var(--marrom); }
+.sr-letra-sinais { display: flex; gap: 3px; }
+.sr-sinal { font-size: 26px; line-height: 1; color: var(--re-violao); transition: transform 0.1s, color 0.1s; }
+.sr-sinal.ponto { color: var(--sol-violao); }
+.sr-sinal.ativo { transform: scale(1.4) translateY(-3px); color: var(--laranja-vivo); }
+.sr-respiro { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1px; padding-bottom: 10px; }
+.sr-respiro.media { width: 34px; }
+.sr-respiro.grande { width: 58px; }
+.sr-respiro-puff { font-size: 20px; animation: pm-flutua 1.6s ease-in-out infinite; }
+.sr-respiro.grande .sr-respiro-puff { font-size: 26px; }
+.sr-respiro-rot { font-family: var(--display); font-style: italic; font-size: 9.5px; color: var(--re-violao); font-weight: 700; text-align: center; white-space: nowrap; }
+.sr-legenda { display: flex; flex-direction: column; gap: 5px; background: var(--papel-medio); border-radius: 12px; padding: 8px 14px; }
+.sr-leg-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--marrom); }
+.sr-leg-bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--re-violao); }
+.sr-leg-bar.curto { width: 10px; }
+.sr-leg-bar.medio { width: 28px; }
+.sr-leg-bar.grande { width: 56px; }
+
+/* --- Recap Temporada 2 --- */
+.silrec-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 6px 0; }
+.silrec-titulo { font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--marrom); }
+.silrec-legenda { display: flex; flex-direction: column; gap: 8px; background: var(--papel-medio); border-radius: 14px; padding: 10px 16px; width: 100%; max-width: 320px; }
+.silrec-leg-item { display: flex; align-items: center; gap: 12px; }
+.silrec-leg-bar { display: inline-block; height: 12px; border-radius: 6px; background: var(--re-violao); flex-shrink: 0; }
+.silrec-leg-bar.curto { width: 12px; }
+.silrec-leg-bar.medio { width: 34px; }
+.silrec-leg-bar.grande { width: 64px; }
+.silrec-leg-label { font-family: var(--display); font-weight: 700; font-size: 14px; color: var(--marrom); }
+.silrec-leg-sub { font-size: 11.5px; color: var(--tinta-suave); }
+.silrec-morse { font-size: 30px; }
+
+/* --- Pulso passo 6 (silêncio) --- */
+.pulso-sil-fileira { display: flex; gap: 14px; justify-content: center; align-items: stretch; flex-wrap: wrap; width: 100%; }
+.pulso-sil-par { display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--papel); border-radius: 14px; padding: 12px 14px; box-shadow: var(--sombra-suave); flex: 1; min-width: 120px; }
+.pulso-sil-rotulo { font-family: var(--display); font-weight: 800; font-size: 14px; color: var(--marrom); }
+.pulso-sil-sinais { display: flex; align-items: center; min-height: 44px; }
+.pulso-sil-sinais.grudado { gap: 2px; }
+.pulso-sil-sinais.respiro { gap: 4px; }
+.pulso-sil-ponto { font-size: 40px; line-height: 1; color: var(--sol-violao); transition: transform 0.1s, color 0.1s; }
+.pulso-sil-ponto.ativa { transform: scale(1.5) translateY(-4px); color: var(--laranja-vivo); }
+.pulso-sil-puff { font-size: 24px; margin: 0 4px; animation: pm-flutua 1.6s ease-in-out infinite; }
+
 /* ===== RESPONSIVO ===== */
 @media (max-height: 640px) {
   .cena-fundo { min-height: 220px; padding: 12px 8px 8px; }
@@ -3924,6 +4054,12 @@ const State = {
   // v9.1 (D1): teclado em 2 modos. Default 'crianca' pra Bento de 5 anos
   // (mostra só chips grandes + tocar). 'explorar' tem alfabeto + config completa.
   tecladoModo: 'crianca', // 'crianca' | 'explorar'
+  // v10: temporadas. A história deixou de ser uma lista única — agora é um
+  // hub de temporadas. temporadaIdx aponta pra TEMPORADAS[i]; cenaIdx indexa
+  // os episódios DELA. episodiosVistos guarda o progresso ('t1:0', 't2:3'…)
+  // pra acender ⭐ no mapa de episódios.
+  temporadaIdx: 0,
+  episodiosVistos: new Set(),
   cumpridas: new Set(),
 };
 
@@ -3945,6 +4081,7 @@ function salvarEstado() {
       pulsoPasso: State.pulsoPasso,
       pulsoModoTela: State.pulsoModoTela,
       tecladoModo: State.tecladoModo,
+      episodiosVistos: Array.from(State.episodiosVistos),
     }));
   } catch(e) {}
 }
@@ -3967,9 +4104,10 @@ function carregarEstado() {
       if (typeof d.mudo === 'boolean') State.mudo = d.mudo;
       if (typeof d.vozPulso === 'string' && ['sabia','palma','telegrafo','coracao'].includes(d.vozPulso)) State.vozPulso = d.vozPulso;
       if (d.pulsoEstrelas && typeof d.pulsoEstrelas === 'object') State.pulsoEstrelas = d.pulsoEstrelas;
-      if (typeof d.pulsoPasso === 'number' && d.pulsoPasso >= 1 && d.pulsoPasso <= 5) State.pulsoPasso = d.pulsoPasso;
+      if (typeof d.pulsoPasso === 'number' && d.pulsoPasso >= 1 && d.pulsoPasso <= 6) State.pulsoPasso = d.pulsoPasso;
       if (d.pulsoModoTela === 'wizard' || d.pulsoModoTela === 'exploracao') State.pulsoModoTela = d.pulsoModoTela;
       if (d.tecladoModo === 'crianca' || d.tecladoModo === 'explorar') State.tecladoModo = d.tecladoModo;
+      if (Array.isArray(d.episodiosVistos)) State.episodiosVistos = new Set(d.episodiosVistos);
     }
   } catch(e) {}
 }
@@ -4379,6 +4517,17 @@ function palavraParaMorse(palavra) {
     if (ch === ' ') return '/';
     return MORSE[ch] || '';
   }).filter(Boolean).join(' ');
+}
+
+// v10: versão PRECISA dos espaçamentos pra Temporada 2 (o silêncio que separa).
+// palavraParaMorse junta tudo com ' ' (inclusive ao redor do '/'), o que soma
+// espaçoLetra+espaçoPalavra+espaçoLetra entre palavras. Aqui as letras de uma
+// palavra são unidas por ' ' (gap 3×) e as palavras por '/' SEM espaços ao
+// redor (gap 7× puro) — exatamente a razão Morse 1:3:7.
+function morsePreciso(frase) {
+  return frase.toUpperCase().trim().split(/\s+/).map(palavra =>
+    palavra.split('').map(ch => MORSE[ch] || '').filter(Boolean).join(' ')
+  ).filter(Boolean).join('/');
 }
 
 // Componente: decompõe um nome em cards de letras (cada uma com seu padrão
@@ -4831,6 +4980,173 @@ const ROTEIRO = [
 ];
 
 /* ============================================================
+   TEMPORADA 2 — "O silêncio que separa"
+   ============================================================
+   Tema pedagógico: no Morse, o SILÊNCIO (a ausência de som) não é vazio
+   — é o que separa uma letra da outra e uma palavra da outra. É o conceito
+   que mais costuma faltar em quem aprende Morse, e é o que faz a leitura
+   funcionar de verdade (boas práticas: razão 1:3:7 — silêncio de 1 unidade
+   dentro da letra, 3 entre letras, 7 entre palavras).
+
+   Metáfora pro Bento (5 anos): o sabiá CANTA e RESPIRA. O respiro é o
+   silêncio. Respiro pequeno dentro da letra, respiro maior entre as letras,
+   suspiro fundo entre as palavras.
+
+   Exemplos canônicos (o silêncio é a ÚNICA diferença — Morse correto):
+     ··  grudado = I      ·  ·  com respiro = E E
+     ·−  grudado = A      ·  −  com respiro = E T
+     −−  grudado = M      −  −  com respiro = T T
+   ============================================================ */
+const ROTEIRO_T2 = [
+  // E1: NENA ABRE A TEMPORADA. O silêncio também faz parte da música.
+  {
+    id: 't2-silencio-canta',
+    titulo: 'O silêncio também canta',
+    bloco: { emoji: '🤫', nome: 'silêncio' },
+    fundo: 'amanhecer',
+    decoracao: 'sol',
+    personagens: [
+      { tipo: 'nena', classe: 'nena' },
+      { tipo: 'to', classe: 'protagonista' },
+    ],
+    fala: '— Escuta o sabiá, To. Ele canta… e <b>respira</b>. Esse respiro é o <b>silêncio</b>.',
+    falaSub: '<em>"O silêncio não é vazio — é ele que diz onde uma letra <b>acaba</b> e a outra <b>começa</b>."</em>',
+    acao: {
+      tipo: 'silencio-respira',
+      palavra: 'TO',
+      dica: 'Ouve o <b>respiro</b> entre o T e o O — é o silêncio separando as letras.',
+    },
+    proximo: '✨ ver a mágica do silêncio',
+  },
+  // E2: O PAR MÁGICO — I vira E E só com o respiro.
+  {
+    id: 't2-par-i-ee',
+    titulo: 'A mágica: I ou E·E?',
+    bloco: { emoji: '✨', nome: 'par mágico' },
+    fundo: 'dia-claro',
+    personagens: [],
+    fala: '✨ Dois pontinhos <b>·&nbsp;·</b>. <b>Grudados</b>, sem respiro, é o <b>I</b>.',
+    falaSub: '<em>Mas se a Nena <b>respira</b> no meio… viram <b>E + E</b>! Mesmos pontinhos — o silêncio é que muda tudo.</em>',
+    acao: {
+      tipo: 'par-magico',
+      junto:     { morse: '..',  leitura: 'I',   conta: 'sem respiro' },
+      separado:  { morse: '. .', leitura: 'E E', conta: 'com respiro' },
+    },
+    proximo: '🅰️ A ou E·T?',
+  },
+  // E3: A vira E T.
+  {
+    id: 't2-par-a-et',
+    titulo: 'A ou E·T?',
+    bloco: { emoji: '🅰️', nome: 'par mágico' },
+    fundo: 'dia-claro',
+    personagens: [],
+    fala: 'Um pontinho e um tracinho <b>·&nbsp;−</b>. <b>Grudados</b> é o <b>A</b>.',
+    falaSub: '<em>Com um respiro no meio viram <b>E + T</b>. O silêncio é quem escolhe!</em>',
+    acao: {
+      tipo: 'par-magico',
+      junto:     { morse: '.-',  leitura: 'A',   conta: 'sem respiro' },
+      separado:  { morse: '. -', leitura: 'E T', conta: 'com respiro' },
+    },
+    proximo: 'Ⓜ️ M ou T·T?',
+  },
+  // E4: M vira T T.
+  {
+    id: 't2-par-m-tt',
+    titulo: 'M ou T·T?',
+    bloco: { emoji: 'Ⓜ️', nome: 'par mágico' },
+    fundo: 'dia-claro',
+    personagens: [],
+    fala: 'Dois tracinhos <b>−&nbsp;−</b>. <b>Grudados</b> é o <b>M</b>.',
+    falaSub: '<em>Com respiro viram <b>T + T</b>. Sempre o silêncio mandando no recado!</em>',
+    acao: {
+      tipo: 'par-magico',
+      junto:     { morse: '--',  leitura: 'M',   conta: 'sem respiro' },
+      separado:  { morse: '- -', leitura: 'T T', conta: 'com respiro' },
+    },
+    proximo: '🌬️ o respiro grande',
+  },
+  // E5: SILÊNCIO ENTRE PALAVRAS — o respiro maior de todos.
+  {
+    id: 't2-respiro-palavra',
+    titulo: 'O respiro grande',
+    bloco: { emoji: '🌬️', nome: 'entre palavras' },
+    fundo: 'tarde',
+    personagens: [
+      { tipo: 'nena', classe: 'nena' },
+      { tipo: 'to', classe: 'protagonista' },
+    ],
+    fala: '— E entre duas <b>palavras</b>? Aí o sabiá dá um <b>suspiro fundo</b> — o respiro maior de todos.',
+    falaSub: '<em>Respiro <b>pequeno</b>: dentro da letra. Respiro <b>médio</b>: entre letras. Respiro <b>grande</b>: entre palavras.</em>',
+    acao: {
+      tipo: 'silencio-respira',
+      palavra: 'OI TO',
+      legenda: true,
+      dica: 'O silêncio <b>maior</b> entre OI e TO mostra que são <b>duas palavras</b>.',
+    },
+    proximo: '🌟 fechar a temporada',
+  },
+  // E6: RECAP + CELEBRAÇÃO. Os três respiros, a turma cantando com pausa.
+  {
+    id: 't2-recap',
+    titulo: 'Você ouve o silêncio!',
+    bloco: { emoji: '🌟', nome: 'fim da T2' },
+    fundo: 'celebracao',
+    personagens: [],
+    fala: '🌟 Agora você sabe: o <b>silêncio</b> não é vazio — é o <b>respiro</b> que separa as letras e as palavras.',
+    falaSub: '<em>Bento, você ouve a música <b>e</b> o silêncio. É assim que o sabiá conta tudo direitinho.</em>',
+    acao: { tipo: 'silencio-recap', frase: 'OI NENA' },
+    proximo: '🏠 voltar pras temporadas',
+  },
+];
+
+/* ============================================================
+   TEMPORADAS — hub que agrupa os episódios
+   ============================================================
+   v10: a "História" deixou de ser uma lista linear única. Agora é um hub:
+   o usuário escolhe a temporada, vê o mapa de episódios (com ⭐ no que já
+   viu) e entra. Adicionar uma temporada nova = só empurrar um objeto aqui;
+   contadores, cabeçalho e landing se ajustam sozinhos (facilitar escalar).
+   ============================================================ */
+const TEMPORADAS = [
+  {
+    numero: 1,
+    id: 't1',
+    emoji: '🏫',
+    titulo: 'O primeiro dia',
+    resumo: 'Em casa, o caminho, a escola da Nena, os amigos, os jogos e a festa surpresa.',
+    cor: 'var(--laranja)',
+    episodios: ROTEIRO,
+  },
+  {
+    numero: 2,
+    id: 't2',
+    emoji: '🤫',
+    titulo: 'O silêncio que separa',
+    resumo: 'O sabiá respira entre as frases. Esse silêncio é o que separa uma letra da outra.',
+    cor: 'var(--re-violao)',
+    episodios: ROTEIRO_T2,
+  },
+];
+
+// Helpers de temporada — toda a navegação da história passa por aqui, então
+// adicionar/reordenar temporadas nunca exige caçar índices chumbados.
+function temporadaAtual() { return TEMPORADAS[State.temporadaIdx] || TEMPORADAS[0]; }
+function epsAtuais() { return temporadaAtual().episodios; }
+function chaveEpisodio(tempIdx, cenaIdx) {
+  return (TEMPORADAS[tempIdx] ? TEMPORADAS[tempIdx].id : 't?') + ':' + cenaIdx;
+}
+function episodioVisto(tempIdx, cenaIdx) {
+  return State.episodiosVistos.has(chaveEpisodio(tempIdx, cenaIdx));
+}
+function progressoTemporada(tempIdx) {
+  const eps = TEMPORADAS[tempIdx].episodios;
+  let vistos = 0;
+  for (let i = 0; i < eps.length; i++) if (episodioVisto(tempIdx, i)) vistos++;
+  return { vistos, total: eps.length };
+}
+
+/* ============================================================
    PALAVRAS POR LETRA
    ============================================================ */
 // v8.3: Lucas pediu palavras CURTAS pro alfabeto + 5 alternativas infantis
@@ -4882,6 +5198,7 @@ function navegar(modo, params = {}) {
   pararLoop();
   if (State.cleanupAtual) { try { State.cleanupAtual(); } catch(e){} State.cleanupAtual = null; }
   State.modo = modo;
+  if (params.temporadaIdx !== undefined) State.temporadaIdx = params.temporadaIdx;
   if (params.cenaIdx !== undefined) State.cenaIdx = params.cenaIdx;
   if (params.letra !== undefined) State.letraSelecionada = params.letra;
   renderApp();
@@ -4902,13 +5219,27 @@ function renderApp() {
     // v9.4: hero da landing já tem "Sábia Sabiá" como h1 — não duplica no header.
     titulo.textContent = '';
     renderLanding(tela);
+  } else if (State.modo === 'temporadas') {
+    btnVoltar.classList.remove('escondido');
+    titulo.textContent = 'História';
+    renderTemporadas(tela);
+  } else if (State.modo === 'mapa') {
+    btnVoltar.classList.remove('escondido');
+    const t = temporadaAtual();
+    titulo.textContent = `Temporada ${t.numero}`;
+    renderMapaEpisodios(tela);
   } else if (State.modo === 'historia') {
     btnVoltar.classList.remove('escondido');
+    const eps = epsAtuais();
     const idx = State.cenaIdx;
-    const ep = ROTEIRO[idx];
+    const ep = eps[idx];
     const tituloEp = ep.titulo || ep.id;
-    titulo.textContent = `Ep ${idx + 1}/${ROTEIRO.length} · ${tituloEp}`;
-    renderCena(tela, ROTEIRO[idx]);
+    const t = temporadaAtual();
+    titulo.textContent = `T${t.numero} · Ep ${idx + 1}/${eps.length} · ${tituloEp}`;
+    // v10: marca o episódio como visto (acende ⭐ no mapa) assim que abre.
+    State.episodiosVistos.add(chaveEpisodio(State.temporadaIdx, idx));
+    salvarEstado();
+    renderCena(tela, ep);
   } else if (State.modo === 'teclado') {
     btnVoltar.classList.remove('escondido');
     titulo.textContent = 'Teclado livre';
@@ -4965,16 +5296,18 @@ function renderLanding(tela) {
   // ===== GRUPO 1: NARRATIVA =====
   const grupoNarrativa = el('section', { class: 'menu-grupo' });
   grupoNarrativa.appendChild(el('div', { class: 'menu-grupo-rotulo' }, '📖 narrativa'));
+  const totalEps = TEMPORADAS.reduce((s, t) => s + t.episodios.length, 0);
   grupoNarrativa.appendChild(el('button', {
     class: 'porta principal',
-    onClick: () => { Audio.unlock(); navegar('historia', { cenaIdx: 0 }); },
+    onClick: () => { Audio.unlock(); navegar('temporadas'); },
   }, [
     el('div', { class: 'porta-icone' }, '🎬'),
     el('div', { class: 'porta-texto' }, [
       el('div', { class: 'porta-titulo' }, 'História'),
-      el('div', { class: 'porta-badge' }, 'Temporada 1 · 12 episódios'),
+      el('div', { class: 'porta-badge' },
+        `${TEMPORADAS.length} temporadas · ${totalEps} episódios`),
       el('div', { class: 'porta-desc' },
-        'Em casa, padrinhos, primeiro dia, jogos e a festa da Nena.'),
+        'O primeiro dia na escola dos sabiás — e o silêncio que separa as letras.'),
     ]),
     el('div', { class: 'porta-seta' }, '→'),
   ]));
@@ -5040,6 +5373,107 @@ function renderLanding(tela) {
     el('div', { class: 'porta-seta' }, '→'),
   ]));
   wrap.appendChild(grupoBrincar);
+
+  tela.appendChild(wrap);
+}
+
+/* ============================================================
+   HUB DE TEMPORADAS — escolhe a temporada
+   ============================================================ */
+function renderTemporadas(tela) {
+  const wrap = el('div', { class: 'temporadas-hub' });
+
+  wrap.appendChild(el('div', { class: 'hub-intro' }, [
+    el('div', { class: 'hub-intro-emoji' }, '📖'),
+    el('div', { class: 'hub-intro-texto' }, [
+      el('div', { class: 'hub-intro-titulo' }, 'A história'),
+      el('div', { class: 'hub-intro-sub' }, 'Escolhe uma temporada pra entrar.'),
+    ]),
+  ]));
+
+  TEMPORADAS.forEach((t, i) => {
+    const prog = progressoTemporada(i);
+    const completa = prog.total > 0 && prog.vistos >= prog.total;
+    const pct = prog.total ? Math.round((prog.vistos / prog.total) * 100) : 0;
+    const card = el('button', {
+      class: 'temporada-card' + (completa ? ' completa' : ''),
+      style: '--temp-cor: ' + t.cor,
+      'aria-label': 'Temporada ' + t.numero + ': ' + t.titulo,
+      onClick: () => { Audio.unlock(); navegar('mapa', { temporadaIdx: i }); },
+    }, [
+      el('div', { class: 'temporada-card-emoji' }, t.emoji),
+      el('div', { class: 'temporada-card-corpo' }, [
+        el('div', { class: 'temporada-card-num' },
+          'Temporada ' + t.numero + (completa ? ' · ⭐' : '')),
+        el('div', { class: 'temporada-card-titulo' }, t.titulo),
+        el('div', { class: 'temporada-card-resumo' }, t.resumo),
+        el('div', { class: 'temporada-card-prog' }, [
+          el('span', { class: 'temporada-card-prog-barra' }, [
+            el('span', { class: 'temporada-card-prog-fill', style: 'width:' + pct + '%' }),
+          ]),
+          el('span', { class: 'temporada-card-prog-num' }, prog.vistos + '/' + prog.total),
+        ]),
+      ]),
+      el('div', { class: 'temporada-card-seta' }, '→'),
+    ]);
+    wrap.appendChild(card);
+  });
+
+  tela.appendChild(wrap);
+}
+
+/* ============================================================
+   MAPA DE EPISÓDIOS — a trilha de uma temporada
+   ============================================================ */
+function renderMapaEpisodios(tela) {
+  const t = temporadaAtual();
+  const eps = t.episodios;
+  const wrap = el('div', { class: 'mapa-tela' });
+
+  wrap.appendChild(el('div', {
+    class: 'mapa-cabecalho', style: '--temp-cor: ' + t.cor,
+  }, [
+    el('div', { class: 'mapa-cab-emoji' }, t.emoji),
+    el('div', { class: 'mapa-cab-texto' }, [
+      el('div', { class: 'mapa-cab-num' }, 'Temporada ' + t.numero),
+      el('div', { class: 'mapa-cab-titulo' }, t.titulo),
+    ]),
+  ]));
+
+  // Próximo episódio não-visto (pra "continuar"); 0 se a temporada toda foi vista.
+  const prog = progressoTemporada(State.temporadaIdx);
+  let proxIdx = 0;
+  for (let i = 0; i < eps.length; i++) {
+    if (!episodioVisto(State.temporadaIdx, i)) { proxIdx = i; break; }
+  }
+  const completa = prog.vistos >= prog.total;
+  const rotuloComecar = prog.vistos === 0 ? '▶ começar'
+    : completa ? '↻ assistir de novo' : '▶ continuar';
+  const btnComecar = el('button', {
+    class: 'mapa-comecar', style: '--temp-cor: ' + t.cor,
+    onClick: () => { Audio.unlock(); navegar('historia', { cenaIdx: proxIdx }); },
+  }, rotuloComecar);
+  wrap.appendChild(btnComecar);
+
+  const trilha = el('div', { class: 'mapa-trilha' });
+  eps.forEach((ep, i) => {
+    const visto = episodioVisto(State.temporadaIdx, i);
+    const item = el('button', {
+      class: 'mapa-ep' + (visto ? ' visto' : ''),
+      style: '--temp-cor: ' + t.cor,
+      'aria-label': 'Episódio ' + (i + 1) + ': ' + (ep.titulo || ep.id) + (visto ? ' (já visto)' : ''),
+      onClick: () => { Audio.unlock(); navegar('historia', { cenaIdx: i }); },
+    }, [
+      el('div', { class: 'mapa-ep-num' }, visto ? '⭐' : String(i + 1)),
+      el('div', { class: 'mapa-ep-corpo' }, [
+        el('div', { class: 'mapa-ep-titulo' }, ep.titulo || ep.id),
+        ep.bloco ? el('div', { class: 'mapa-ep-bloco' }, ep.bloco.emoji + ' ' + ep.bloco.nome) : null,
+      ]),
+      el('div', { class: 'mapa-ep-seta' }, '→'),
+    ]);
+    trilha.appendChild(item);
+  });
+  wrap.appendChild(trilha);
 
   tela.appendChild(wrap);
 }
@@ -5399,6 +5833,14 @@ const PASSOS_PULSO = [
     explica: 'No Morse, <b>· ponto</b> dura <b>1</b> pinguinho. <b>− traço</b> dura <b>3</b>. Tamanho diferente, mesmo pulso.',
     totalBeats: 2,
   },
+  {
+    // v10: ponte pedagógica pra Temporada 2. O silêncio também tem tamanho —
+    // a criança ouve "·· grudado" (=I) virar "· · com respiro" (=E E).
+    icone: '🤫',
+    titulo: 'O silêncio também conta',
+    explica: 'O <b>vazio</b> entre os toques também tem tamanho! <b>Grudado</b> vira uma letra; com um <b>respiro</b> no meio, viram duas.',
+    totalBeats: 4,
+  },
 ];
 
 function renderPulso(tela) {
@@ -5542,12 +5984,13 @@ function renderPulso(tela) {
       montar();
     });
 
+    const ehUltimoPasso = passo === PASSOS_PULSO.length;
     const btnProx = el('button', { class: 'pulso-nav-btn primario' },
-      passo === 5 ? '🎉 brincar livre →' : 'próximo →');
+      ehUltimoPasso ? '🎉 brincar livre →' : 'próximo →');
     btnProx.addEventListener('click', () => {
       State.pulsoEstrelas['passo' + passo] = true;
       salvarEstado();
-      if (passo === 5) {
+      if (ehUltimoPasso) {
         State.pulsoModoTela = 'exploracao';
         salvarEstado();
         if (todasEstrelasGanhas()) mostrarConfetePulso();
@@ -5868,10 +6311,51 @@ function renderPulso(tela) {
         },
       };
     },
+    // ----- Passo 6: O silêncio (grudado vira respiro) -----
+    (vis) => {
+      // Dois pontinhos GRUDADOS (= I) vs os mesmos com um RESPIRO no meio
+      // (= E E). É o teaser direto da Temporada 2.
+      function par(rotulo, classe, comPuff) {
+        const wrap = el('div', { class: 'pulso-sil-par' });
+        wrap.appendChild(el('div', { class: 'pulso-sil-rotulo' }, rotulo));
+        const sinais = el('div', { class: 'pulso-sil-sinais ' + classe });
+        const p1 = el('span', { class: 'pulso-sil-ponto' }, '·');
+        const p2 = el('span', { class: 'pulso-sil-ponto' }, '·');
+        sinais.appendChild(p1);
+        if (comPuff) sinais.appendChild(el('span', { class: 'pulso-sil-puff' }, '🌬️'));
+        sinais.appendChild(p2);
+        wrap.appendChild(sinais);
+        return { wrap, p1, p2 };
+      }
+      const grudado = par('grudado = I', 'grudado', false);
+      const respiro = par('respiro = E E', 'respiro', true);
+      const fileira = el('div', { class: 'pulso-sil-fileira' });
+      fileira.appendChild(grudado.wrap);
+      fileira.appendChild(respiro.wrap);
+      vis.appendChild(fileira);
+
+      function flash(node) {
+        if (!node) return;
+        node.classList.add('ativa');
+        setTimeout(() => node.classList.remove('ativa'), 160);
+      }
+      return {
+        gerarPadroes() {
+          // I: 2 pontos colados (gap 1 pinguinho) → beats 0 e 0.5.
+          // E E: 2 pontos com um respiro inteiro no meio → beats 2 e 3.
+          return [
+            { atBeat: 0,   type: '.', visualHandler: () => flash(grudado.p1) },
+            { atBeat: 0.5, type: '.', visualHandler: () => flash(grudado.p2) },
+            { atBeat: 2,   type: '.', visualHandler: () => flash(respiro.p1) },
+            { atBeat: 3,   type: '.', visualHandler: () => flash(respiro.p2) },
+          ];
+        },
+      };
+    },
   ];
 
   function todasEstrelasGanhas() {
-    return [1,2,3,4,5].every(n => State.pulsoEstrelas['passo' + n]);
+    return PASSOS_PULSO.every((_, i) => State.pulsoEstrelas['passo' + (i + 1)]);
   }
 
   function mostrarConfetePulso() {
@@ -5983,12 +6467,13 @@ function renderCena(tela, cena) {
         Audio.playSabiaTom(t, 79, 0.08, 0.35);        // G5
         Audio.playSabiaTom(t + 0.09, 83, 0.10, 0.35); // B5
       } catch(e) {}
-      if (State.cenaIdx < ROTEIRO.length - 1) {
+      if (State.cenaIdx < epsAtuais().length - 1) {
         navegar('historia', { cenaIdx: State.cenaIdx + 1 });
       } else {
-        // Final: volta pra landing (a história termina em si mesma).
+        // Final: a temporada termina em si mesma e volta pro hub — onde a
+        // temporada recém-concluída aparece com ⭐ e a próxima fica à vista.
         celebrar(40);
-        setTimeout(() => navegar('landing'), 1800);
+        setTimeout(() => navegar('temporadas'), 1800);
       }
     }
   }, cena.proximo));
@@ -6884,6 +7369,257 @@ function renderAcaoCena(container, cena) {
 
     posicionarPersonagens();
     atualizaStatus();
+  } else if (a.tipo === 'par-magico') {
+    // ===== TEMPORADA 2: O PAR MÁGICO =====
+    // O silêncio é a ÚNICA diferença entre dois sentidos. Um switch alterna
+    // "grudado" (sem respiro) ↔ "com respiro": os MESMOS sinais, mas o vazio
+    // no meio cresce e a leitura muda (·· vira E·E, ·− vira E·T, −− vira T·T).
+    let comRespiro = false;
+
+    const pm = el('div', { class: 'pm-wrap' });
+
+    const leitura = el('div', { class: 'pm-leitura', 'aria-live': 'polite' });
+    pm.appendChild(leitura);
+
+    const morseVis = el('div', { class: 'pm-morse' });
+    pm.appendChild(morseVis);
+
+    const conta = el('div', { class: 'pm-conta' });
+    pm.appendChild(conta);
+
+    function estado() { return comRespiro ? a.separado : a.junto; }
+
+    // Monta os sinais; onde houver ' ' (silêncio entre letras) entra um respiro.
+    let sinaisRefs = [];
+    function montar() {
+      const e = estado();
+      // leitura grande, uma "ficha" por letra resultante
+      leitura.innerHTML = '';
+      e.leitura.split(' ').forEach(L => {
+        leitura.appendChild(el('span', { class: 'pm-letra-res' }, L));
+      });
+      // sinais + respiro
+      morseVis.innerHTML = '';
+      sinaisRefs = [];
+      const grupo = el('div', { class: 'pm-grupo' });
+      e.morse.split('').forEach(ch => {
+        if (ch === ' ') {
+          grupo.appendChild(el('div', { class: 'pm-respiro' }, [
+            el('span', { class: 'pm-respiro-puff' }, '🌬️'),
+            el('span', { class: 'pm-respiro-rot' }, 'respiro'),
+          ]));
+        } else {
+          const s = el('span', {
+            class: ch === '.' ? 'pm-sinal ponto' : 'pm-sinal traco',
+          }, ch === '.' ? '·' : '–');
+          sinaisRefs.push(s);
+          grupo.appendChild(s);
+        }
+      });
+      morseVis.appendChild(grupo);
+      conta.textContent = e.conta || (comRespiro ? 'com respiro' : 'sem respiro');
+      pm.classList.toggle('respirando', comRespiro);
+    }
+
+    function tocar() {
+      Audio.unlock();
+      pararLoop();
+      const e = estado();
+      const sinais = sinaisRefs;
+      tocarSequencia(e.morse, {
+        voz: 'sabia',
+        onElemento: (ch, idx) => {
+          sinais.forEach(s => s.classList.remove('ativo'));
+          if (sinais[idx]) {
+            sinais[idx].classList.add('ativo');
+            setTimeout(() => sinais[idx] && sinais[idx].classList.remove('ativo'),
+              ch === '.' ? 150 : 360);
+          }
+        },
+      });
+    }
+
+    const sw = el('button', {
+      class: 'pm-switch', role: 'switch', 'aria-checked': 'false',
+      'aria-label': 'respirar no meio dos sinais',
+    }, [
+      el('span', { class: 'pm-switch-lado off' }, 'grudado'),
+      el('span', { class: 'pm-switch-trilho' }, [ el('span', { class: 'pm-switch-knob' }, '🌬️') ]),
+      el('span', { class: 'pm-switch-lado on' }, 'respiro'),
+    ]);
+    sw.addEventListener('click', () => {
+      comRespiro = !comRespiro;
+      sw.setAttribute('aria-checked', comRespiro ? 'true' : 'false');
+      sw.classList.toggle('on', comRespiro);
+      montar();
+      tocar();
+    });
+    pm.appendChild(sw);
+
+    const btnOuvir = el('button', { class: 'botao laranja grande pm-ouvir' }, '🔊 ouvir');
+    btnOuvir.addEventListener('click', tocar);
+    pm.appendChild(btnOuvir);
+
+    container.appendChild(pm);
+    montar();
+  } else if (a.tipo === 'silencio-respira') {
+    // ===== TEMPORADA 2: OUVIR O RESPIRO =====
+    // Mostra a palavra como grupos de letras separados por "respiros" (o
+    // silêncio). Respiro médio entre letras, respiro grande entre palavras.
+    const palavra = a.palavra;
+    const morse = morsePreciso(palavra);
+
+    const sr = el('div', { class: 'sr-wrap' });
+
+    if (a.dica) sr.appendChild(el('div', { class: 'sr-dica', html: a.dica }));
+
+    const linha = el('div', { class: 'sr-linha' });
+    const sinaisRefs = [];
+    let globalIdx = 0;
+    palavra.toUpperCase().trim().split(/\s+/).forEach((pw, wi) => {
+      if (wi > 0) {
+        linha.appendChild(el('div', { class: 'sr-respiro grande' }, [
+          el('span', { class: 'sr-respiro-puff' }, '🌬️'),
+          el('span', { class: 'sr-respiro-rot' }, 'respiro grande'),
+        ]));
+      }
+      pw.split('').forEach((letra, li) => {
+        if (li > 0) {
+          linha.appendChild(el('div', { class: 'sr-respiro media' }, [
+            el('span', { class: 'sr-respiro-puff' }, '🌬️'),
+            el('span', { class: 'sr-respiro-rot' }, 'respiro'),
+          ]));
+        }
+        const cod = MORSE[letra] || '';
+        const sinais = el('div', { class: 'sr-letra-sinais' });
+        cod.split('').forEach(ch => {
+          const s = el('span', {
+            class: ch === '.' ? 'sr-sinal ponto' : 'sr-sinal traco',
+          }, ch === '.' ? '·' : '–');
+          sinaisRefs[globalIdx] = s;
+          globalIdx++;
+          sinais.appendChild(s);
+        });
+        linha.appendChild(el('div', { class: 'sr-letra' }, [
+          el('div', { class: 'sr-letra-nome' }, letra),
+          sinais,
+        ]));
+      });
+    });
+    sr.appendChild(linha);
+
+    if (a.legenda) {
+      sr.appendChild(el('div', { class: 'sr-legenda' }, [
+        el('div', { class: 'sr-leg-item' }, [
+          el('span', { class: 'sr-leg-bar curto' }), el('span', {}, 'dentro da letra'),
+        ]),
+        el('div', { class: 'sr-leg-item' }, [
+          el('span', { class: 'sr-leg-bar medio' }), el('span', {}, 'entre letras'),
+        ]),
+        el('div', { class: 'sr-leg-item' }, [
+          el('span', { class: 'sr-leg-bar grande' }), el('span', {}, 'entre palavras'),
+        ]),
+      ]));
+    }
+
+    const compassoSR = criarCompasso('pulso');
+    sr.appendChild(compassoSR);
+
+    const rotuloOuvir = '🔊 ouvir ' + palavra.toUpperCase();
+    const btn = el('button', { class: 'botao laranja grande' }, rotuloOuvir);
+    let tocandoSR = false;
+    function pararSR() {
+      pararLoop();
+      tocandoSR = false;
+      btn.textContent = rotuloOuvir;
+      sinaisRefs.forEach(s => s && s.classList.remove('ativo'));
+    }
+    btn.addEventListener('click', () => {
+      Audio.unlock();
+      if (tocandoSR) { pararSR(); return; }
+      tocandoSR = true;
+      btn.textContent = '⏸ parar';
+      tocarSequencia(morse, {
+        voz: 'sabia', compasso: compassoSR, infinito: true,
+        onElemento: (ch, idx) => {
+          sinaisRefs.forEach(s => s && s.classList.remove('ativo'));
+          const s = sinaisRefs[idx];
+          if (s) {
+            s.classList.add('ativo');
+            setTimeout(() => s && s.classList.remove('ativo'), ch === '.' ? 150 : 360);
+          }
+        },
+      });
+    });
+    sr.appendChild(btn);
+
+    container.appendChild(sr);
+  } else if (a.tipo === 'silencio-recap') {
+    // ===== TEMPORADA 2: RECAP + CELEBRAÇÃO =====
+    // Os três respiros lado a lado + ouvir uma frase com o espaçamento certo.
+    const frase = a.frase || 'OI NENA';
+    const morse = morsePreciso(frase);
+
+    const rc = el('div', { class: 'silrec-wrap' });
+
+    rc.appendChild(el('div', { class: 'silrec-titulo' }, 'Os três respiros'));
+    const legenda = el('div', { class: 'silrec-legenda' });
+    [
+      { bar: 'curto',  label: 'dentro da letra',   sub: 'respiro pequeno' },
+      { bar: 'medio',  label: 'entre as letras',   sub: 'respiro maior' },
+      { bar: 'grande', label: 'entre as palavras', sub: 'suspiro fundo' },
+    ].forEach(item => {
+      legenda.appendChild(el('div', { class: 'silrec-leg-item' }, [
+        el('span', { class: 'silrec-leg-bar ' + item.bar }),
+        el('div', { class: 'silrec-leg-txt' }, [
+          el('div', { class: 'silrec-leg-label' }, item.label),
+          el('div', { class: 'silrec-leg-sub' }, item.sub),
+        ]),
+      ]));
+    });
+    rc.appendChild(legenda);
+
+    const compassoRC = criarCompasso('pulso');
+    rc.appendChild(compassoRC);
+
+    const morseBox = el('div', {
+      class: 'morse-display silrec-morse', html: renderMorse(morse),
+    });
+    rc.appendChild(morseBox);
+
+    const rotuloRC = '🔊 ouvir "' + frase + '" com respiro';
+    const btnOuvir = el('button', { class: 'botao laranja grande' }, rotuloRC);
+    let tocandoRC = false;
+    function pararRC() {
+      pararLoop();
+      tocandoRC = false;
+      btnOuvir.textContent = rotuloRC;
+      morseBox.querySelectorAll('.ponto, .traco').forEach(e => e.classList.remove('ativo'));
+    }
+    btnOuvir.addEventListener('click', () => {
+      Audio.unlock();
+      if (tocandoRC) { pararRC(); return; }
+      tocandoRC = true;
+      btnOuvir.textContent = '⏸ parar';
+      const els = morseBox.querySelectorAll('.ponto, .traco');
+      tocarSequencia(morse, {
+        voz: 'sabia', compasso: compassoRC, infinito: true,
+        onElemento: (ch, i) => {
+          els.forEach(e => e.classList.remove('ativo'));
+          if (els[i]) {
+            els[i].classList.add('ativo');
+            setTimeout(() => els[i] && els[i].classList.remove('ativo'), ch === '.' ? 120 : 320);
+          }
+        },
+      });
+    });
+    rc.appendChild(btnOuvir);
+
+    const btnFesta = el('button', { class: 'botao secundario' }, '🎉 comemorar');
+    btnFesta.addEventListener('click', () => { Audio.unlock(); celebrar(44); });
+    rc.appendChild(btnFesta);
+
+    container.appendChild(rc);
   }
 }
 
@@ -7637,7 +8373,10 @@ function renderLetraDetalhe(tela, letra) {
    ============================================================ */
 $('#btn-voltar').addEventListener('click', () => {
   pararLoop();
+  // v10: volta um nível por vez dentro do hub de temporadas.
   if (State.modo === 'letra-detalhe') navegar('letras');
+  else if (State.modo === 'historia') navegar('mapa');
+  else if (State.modo === 'mapa') navegar('temporadas');
   else navegar('landing');
 });
 
