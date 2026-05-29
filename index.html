@@ -2755,7 +2755,7 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .pm-respiro-rot { font-family: var(--display); font-style: italic; font-size: 11px; color: var(--re-violao); font-weight: 700; }
 @keyframes pm-flutua { 0%,100% { transform: translateY(0); opacity: 0.85; } 50% { transform: translateY(-4px); opacity: 1; } }
 .pm-conta { font-family: var(--display); font-style: italic; font-size: 14px; color: var(--tinta-suave); }
-.pm-switch { display: inline-flex; align-items: center; gap: 6px; background: var(--papel-medio); border: 2px solid var(--marrom-claro); border-radius: 30px; padding: 5px 8px; }
+.pm-switch { display: inline-flex; align-items: center; gap: 6px; background: var(--papel-medio); border: 2px solid var(--marrom-claro); border-radius: 30px; padding: 8px 12px; min-height: 48px; }
 .pm-switch-lado { font-family: var(--display); font-weight: 700; font-size: 13px; color: var(--tinta-suave); padding: 0 4px; transition: color 0.2s; }
 .pm-switch.on .pm-switch-lado.on { color: var(--re-violao); }
 .pm-switch:not(.on) .pm-switch-lado.off { color: var(--marrom); }
@@ -2811,6 +2811,39 @@ button { font: inherit; color: inherit; background: transparent; border: none; c
 .pulso-sil-ponto { font-size: 40px; line-height: 1; color: var(--sol-violao); transition: transform 0.1s, color 0.1s; }
 .pulso-sil-ponto.ativa { transform: scale(1.5) translateY(-4px); color: var(--laranja-vivo); }
 .pulso-sil-puff { font-size: 24px; margin: 0 4px; animation: pm-flutua 1.6s ease-in-out infinite; }
+
+/* --- Balão de pergunta da Ana (Temporada 2) --- */
+.ana-bolha {
+  display: flex; align-items: flex-end; gap: 8px;
+  width: 100%; max-width: 380px; margin: 0 auto 10px;
+  animation: pm-pop 0.35s ease-out;
+}
+.ana-bolha-avatar {
+  width: 56px; height: 56px; flex-shrink: 0;
+  display: grid; place-items: end center;
+}
+.ana-bolha-avatar .passaro-svg { width: 56px; height: 56px; }
+.ana-bolha-fala {
+  position: relative; flex: 1;
+  background: #EAF6EE;
+  border: 2px solid var(--folha);
+  border-radius: 16px 16px 16px 4px;
+  padding: 8px 14px;
+  box-shadow: var(--sombra-suave);
+}
+/* rabicho do balão apontando pra Ana */
+.ana-bolha-fala::before {
+  content: ''; position: absolute; left: -8px; bottom: 8px;
+  border: 6px solid transparent; border-right-color: var(--folha); border-left: 0;
+}
+.ana-bolha-nome {
+  font-family: var(--display); font-weight: 800; font-size: 12px;
+  color: var(--folha-escura); letter-spacing: 0.2px; margin-bottom: 1px;
+}
+.ana-bolha-texto {
+  font-family: var(--display); font-style: italic; font-weight: 500;
+  font-size: clamp(14px, 4vw, 16px); color: var(--marrom); line-height: 1.25;
+}
 
 /* ===== RESPONSIVO ===== */
 @media (max-height: 640px) {
@@ -4147,7 +4180,7 @@ function el(tag, props = {}, children = []) {
    PERSONAGENS — fábrica de SVGs estilizados
    ============================================================ */
 function passaroSVG(personagem) {
-  // personagem: 'to' | 'ben' | 'caca' | 'jo' | 'tete' | 'tata' | 'tito' | 'lila' | 'nena' | 'sabia'
+  // personagem: 'to' | 'ben' | 'caca' | 'jo' | 'tete' | 'tata' | 'tito' | 'lila' | 'nena' | 'ana' | 'sabia'
   // Retorna um SVG configurado.
   const wrap = el('div', { class: 'passaro-' + personagem });
   let svgInner = '';
@@ -4170,6 +4203,10 @@ function passaroSVG(personagem) {
     // Lila: time de xadrez. Penagem rosa-violeta.
     lila:  { cores: { ...COR_PADRAO, peito: '#E8B8C2', dorso: '#8E6A8B', dorsoClaro: '#B093AE', cabeca: '#8E6A8B', cabecaClara: '#B093AE' }, acessorio: 'flor', scale: 0.95 },
     nena:  { cores: { ...COR_PADRAO, dorso: '#5F4329', peito: '#C99A6A' }, acessorio: 'oculos', scale: 1.2 },
+    // Ana (v11): amiga nova e curiosa da Temporada 2. Penagem verde-folha
+    // (ancorada na paleta --folha / --folha-escura / --folha-clara) — cor única
+    // na turma, sem acessório. É ela quem faz as perguntas sobre o silêncio.
+    ana:   { cores: { ...COR_PADRAO, peito: '#9FD6B5', peitoEscura: '#6FA98E', dorso: '#4A8B5A', dorsoClaro: '#7AB87A', cabeca: '#4A8B5A', cabecaClara: '#7AB87A' }, acessorio: null, scale: 0.95 },
     sabia: { cores: COR_PADRAO, acessorio: null, scale: 1 },
   };
   const cfg = config[personagem];
@@ -4203,6 +4240,22 @@ function passaroSVG(personagem) {
     if (cfg && cfg.scale !== 1) svg.style.transform = `scale(${cfg.scale})`;
   }
   return wrap.querySelector('svg');
+}
+
+// v11: balão de pergunta da Ana — a aluna curiosa da Temporada 2. É ela quem
+// faz as perguntas que abrem cada lição do silêncio. Mostra o avatar dela
+// (sabiá verde) + a pergunta num balão. Usado no topo dos renderers da T2.
+function criarBolhaAna(pergunta) {
+  const wrap = el('div', { class: 'ana-bolha' });
+  const avatar = el('div', { class: 'ana-bolha-avatar' });
+  const svg = passaroSVG('ana');
+  if (svg) avatar.appendChild(svg);
+  wrap.appendChild(avatar);
+  wrap.appendChild(el('div', { class: 'ana-bolha-fala' }, [
+    el('div', { class: 'ana-bolha-nome' }, '🐦 Ana pergunta'),
+    el('div', { class: 'ana-bolha-texto', html: pergunta }),
+  ]));
+  return wrap;
 }
 
 function celebrar(qtd = 20) {
@@ -4998,7 +5051,7 @@ const ROTEIRO = [
      −−  grudado = M      −  −  com respiro = T T
    ============================================================ */
 const ROTEIRO_T2 = [
-  // E1: NENA ABRE A TEMPORADA. O silêncio também faz parte da música.
+  // E1: CHEGA A ANA — amiga nova e curiosa. A Nena abre o tema do silêncio.
   {
     id: 't2-silencio-canta',
     titulo: 'O silêncio também canta',
@@ -5008,17 +5061,19 @@ const ROTEIRO_T2 = [
     personagens: [
       { tipo: 'nena', classe: 'nena' },
       { tipo: 'to', classe: 'protagonista' },
+      { tipo: 'ana' },
     ],
-    fala: '— Escuta o sabiá, To. Ele canta… e <b>respira</b>. Esse respiro é o <b>silêncio</b>.',
-    falaSub: '<em>"O silêncio não é vazio — é ele que diz onde uma letra <b>acaba</b> e a outra <b>começa</b>."</em>',
+    fala: 'Chegou a <b>Ana</b> — amiga nova, de penas verdes, e a que <b>mais faz pergunta</b> na escola. Hoje a Nena vai ensinar o <b>silêncio</b>.',
+    falaSub: '<em>Nena: "O silêncio é o <b>respiro</b> do sabiá — é ele que diz onde uma letra <b>acaba</b> e a outra <b>começa</b>."</em>',
     acao: {
       tipo: 'silencio-respira',
       palavra: 'TO',
+      pergunta: 'Tem <b>respiro escondido</b> até no nome do To?',
       dica: 'Ouve o <b>respiro</b> entre o T e o O — é o silêncio separando as letras.',
     },
     proximo: '✨ ver a mágica do silêncio',
   },
-  // E2: O PAR MÁGICO — I vira E E só com o respiro.
+  // E2: O PAR MÁGICO — I vira E E só com o respiro. Ana puxa a pergunta-chave.
   {
     id: 't2-par-i-ee',
     titulo: 'A mágica: I ou E·E?',
@@ -5026,9 +5081,10 @@ const ROTEIRO_T2 = [
     fundo: 'dia-claro',
     personagens: [],
     fala: '✨ Dois pontinhos <b>·&nbsp;·</b>. <b>Grudados</b>, sem respiro, é o <b>I</b>.',
-    falaSub: '<em>Mas se a Nena <b>respira</b> no meio… viram <b>E + E</b>! Mesmos pontinhos — o silêncio é que muda tudo.</em>',
+    falaSub: '<em>Nena: "Mas se eu <b>respiro</b> no meio… viram <b>E + E</b>! Os mesmos pontinhos — o silêncio é que muda tudo."</em>',
     acao: {
       tipo: 'par-magico',
+      pergunta: 'E se eu <b>não respirar</b> entre os dois pontinhos — vira o quê?',
       junto:     { morse: '..',  leitura: 'I',   conta: 'sem respiro' },
       separado:  { morse: '. .', leitura: 'E E', conta: 'com respiro' },
     },
@@ -5045,6 +5101,7 @@ const ROTEIRO_T2 = [
     falaSub: '<em>Com um respiro no meio viram <b>E + T</b>. O silêncio é quem escolhe!</em>',
     acao: {
       tipo: 'par-magico',
+      pergunta: 'Com um ponto <b>e</b> um traço, o respiro também manda aqui?',
       junto:     { morse: '.-',  leitura: 'A',   conta: 'sem respiro' },
       separado:  { morse: '. -', leitura: 'E T', conta: 'com respiro' },
     },
@@ -5061,6 +5118,7 @@ const ROTEIRO_T2 = [
     falaSub: '<em>Com respiro viram <b>T + T</b>. Sempre o silêncio mandando no recado!</em>',
     acao: {
       tipo: 'par-magico',
+      pergunta: 'E com dois tracinhos — junta num <b>M</b> ou separa em <b>T e T</b>?',
       junto:     { morse: '--',  leitura: 'M',   conta: 'sem respiro' },
       separado:  { morse: '- -', leitura: 'T T', conta: 'com respiro' },
     },
@@ -5075,27 +5133,33 @@ const ROTEIRO_T2 = [
     personagens: [
       { tipo: 'nena', classe: 'nena' },
       { tipo: 'to', classe: 'protagonista' },
+      { tipo: 'ana' },
     ],
     fala: '— E entre duas <b>palavras</b>? Aí o sabiá dá um <b>suspiro fundo</b> — o respiro maior de todos.',
-    falaSub: '<em>Respiro <b>pequeno</b>: dentro da letra. Respiro <b>médio</b>: entre letras. Respiro <b>grande</b>: entre palavras.</em>',
+    falaSub: '<em>Respiro <b>pequeno</b>: dentro da letra. <b>Médio</b>: entre letras. <b>Grande</b>: entre palavras.</em>',
     acao: {
       tipo: 'silencio-respira',
       palavra: 'OI TO',
       legenda: true,
+      pergunta: 'Quando são <b>duas palavras</b>, o respiro fica ainda maior?',
       dica: 'O silêncio <b>maior</b> entre OI e TO mostra que são <b>duas palavras</b>.',
     },
     proximo: '🌟 fechar a temporada',
   },
-  // E6: RECAP + CELEBRAÇÃO. Os três respiros, a turma cantando com pausa.
+  // E6: RECAP + CELEBRAÇÃO. Os três respiros, a turma comemorando com a Ana.
   {
     id: 't2-recap',
     titulo: 'Você ouve o silêncio!',
     bloco: { emoji: '🌟', nome: 'fim da T2' },
     fundo: 'celebracao',
-    personagens: [],
+    personagens: [
+      { tipo: 'nena', classe: 'nena' },
+      { tipo: 'to', classe: 'protagonista' },
+      { tipo: 'ana' },
+    ],
     fala: '🌟 Agora você sabe: o <b>silêncio</b> não é vazio — é o <b>respiro</b> que separa as letras e as palavras.',
-    falaSub: '<em>Bento, você ouve a música <b>e</b> o silêncio. É assim que o sabiá conta tudo direitinho.</em>',
-    acao: { tipo: 'silencio-recap', frase: 'OI NENA' },
+    falaSub: '<em>— Ana, de olho arregalado: "Então o silêncio conta <b>tanto quanto</b> o som!" A Nena pisca: "Isso, Ana."</em>',
+    acao: { tipo: 'silencio-recap', frase: 'OI NENA', pergunta: 'O <b>silêncio</b> conta tanto quanto o <b>som</b>?' },
     proximo: '🏠 voltar pras temporadas',
   },
 ];
@@ -5507,6 +5571,7 @@ function renderColeguinhas(tela) {
         { quem: 'tete', nome: 'Tete', papel: 'primeira amiga' },
         { quem: 'caca', nome: 'Caca', papel: 'ping-pong' },
         { quem: 'jo',   nome: 'Jo',   papel: 'ping-pong' },
+        { quem: 'ana',  nome: 'Ana',  papel: 'a amiga curiosa (T2)' },
       ],
     },
     {
@@ -5558,7 +5623,7 @@ function renderColeguinhas(tela) {
     }
     const fala = el('div', { class: 'decomp-fala' }, [
       el('div', { class: 'decomp-fala-texto' },
-        item.quem === 'nena' ? `oi, eu sou a ${item.nome}!` : `oi, eu sou ${item.nome === 'Tata' || item.nome === 'Tete' || item.nome === 'Caca' || item.nome === 'Jo' || item.nome === 'Lila' ? 'a ' : 'o '}${item.nome}!`),
+        item.quem === 'nena' ? `oi, eu sou a ${item.nome}!` : `oi, eu sou ${item.nome === 'Tata' || item.nome === 'Tete' || item.nome === 'Caca' || item.nome === 'Jo' || item.nome === 'Lila' || item.nome === 'Ana' ? 'a ' : 'o '}${item.nome}!`),
       el('div', { class: 'decomp-fala-papel' }, item.papel),
     ]);
     cabec.appendChild(svgGrande);
@@ -5614,7 +5679,7 @@ function renderColeguinhas(tela) {
   function renderTour() {
     tourArea.innerHTML = '';
     const item = todos[tourIdx];
-    const eh_a = item.quem === 'nena' || ['Tata','Tete','Caca','Jo','Lila'].includes(item.nome);
+    const eh_a = item.quem === 'nena' || ['Tata','Tete','Caca','Jo','Lila','Ana'].includes(item.nome);
 
     // Header com posição
     tourArea.appendChild(el('div', { class: 'tour-pos' },
@@ -7374,6 +7439,7 @@ function renderAcaoCena(container, cena) {
     // O silêncio é a ÚNICA diferença entre dois sentidos. Um switch alterna
     // "grudado" (sem respiro) ↔ "com respiro": os MESMOS sinais, mas o vazio
     // no meio cresce e a leitura muda (·· vira E·E, ·− vira E·T, −− vira T·T).
+    if (a.pergunta) container.appendChild(criarBolhaAna(a.pergunta));
     let comRespiro = false;
 
     const pm = el('div', { class: 'pm-wrap' });
@@ -7469,6 +7535,8 @@ function renderAcaoCena(container, cena) {
     const palavra = a.palavra;
     const morse = morsePreciso(palavra);
 
+    if (a.pergunta) container.appendChild(criarBolhaAna(a.pergunta));
+
     const sr = el('div', { class: 'sr-wrap' });
 
     if (a.dica) sr.appendChild(el('div', { class: 'sr-dica', html: a.dica }));
@@ -7559,6 +7627,8 @@ function renderAcaoCena(container, cena) {
     // Os três respiros lado a lado + ouvir uma frase com o espaçamento certo.
     const frase = a.frase || 'OI NENA';
     const morse = morsePreciso(frase);
+
+    if (a.pergunta) container.appendChild(criarBolhaAna(a.pergunta));
 
     const rc = el('div', { class: 'silrec-wrap' });
 

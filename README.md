@@ -12,7 +12,7 @@ Três áreas distintas, sem mistura entre si:
 
 - **História** — um hub de **temporadas**, cada uma com seu mapa de episódios e progresso (⭐).
   - **Temporada 1 · O primeiro dia** (16 episódios): To e Ben no primeiro dia de escola; conhecem os amigos (Caca, Jo, Tete, Tata, Tito, Lila); jogos cooperativos; **SOS é pedido de ajuda**; um parabéns secreto pra Nena.
-  - **Temporada 2 · O silêncio que separa** (6 episódios): o sabiá respira entre as frases — e esse **silêncio** é o que separa uma letra da outra. `··` grudado é **I**; com um respiro no meio vira **E·E** (e `·−`→A vs E·T, `−−`→M vs T·T).
+  - **Temporada 2 · O silêncio que separa** (6 episódios): a **Ana** (amiga nova e curiosa) puxa as perguntas e o sabiá respira entre as frases — esse **silêncio** é o que separa uma letra da outra. `··` grudado é **I**; com um respiro no meio vira **E·E** (e `·−`→A vs E·T, `−−`→M vs T·T).
 - **Jogo das letras** — 26 letras × 26 palavras-âncora (A→Asa, B→Bento, C→Casa…). Ouve cada letra e palavra em canto sabiá.
 - **Teclado livre** — escreve qualquer palavra, ouve em sabiá / palma / telégrafo / **guitarra**, com 4 velocidades (🐢 🚶 🐰 🐆) e loop.
 
